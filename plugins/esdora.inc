@@ -6,6 +6,7 @@ class Esdora {
 
   function __construct($pid = '') {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    module_load_include('inc', 'fedora_repository', 'CollectionClass');
     if (!empty($pid)) {
       $this->pid = $pid;
       $this->item = new Fedora_Item($pid);
@@ -116,6 +117,32 @@ class Esdora {
     return $list_of_streams;
   }
 
+  public function getListOfStreamsFromItql($results) {
+    $list_of_streams[] = array();
+    try {
+      $xml = new SimpleXMLElement($results);
+    } catch (Exception $e) {
+      drupal_set_message(t('Error getting rels-int for list of metadata !e', array('!e' => $e->getMessage())), 'error');
+      return;
+    }
+    foreach ($xml->results->result as $result) {
+      $a = $result->datastream->attributes();
+      $temp = $a['uri'];
+      $dsid = substr($temp, strrpos($temp, '/') + 1);
+      $mimeType = $result->mimeType;
+      $list_of_streams[] = array($dsid, (string) $mimeType);
+    }
+    return $list_of_streams;
+  }
+
+  /**
+   * this is function is referenced in the bigfoot cmodel and creates the object level diplay
+   *
+   * This function iterates through the list of datastreams and creates fieldsets within
+   * tabs to display the text and pdf streams.  another tab just lists all the datastreams
+   *
+   * @return returns a drupal tab tabset
+   */
   public function showFieldSets() {
     global $base_url;
     $objectHelper = new ObjectHelper();
@@ -129,41 +156,41 @@ class Esdora {
     $tabset['my_tabset'] = array(
       '#type' => 'tabset',
     );
-
+    $itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.gov/ontologies/relationships#isMetaDataFor>
+      <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
+    $collectionClass = new CollectionClass();
+    $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
     $streams = $this->getListOfStreams('*');
-    $textStreams = $this->getListOfStreamsRaw('text/plain');
-    $pdfStreams = $this->getListOfStreamsRaw('application/octet-stream');
-
+    $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
     $content = '';
-    $fieldSet = null;
-    foreach ($pdfStreams as $pdfStream) {
-      if (stripos($pdfStream, 'readme')) {
-        $pdfDsid = substr($pdfStream, strpos($pdfStream, '/') + 1);
-        $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=$base_url/fedora/repository/' .
-            $this->pid . '/' . $pdfDsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe>S</div>';
-        $fieldSet = array(
-          '#title' => $pdfDsid,
-          '#attributes' => array(),
-          '#collapsible' => TRUE,
-          '#collapsed' => TRUE,
-          '#value' => $pdfUrl,
-        );
-        $content .= theme('fieldset', $fieldSet);
-      }
-    }
-    foreach ($textStreams as $txtStream) {
-      $txtDsid = substr($txtStream, strpos($txtStream, '/') + 1);
-      $txtValue = trim($this->item->get_datastream_dissemination($txtDsid));
-      if (!empty($txtValue)) {
-        $fieldSet = array(
-          '#title' => $txtDsid,
-          '#attributes' => array(),
-          '#collapsible' => TRUE,
-          '#collapsed' => TRUE,
-          '#value' => '<div class="text">' . $txtValue . '</div>'
-        );
-        $content .= theme('fieldset', $fieldSet);
+    foreach ($metadataStreams as $streamInfo) {
+      if (!empty($streamInfo)) {
+        $dsid = $streamInfo[0];
+        $txtValue = $this->item->get_datastream_dissemination($dsid);
+        $mimeType = $streamInfo[1];
+        if ($mimeType == 'application/pdf') {
+          $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=$base_url/fedora/repository/' .
+              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe>S</div>';
+          $fieldSet = array(
+            '#title' => $dsid,
+            '#attributes' => array(),
+            '#collapsible' => TRUE,
+            '#collapsed' => TRUE,
+            '#value' => $pdfUrl,
+          );
+          $content .= theme('fieldset', $fieldSet);
+        }
+        else if (!empty($txtValue)) {
+          $fieldSet = array(
+            '#title' => $dsid,
+            '#attributes' => array(),
+            '#collapsible' => TRUE,
+            '#collapsed' => TRUE,
+            '#value' => '<div class="text">' . $txtValue . '</div>'
+          );
+          $content .= theme('fieldset', $fieldSet);
+        }
       }
     }
     $tabset['my_tabset'][0] = array(
@@ -171,8 +198,6 @@ class Esdora {
       '#title' => t('Metadata'),
       '#content' => $fdgcAsHtml,
     );
-
-    //$content=$objectHelper->getQDC($this->pid);
 
     $tabset['my_tabset'][1] = array(
       // #type and #title are the minimum requirements.
