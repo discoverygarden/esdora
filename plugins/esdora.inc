@@ -148,7 +148,7 @@ class Esdora {
     $objectHelper = new ObjectHelper();
     global $base_url;
     global $user;
-    $fdgcText = $this->item->get_datastream_dissemination("fdgc.xml");
+    $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
     $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
 
     $tabset = array();
