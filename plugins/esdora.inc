@@ -158,7 +158,7 @@ class Esdora {
     $tabset['my_tabset'] = array(
       '#type' => 'tabset',
     );
-    $itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.gov/ontologies/relationships#isMetaDataFor>
+    $itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
       <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
     $collectionClass = new CollectionClass();
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
