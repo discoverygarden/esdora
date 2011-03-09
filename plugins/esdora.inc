@@ -64,7 +64,8 @@ class Esdora {
           $include = TRUE;
           if (isset($exclude)) {
             foreach ($exclude as $value) {
-              if (stristr($ds->ID, $value)) {
+              //var_dump($value);var_dump($ds->ID);exit();
+              if (!empty($value[0]) && stristr($ds->ID, $value[0])) {
                 $include = false;
               }
             }
@@ -98,7 +99,7 @@ class Esdora {
           $include = TRUE;
           if (isset($exclude)) {
             foreach ($exclude as $value) {
-              if (stristr($ds->ID, $value)) {
+              if (stristr($ds->ID, $value[0])) {
                 $include = false;
               }
             }
@@ -130,7 +131,8 @@ class Esdora {
       $temp = $a['uri'];
       $dsid = substr($temp, strrpos($temp, '/') + 1);
       $mimeType = $result->mimeType;
-      $list_of_streams[] = array($dsid, (string) $mimeType);
+      $dsInfo = $this->item->get_datastream_info($dsid);
+      $list_of_streams[] = array($dsid, (string) $mimeType,$dsInfo->datastream->controlGroup);
     }
     return $list_of_streams;
   }
@@ -161,8 +163,8 @@ class Esdora {
     $collectionClass = new CollectionClass();
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
-    $streams = $this->getListOfStreams('*');
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $streams = $this->getListOfStreams('*',$metadataStreams);
     $content = '';
     foreach ($metadataStreams as $streamInfo) {
       if (!empty($streamInfo)) {
@@ -182,16 +184,21 @@ class Esdora {
           $content .= theme('fieldset', $fieldSet);
         }
         else if (!empty($txtValue)) {
+          if($streamInfo[2]==='R' || $streamInfo[2]==='E'){
+            $val = '<div class="text"><a href="'.$txtValue.'">' . $txtValue . '</a></div>';
+          } else {
+            $val = '<div class="text">' . $txtValue . '</div>';
+          }
           $fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
-            '#value' => '<div class="text">' . $txtValue . '</div>'
+            '#value' => $val
           );
           $content .= theme('fieldset', $fieldSet);
         }
-      }
+      } 
     }
     $tabset['my_tabset'][0] = array(
       '#type' => 'tabpage',
