@@ -172,8 +172,8 @@ class Esdora {
         $txtValue = $this->item->get_datastream_dissemination($dsid);
         $mimeType = $streamInfo[1];
         if ($mimeType == 'application/pdf') {
-          $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=$base_url/fedora/repository/' .
-              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe>S</div>';
+          $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url='.$base_url.'/fedora/repository/' .
+              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
           $fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
