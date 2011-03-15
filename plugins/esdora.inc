@@ -3,7 +3,10 @@
 // $Id$
 
 class Esdora {
-
+/**
+ *
+ * @param <type> $pid
+ */
   function __construct($pid = '') {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
@@ -12,7 +15,12 @@ class Esdora {
       $this->item = new Fedora_Item($pid);
     }
   }
-
+/**
+ *
+ * @param <type> $fieldName
+ * @param <type> $value
+ * @return string
+ */
   function htmlSnippet($fieldName, $value) {
     $html = '</td></tr>';
     $html .='<tr><td valign="top" align="right" class="mods_field"><strong>' . $fieldName . '</strong></td><td>';
@@ -26,7 +34,11 @@ class Esdora {
       return '';
     }
   }
-
+/**
+ *
+ * @param <type> $xmlString
+ * @return string
+ */
   function getFdgcAsHtml($xmlString) {
     $fdgcXml = new SimpleXMLElement($xmlString);
     $title = $fdgcXml->xpath('//title');
@@ -42,7 +54,7 @@ class Esdora {
     }
     $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
     foreach ($links as $t) {
-      $html .= $t . '<br />';
+      $html .= '<a href="'.$t.'"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
     $html .= $this->htmlSnippet("Description", $resdesc);
@@ -52,6 +64,13 @@ class Esdora {
 
   //finds datastreams that have a certain mimetype
   //excludes ones that contain any strings in the array $exclude
+  /**
+   *
+   * @global <type> $base_url
+   * @param <type> $mimeTypeToRetrieve
+   * @param <type> $exclude
+   * @return string
+   */
   function getListOfStreams($mimeTypeToRetrieve, $exclude=null) {
     // $list_of_streams = array();
     global $base_url;
@@ -87,6 +106,13 @@ class Esdora {
   //finds datastreams that have a certain mimetype
   //excludes ones that contain any strings in the array $exclude
   //returns an array of streams we are interested in
+  /**
+   *
+   * @global  $base_url
+   * @param <type> $mimeTypeToRetrieve
+   * @param <type> $exclude
+   * @return string
+   */
   function getListOfStreamsRaw($mimeTypeToRetrieve, $exclude=null) {
     $list_of_streams = array();
     global $base_url;
@@ -117,7 +143,11 @@ class Esdora {
 
     return $list_of_streams;
   }
-
+/**
+ *
+ * @param <type> $results
+ * @return <type> 
+ */
   public function getListOfStreamsFromItql($results) {
     $list_of_streams[] = array();
     try {
@@ -187,7 +217,7 @@ class Esdora {
           if($streamInfo[2]==='R' || $streamInfo[2]==='E'){
             $val = '<div class="text"><a href="'.$txtValue.'">' . $txtValue . '</a></div>';
           } else {
-            $val = '<div class="text">' . $txtValue . '</div>';
+            $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
           }
           $fieldSet = array(
             '#title' => $dsid,
