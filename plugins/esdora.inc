@@ -40,9 +40,6 @@ class Esdora {
  * @return string
  */
   function getFdgcAsHtml($xmlString) {
-    if(empty($xmlString)){
-      return "";
-    }
     $fdgcXml = new SimpleXMLElement($xmlString);
     $title = $fdgcXml->xpath('//title');
     $links = $fdgcXml->xpath('//onlink');
@@ -57,10 +54,10 @@ class Esdora {
     }
     $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
     foreach ($links as $t) {
-      $html .= '<a href="'.$t.'" target="_blank"/>'.$t . '</a><br />';
+      $html .= '<a href="'.$t.'"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
-    $html .= $this->htmlSnippet("Data Citation", $resdesc);
+    $html .= $this->htmlSnippet("Description", $resdesc);
     $html .='</td></tr></table></div></div><br />';
     return $html;
   }
@@ -200,9 +197,6 @@ class Esdora {
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
-    $metadataStreams[]='DC';
-    $metadataStreams[]='RELS-EXT';
-    $metadataStreams[]='RELS-INT';
     $streams = $this->getListOfStreams('*',$metadataStreams);
     $content = '';
     foreach ($metadataStreams as $streamInfo) {
@@ -260,26 +254,40 @@ class Esdora {
       '#content' => $streams,
     );
 	// Lines added by Biva
-    $fieldSetP1 = array(
-          '#title' => t("Lineage"),
+	$fieldSetcontent = "";
+    if( $lineage!=null)
+    {
+    	$fieldSetP1 = array(
+          '#title' => t("Data History"),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
           '#value' => $lineage,
-    );
-    $fieldSetcontent = theme('fieldset', $fieldSetP1);
-    $fieldSetP2 = array(
-          '#title' => t("Audit Trails"),
-          '#collapsible' => TRUE,
-          '#collapsed' => TRUE,
-          '#value' => $versions,
-    );
-    $fieldSetcontent .= theme('fieldset', $fieldSetP2);
+    	);
+    	$fieldSetcontent = theme('fieldset', $fieldSetP1);
+    	$fieldSetP2 = array(
+	          '#title' => t("Audit History"),
+	          '#collapsible' => TRUE,
+	          '#collapsed' => TRUE,
+	          '#value' => $versions,
+	    );
+	    $fieldSetcontent .= theme('fieldset', $fieldSetP2);
+	    
+    }
+    else {
+	    $fieldSetP2 = array(
+	          '#title' => t("Audit History"),
+	          '#collapsible' => TRUE,
+	          '#collapsed' => FALSE,
+	          '#value' => $versions,
+	    );
+	    $fieldSetcontent .= theme('fieldset', $fieldSetP2);	    
+    }
     $tabset['my_tabset'][3]=array(
-   
-      '#type' => 'tabpage',      
-      '#title' => t('Provenance'),    
-      '#content'=>$fieldSetcontent,
-    );
+	   
+	      '#type' => 'tabpage',      
+	      '#title' => t('History'),    
+	      '#content'=>$fieldSetcontent,
+	    );
     // lines added ends here
     return tabs_render($tabset);
   }
