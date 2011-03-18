@@ -182,7 +182,10 @@ class Esdora {
     global $user;
     $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
     $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
-
+	//lines added by Biva
+	$lineage = $this->getLineage( $this->pid );
+	$versions = $this->getVersionTrails($this->pid );
+	// ends here
     $tabset = array();
 
     $tabset['my_tabset'] = array(
@@ -250,9 +253,146 @@ class Esdora {
       // This will be the content of the tab.
       '#content' => $streams,
     );
-
-
+	// Lines added by Biva
+    $fieldSetP1 = array(
+          '#title' => t("Lineage"),
+          '#collapsible' => TRUE,
+          '#collapsed' => TRUE,
+          '#value' => $lineage,
+    );
+    $fieldSetcontent = theme('fieldset', $fieldSetP1);
+    $fieldSetP2 = array(
+          '#title' => t("Audit Trails"),
+          '#collapsible' => TRUE,
+          '#collapsed' => TRUE,
+          '#value' => $versions,
+    );
+    $fieldSetcontent .= theme('fieldset', $fieldSetP2);
+    $tabset['my_tabset'][3]=array(
+   
+      '#type' => 'tabpage',      
+      '#title' => t('Provenance'),    
+      '#content'=>$fieldSetcontent,
+    );
+    // lines added ends here
     return tabs_render($tabset);
   }
+  //functions added By Biva
+   public function getLineage( $pid )
+  {
+ 	 module_load_include('inc', 'fedora_repository', 'api/fedora_utils');  
+     $encodedPID = str_replace(":", "%3A", $pid);
+  	 $query_string = "select%20%24subject%20'isChildOf'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
+  	 $query_string .= $encodedPID;
+  	 //A%3A
+  	 $query_string .="%3E%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object)";
+
+     $url1 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+     $url1 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
+     $url1 .= $query_string;
+     $content = do_Curl($url1);
+     $rows = explode("\n", $content);
+     $lineage = null;
+     if( count($rows)>2 )
+     {
+	     $lineage = '<table border="2" cellpadding="5px" style="margin_bottom:5;"><th>Children</th><th>Relation</th><th>Parent</th>';
+	     $count=0;
+	     foreach ( $rows as $row )
+	     {
+	     	if ( $count > 0 && $row != null)
+	     	{
+		     	$lineage.= "<tr>";
+		     	$entities = explode(",", $row);
+		     	foreach ($entities as $entity)
+		     	{
+		      		$lineage.= "<td>";
+		     		$entity = str_replace("info:fedora/", "", $entity);
+		     		$lineage.= $entity;
+		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		     		$lineage.= "</td>";     		
+		     	}
+		        $lineage.= "</tr>" ;
+	     	}
+	     	$count = $count + 1;      
+	     }
+	     $lineage.= "</table>";
+     }
+     
+     $query_string = "select%20%20%24object'isParentof'%20%24subject%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+  	 $query_string .= $encodedPID;
+  	 //A%3A
+  	 $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
+
+     $url2 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+     $url2 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
+     $url2 .= $query_string;
+     $content = do_Curl($url2);
+     $rows = explode("\n", $content);
+     if( count($rows)>2 )
+     {
+	     $lineage.= '<table border="2" cellpadding="5px" float:left;"><th>Children</th><th>Relation</th><th>Parent</th>';
+	     $count=0;
+	     foreach ( $rows as $row )
+	     {
+	     	if ( $count > 0 && $row != null )
+	     	{
+		     	$lineage.= "<tr>";
+		     	$entities = explode(",", $row);
+		     	foreach ($entities as $entity)
+		     	{
+		      		$lineage.= "<td>";
+		     		$entity = str_replace("info:fedora/", "", $entity);
+		     		$lineage.= $entity;
+		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		     		$lineage.= "</td>";     		
+		     	}
+		        $lineage.= "</tr>" ;
+	     	}
+	     	$count = $count + 1;      
+	     }
+	     $lineage.= "</table>";
+     }
+      //curl_exec($ch);
+     //drupal_set_message(t("Invalid dsID!"));
+     return $lineage;
+    
+  }
+  function getVersionTrails( $pid )
+  {
+  	$item = new Fedora_Item( $pid );
+    $foxml = $item->export_as_foxml();
+    $audit_section = explode("<audit:auditTrail xmlns:audit=\"info:fedora/fedora-system:def/audit#\">",$foxml);
+    $audit = explode("</audit:auditTrail>" , trim($audit_section[1]));
+    $sections = explode("</audit:record>",trim($audit[0]));
+    $trails = '<table border="2" cellpadding="5px" float:left;">
+    <th>Count</th><th>Timestamp</th><th>component</th><th>Action</th><th>Justification</th>';
+    $count = count($sections);  
+    $run = 1;  
+    
+    
+    foreach($sections as $section)
+    {
+    	$tags = explode("\n",trim($section));
+    	$timestamp = substr_replace("<audit:date>","",$timestamp);
+    	$timestamp = substr_replace("</audit:date>","",$timestamp);
+    	if(strcmp($section,$sections[count])!=0)
+    	{
+	    	$trails .= "<tr><td>";
+	    	$timestamp = $tags[5];   	
+    		$trails .= $run."</td><td>";    	
+	    	$trails .= $timestamp."</td><td>";
+	    	$componentId = $tags[3];
+	    	$trails .= $componentId."</td><td>";
+	    	$action = $tags[2];
+	    	$trails .= $action."</td><td>";
+	    	$Justification = $tags[6];
+	    	$trails .= $Justification."</td></tr>";
+	    	$run +=1;
+    	}  
+    }
+    $trails .= "</table>"; 
+    return $trails;
+  }
+
 
 }
