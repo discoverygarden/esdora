@@ -40,6 +40,9 @@ class Esdora {
  * @return string
  */
   function getFdgcAsHtml($xmlString) {
+    if(empty($xmlString)){
+      return "";
+    }
     $fdgcXml = new SimpleXMLElement($xmlString);
     $title = $fdgcXml->xpath('//title');
     $links = $fdgcXml->xpath('//onlink');
@@ -54,7 +57,7 @@ class Esdora {
     }
     $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
     foreach ($links as $t) {
-      $html .= '<a href="'.$t.'"/>'.$t . '</a><br />';
+      $html .= '<a href="'.$t.'" target="_blank"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
     $html .= $this->htmlSnippet("Description", $resdesc);
@@ -194,6 +197,9 @@ class Esdora {
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $metadataStreams[]='DC';
+    $metadataStreams[]='RELS-EXT';
+    $metadataStreams[]='RELS-INT';
     $streams = $this->getListOfStreams('*',$metadataStreams);
     $content = '';
     foreach ($metadataStreams as $streamInfo) {
@@ -239,7 +245,7 @@ class Esdora {
     $tabset['my_tabset'][1] = array(
       // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
-      '#title' => t('Description'),
+      '#title' => t('Data Citation'),
       // This will be the content of the tab.
       '#content' => $content,
     );
