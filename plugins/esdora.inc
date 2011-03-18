@@ -60,7 +60,7 @@ class Esdora {
       $html .= '<a href="'.$t.'" target="_blank"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
-    $html .= $this->htmlSnippet("Description", $resdesc);
+    $html .= $this->htmlSnippet("Data Citation", $resdesc);
     $html .='</td></tr></table></div></div><br />';
     return $html;
   }
@@ -245,7 +245,7 @@ class Esdora {
     $tabset['my_tabset'][1] = array(
       // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
-      '#title' => t('Data Citation'),
+      '#title' => t('Description'),
       // This will be the content of the tab.
       '#content' => $content,
     );
