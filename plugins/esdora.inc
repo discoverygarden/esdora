@@ -178,7 +178,7 @@ class Esdora {
   public function showFieldSets() {
     global $base_url;
     $objectHelper = new ObjectHelper();
-    global $base_url;
+    //global $base_url;
     global $user;
     $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
     $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
