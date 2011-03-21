@@ -44,7 +44,7 @@ class Esdora {
     $title = $fdgcXml->xpath('//title');
     $links = $fdgcXml->xpath('//onlink');
     $resdesc = $fdgcXml->xpath('//resdesc');
-    $contactPerson = $fdgcXml->xpath('//cntper');
+    $contactPerson = $fdgcXml->xpath('//cntperp/cntper');
     $html = '';
 
     $html .= '<table align="left"><tr><td valign="top" align="right" class="fedora_mods_field" width="15%">';
@@ -54,10 +54,10 @@ class Esdora {
     }
     $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
     foreach ($links as $t) {
-      $html .= '<a href="'.$t.'"/>'.$t . '</a><br />';
+      $html .= '<a href="'.$t.'" target="_blank"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
-    $html .= $this->htmlSnippet("Description", $resdesc);
+    $html .= $this->htmlSnippet("Data Citation", $resdesc);
     $html .='</td></tr></table></div></div><br />';
     return $html;
   }
@@ -77,7 +77,10 @@ class Esdora {
     $html = '';
     $this->datastreams_list = $this->item->get_datastreams_list_as_SimpleXML();
     if ($this->datastreams_list != FALSE) {
+      $html .='<table><tr><td>File</td><td>Checksum</td><td>Checksum Type</td></tr>';
       foreach ($this->datastreams_list->datastreamDef as $ds) {
+        $ds_info = $this->item->get_datastream_info($ds->ID);
+        //var_dump($ds_info->datastream);exit();
         if ($mimeTypeToRetrieve == $ds->MIMEType || $mimeTypeToRetrieve == '*') {
           // $list_of_streams[] = $ds;
           $include = TRUE;
@@ -94,13 +97,14 @@ class Esdora {
             if (empty($label)) {
               $label = $ds->ID;
             }
-            $html .= '<a href = "' . $base_url . '/fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a><br />';
+            $html .= '<tr><td>';
+            $html .= '<a href = "' . $base_url . '/fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> '.$ds_info->datastream->checksum.'</td><td> '.$ds_info->datastream->checksumType.'</td></tr>';
           }
         }
       }
     }
     //return $list_of_streams;
-    return $html;
+    return $html .'</table>';
   }
 
   //finds datastreams that have a certain mimetype
@@ -197,6 +201,9 @@ class Esdora {
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $metadataStreams[]='DC';
+    $metadataStreams[]='RELS-EXT';
+    $metadataStreams[]='RELS-INT';
     $streams = $this->getListOfStreams('*',$metadataStreams);
     $content = '';
     foreach ($metadataStreams as $streamInfo) {
@@ -206,7 +213,7 @@ class Esdora {
         $mimeType = $streamInfo[1];
         if ($mimeType == 'application/pdf') {
           $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url='.$base_url.'/fedora/repository/' .
-              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
+              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
           $fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
@@ -389,7 +396,7 @@ class Esdora {
     	$tags = explode("\n",trim($section));
     	$timestamp = substr_replace("<audit:date>","",$timestamp);
     	$timestamp = substr_replace("</audit:date>","",$timestamp);
-    	if(strcmp($section,$sections[count])!=0)
+    	if(strcmp($section,$sections[$count])!=0)
     	{
 	    	$trails .= "<tr><td>";
 	    	$timestamp = $tags[5];   	
