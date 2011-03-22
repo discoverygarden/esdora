@@ -298,7 +298,7 @@ class Esdora {
   {
  	 module_load_include('inc', 'fedora_repository', 'api/fedora_utils');  
      $encodedPID = str_replace(":", "%3A", $pid);
-  	 $query_string = "select%20%24subject%20'isChildOf'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
+  	 $query_string = "select%20%24subject%20'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
   	 $query_string .= $encodedPID;
   	 //A%3A
   	 $query_string .="%3E%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object)";
@@ -311,7 +311,7 @@ class Esdora {
      $lineage = null;
      if( count($rows)>2 )
      {
-	     $lineage = '<table border="2" cellpadding="5px" style="margin_bottom:5;"><th>Children</th><th>Relation</th><th>Parent</th>';
+	     $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Children</th><th>Relation</th><th>Parent</th>';
 	     $count=0;
 	     foreach ( $rows as $row )
 	     {
@@ -322,7 +322,12 @@ class Esdora {
 		     	foreach ($entities as $entity)
 		     	{
 		      		$lineage.= "<td>";
-		     		$entity = str_replace("info:fedora/", "", $entity);
+		     		$entity = str_replace("info:fedora/", "", $entity);		     		
+		     		$entity = str_replace("DerivedFrom", "derived from", $entity);
+		   			$label = preg_split("/:/", $entity);
+		   			if ($label[1]!=null)
+		   			$lineage.= $label[1];
+		   			else
 		     		$lineage.= $entity;
 		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		     		$lineage.= "</td>";     		
@@ -334,9 +339,8 @@ class Esdora {
 	     $lineage.= "</table>";
      }
      
-     $query_string = "select%20%20%24object'isParentof'%20%24subject%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+     $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
   	 $query_string .= $encodedPID;
-  	 //A%3A
   	 $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
 
      $url2 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
@@ -357,7 +361,12 @@ class Esdora {
 		     	foreach ($entities as $entity)
 		     	{
 		      		$lineage.= "<td>";
-		     		$entity = str_replace("info:fedora/", "", $entity);
+		     		$entity = str_replace("info:fedora/", "", $entity);		     		
+		     		$entity = str_replace("DerivedFrom", "derived from", $entity);
+		   			$label = preg_split("/:/", $entity);
+		   			if ($label[1]!=null)
+		   			$lineage.= $label[1];
+		   			else
 		     		$lineage.= $entity;
 		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 		     		$lineage.= "</td>";     		
