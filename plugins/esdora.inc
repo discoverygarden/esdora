@@ -57,7 +57,7 @@ class Esdora {
       $html .= '<a href="'.$t.'"/>'.$t . '</a><br />';
     }
     $html .= $this->htmlSnippet("Contact", $contactPerson);
-    $html .= $this->htmlSnippet("Description", $resdesc);
+    $html .= $this->htmlSnippet("Citation", $resdesc);
     $html .='</td></tr></table></div></div><br />';
     return $html;
   }
@@ -233,26 +233,28 @@ class Esdora {
         }
       } 
     }
-    $tabset['my_tabset'][0] = array(
+	$tabset['my_tabset'][0] = array(
+      // #type and #title are the minimum requirements.
+      '#type' => 'tabpage',
+      '#title' => t('Items'),
+      // This will be the content of the tab.
+      '#content' => $streams,
+	);
+    $tabset['my_tabset'][1] = array(
       '#type' => 'tabpage',
       '#title' => t('Metadata'),
       '#content' => $fdgcAsHtml,
     );
 
-    $tabset['my_tabset'][1] = array(
+    $tabset['my_tabset'][2] = array(
       // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
       '#title' => t('Description'),
       // This will be the content of the tab.
       '#content' => $content,
     );
-    $tabset['my_tabset'][2] = array(
-      // #type and #title are the minimum requirements.
-      '#type' => 'tabpage',
-      '#title' => t('Items'),
-      // This will be the content of the tab.
-      '#content' => $streams,
-    );
+    
+   
 	// Lines added by Biva
 	$fieldSetcontent = "";
     if( $lineage!=null)
@@ -389,7 +391,7 @@ class Esdora {
     	$tags = explode("\n",trim($section));
     	$timestamp = substr_replace("<audit:date>","",$timestamp);
     	$timestamp = substr_replace("</audit:date>","",$timestamp);
-    	if(strcmp($section,$sections[count])!=0)
+		if(strcmp($section,$sections[$count])!=0)
     	{
 	    	$trails .= "<tr><td>";
 	    	$timestamp = $tags[5];   	
@@ -401,7 +403,7 @@ class Esdora {
 	    	$trails .= $action."</td><td>";
 	    	$Justification = $tags[6];
 	    	$trails .= $Justification."</td></tr>";
-	    	$run +=1;
+	    	$run+=1;
     	}  
     }
     $trails .= "</table>"; 
