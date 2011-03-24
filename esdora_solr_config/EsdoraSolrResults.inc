@@ -62,10 +62,12 @@ extends IslandoraSolrResults {
         $title = (string)$title[0];
       }
       $output .= '<tr><td><div class="thumbnail">';
-			$output.='<a href="'.$base_url.'/fedora/repository/'.$pid.'" title="'.$title.'"><img src="'.$base_url.'/fedora/'.$pid.'/TN"/></a></div></td>';
+			//$output.='<a href="'.$base_url.'/fedora/repository/'.$pid.'" title="'.$title.'"><img src="'.$base_url.'/fedora/'.$pid.'/TN"/></a></div></td>';
+      $output.='<a href="'.$base_url.'/fedora/repository/'.$pid.'" title="'.$title.'"><img src="https://esdora.ornl.gov/sites/default/files/islandora_img/folder-2-icon.png"/></a></div></td>';
+      
       $output .= '<td><div class="metadata"><a href="'.$base_url.'/fedora/repository/'.$pid.'">'.$title.'</a><ul>';
 			if (!empty($doc->Creator)){
-		 	 $output.='<li><b>Author:</b>&nbsp;';
+		 	 $output.='<li><b>Contact:</b>&nbsp;';
        if(is_array($doc->Creator)){
        foreach ($doc->Creator as $author) {
          $output .= "$author, ";
@@ -88,13 +90,13 @@ extends IslandoraSolrResults {
       }
 
       if (!empty($doc->Summary)){
-		 	 $output.='<li><b>Format:</b>&nbsp;';
+		 	 $output.='<li><b>Summary:</b>&nbsp;';
        if(is_array($doc->Summary)){
        foreach ($doc->Summary as $summary) {
          $output .= "$summary, ";
         }
        } else {
-         $output .=$doc->Summary;
+         $output .=substr((string)$doc->Summary,0,200);
        }
         $output .= '</li>';
       }
