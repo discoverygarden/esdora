@@ -22,7 +22,7 @@ class IslandoraCollection {
     $xml = new SimpleXMLElement($dc);
     $returnValue = '';
     foreach ($xml->children('http://purl.org/dc/elements/1.1/') as $key => $entry) {
-      if ($key == 'title' || $key == 'description') {//get the dc description and or title
+      if ($key == 'description') {//get the dc description and or title
         $returnValue .= ' ' . (string) $entry;
       }
     }
