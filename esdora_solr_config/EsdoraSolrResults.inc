@@ -96,7 +96,7 @@ extends IslandoraSolrResults {
          $output .= "$summary, ";
         }
        } else {
-         $output .=substr((string)$doc->Summary,0,200);
+         $output .=substr((string)$doc->Summary,0,200).'...';
        }
         $output .= '</li>';
       }

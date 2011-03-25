@@ -88,7 +88,7 @@ class Esdora {
             foreach ($exclude as $value) {
               //var_dump($value);var_dump($ds->ID);exit();
               if (!empty($value[0]) && stristr($ds->ID, $value[0])) {
-                $include = false;
+                $include = FALSE;
               }
             }
           }
@@ -201,11 +201,16 @@ class Esdora {
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     global $user;
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
-    $metadataStreams[]='DC';
-    $metadataStreams[]='RELS-EXT';
-    $metadataStreams[]='RELS-INT';
-    $streams = $this->getListOfStreams('*',$metadataStreams);
+    $non_data_streams = $metadataStreams;
+    $non_data_streams[]= array('DC','text/xml','X');
+    $non_data_streams[]= array('RELS-EXT','text/xml','X');
+    $non_data_streams[]= array('RELS-INT','text/xml','X');
+   // var_dump($metadataStreams);exit();
+    $streams = $this->getListOfStreams('*',$non_data_streams);//get everything except metadata
     $content = '';
+    $config = array('indent' => TRUE,
+                'output-xml' => TRUE,
+                'wrap' => 200);
     foreach ($metadataStreams as $streamInfo) {
       if (!empty($streamInfo)) {
         $dsid = $streamInfo[0];
@@ -227,7 +232,12 @@ class Esdora {
           if($streamInfo[2]==='R' || $streamInfo[2]==='E'){
             $val = '<div class="text"><a href="'.$txtValue.'">' . $txtValue . '</a></div>';
           } else {
-            $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+            //if($mimeType =='text/xml'){
+              //$val = '<div class="text"><pre>' . tidy_parse_string($txtValue,$config,'UTF8') . '</pre></div>';
+            //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+            //}else{
+              $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+            //}
           }
           $fieldSet = array(
             '#title' => $dsid,
