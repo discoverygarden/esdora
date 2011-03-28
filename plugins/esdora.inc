@@ -101,8 +101,10 @@ class Esdora {
             }
             $html .= '<tr><td>';
             if ($ds_info->datastream->controlGroup == 'E' || $ds_info->datastream->controlGroup == 'R') {//link to external viewer
-              $txtValue = $this->item->get_datastream_dissemination($ds->ID);
-              $html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
+              //$txtValue = $this->item->get_datastream_dissemination($ds->ID);
+              //$html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
+              //don't do anything here as we don't want show external links here
+
             }
             else {
               $html .= '<a href = "' . $base_url . '/fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
