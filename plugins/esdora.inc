@@ -83,7 +83,6 @@ class Esdora {
       $html .='<table><tr><td>File</td><td>Checksum</td><td>Checksum Type</td></tr>';
       foreach ($this->datastreams_list->datastreamDef as $ds) {
         $ds_info = $this->item->get_datastream_info($ds->ID);
-        //var_dump($ds_info->datastream);exit();
         if ($mimeTypeToRetrieve == $ds->MIMEType || $mimeTypeToRetrieve == '*') {
           // $list_of_streams[] = $ds;
           $include = TRUE;
@@ -101,9 +100,9 @@ class Esdora {
               $label = $ds->ID;
             }
             $html .= '<tr><td>';
-            if ($ds_info->datastream->checksumType == 'DISABLED') {
+            if ($ds_info->datastream->controlGroup == 'E' || $ds_info->datastream->controlGroup == 'R') {//link to external viewer
               $txtValue = $this->item->get_datastream_dissemination($ds->ID);
-              $html .= '<a href = "' . $textValue . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
+              $html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
             }
             else {
               $html .= '<a href = "' . $base_url . '/fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
@@ -209,8 +208,16 @@ class Esdora {
       <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
     $collectionClass = new CollectionClass();
     $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+
+    //<rdf:Description rdf:about="info:fedora/es:ISLSCP_II.C4_VEGETATION_PERCENTAGE/OPENDAP-VIEW">
+    //<myns:isViewerFor rdf:resource="info:fedora/es:ISLSCP_II.C4_VEGETATION_PERCENTAGE"></myns:isViewerFor> 
+    //</rdf:Description> 
+    $viewerQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
+      <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType';
+    $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
     global $user;
     $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $viewerStreams = $this->getListofStreamsFromItql($viewerResults);
     $non_data_streams = $metadataStreams;
     $non_data_streams[] = array('DC', 'text/xml', 'X');
     $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
@@ -243,12 +250,13 @@ class Esdora {
             $val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
           }
           else {
-            //if($mimeType =='text/xml'){
-            //$val = '<div class="text"><pre>' . tidy_parse_string($txtValue,$config,'UTF8') . '</pre></div>';
-            //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
-            //}else{
-            $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
-            //}
+            if ($mimeType == 'text/xml') {
+              $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
+              //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+            }
+            else {
+              $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+            }
           }
           $fieldSet = array(
             '#title' => $dsid,
@@ -315,8 +323,38 @@ class Esdora {
       '#title' => t('History'),
       '#content' => $fieldSetcontent,
     );
+    $viewerContent = $this->createViewerContent($viewerStreams);
+
+    $tabset['my_tabset'][4] = array(
+      '#type' => 'tabpage',
+      '#title' => t('External Viewers'),
+      '#content' => $viewerContent,
+    );
     // lines added ends here
     return tabs_render($tabset);
+  }
+
+  function createViewerContent($viewerStreams) {
+    //var_dump($viewerStreams);exit();
+    if (empty($viewerStreams)) {
+      return;
+    }
+    $content = '';
+    foreach ($viewerStreams as $viewer) {
+      if (!empty($viewer)) {
+        $txtValue = $this->item->get_datastream_dissemination($viewer[0]);
+        $viewerUrl = '<div class="text"><iframe src="' . $txtValue . '" &embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
+        $fieldSet = array(
+          '#title' => $viewer[0],
+          '#attributes' => array(),
+          '#collapsible' => TRUE,
+          '#collapsed' => TRUE,
+          '#value' => $viewerUrl
+        );
+        $content .= theme('fieldset', $fieldSet);
+      }
+    }
+    return $content;
   }
 
   //functions added By Biva
