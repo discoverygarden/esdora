@@ -50,7 +50,8 @@ class Esdora {
     $contactPerson = $fdgcXml->xpath('//cntperp/cntper');
     $html = '';
 
-    $html .= '<table align="left"><tr><td valign="top" align="right" class="fedora_mods_field" width="15%">';
+    //$html .= '<table align="left"><tr><td valign="top" align="right" class="fedora_mods_field" width="15%">';
+	$html .= '<table><tr><td align="right" valign="top" class="fedora_mods_field" width="15%">';
     $html .='<strong>Title</strong></td><td>';
     foreach ($title as $t) {
       $html .= $t . '<br />';
@@ -236,8 +237,10 @@ class Esdora {
         $txtValue = $this->item->get_datastream_dissemination($dsid);
         $mimeType = $streamInfo[1];
         if ($mimeType == 'application/pdf') {
-          $pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
-              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
+          //$pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
+             // $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
+			 $pdfUrl = '<div class="text"><iframe marginheight="0" marginwidth="0" src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
+              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded=TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
           $fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
@@ -277,11 +280,13 @@ class Esdora {
       '#title' => t('Items'),
       // This will be the content of the tab.
       '#content' => $streams,
+	  '#weight' => '0',
     );
     $tabset['my_tabset'][1] = array(
       '#type' => 'tabpage',
       '#title' => t('Metadata'),
       '#content' => $fdgcAsHtml,
+	  '#weight' => '1',
     );
 
     $tabset['my_tabset'][2] = array(
@@ -290,6 +295,7 @@ class Esdora {
       '#title' => t('Description'),
       // This will be the content of the tab.
       '#content' => $content,
+	  '#weight' => '2',
     );
 
 
@@ -324,6 +330,7 @@ class Esdora {
       '#type' => 'tabpage',
       '#title' => t('History'),
       '#content' => $fieldSetcontent,
+	  '#weight' => '3',
     );
     $viewerContent = $this->createViewerContent($viewerStreams);
 
@@ -331,6 +338,7 @@ class Esdora {
       '#type' => 'tabpage',
       '#title' => t('External Viewers'),
       '#content' => $viewerContent,
+	  '#weight' => '4',
     );
     // lines added ends here
     return tabs_render($tabset);
