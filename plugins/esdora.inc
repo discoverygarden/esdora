@@ -227,7 +227,7 @@ class Esdora {
     $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
     // var_dump($metadataStreams);exit();
     $streams = $this->getListOfStreams('*', $non_data_streams); //get everything except metadata
-    $content = '';
+    $content = '<ul>';
     $config = array('indent' => TRUE,
       'output-xml' => TRUE,
       'wrap' => 200);
@@ -236,44 +236,65 @@ class Esdora {
         $dsid = $streamInfo[0];
         $txtValue = $this->item->get_datastream_dissemination($dsid);
         $mimeType = $streamInfo[1];
+        //$content.=$mimeType;
         if ($mimeType == 'application/pdf') {
-          //$pdfUrl = '<div class="text"><iframe src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
-             // $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded="TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
-			 $pdfUrl = '<div class="text"><iframe marginheight="0" marginwidth="0" src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
+        /*
+		$pdfUrl = '<div class="text"><iframe marginheight="0" marginwidth="0" src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
               $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded=TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
-          $fieldSet = array(
+         
+         $fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#value' => $pdfUrl,
           );
-          $content .= theme('fieldset', $fieldSet);
+          $content .= theme('fieldset', $fieldSet);*/
+          // Adding a light box instead of fieldset
+          	$url= 'http://docs.google.com/viewer?url='.'https://esdora.ornl.gov'.'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
+        	$pdf = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
+        	$content.='<li>'.$pdf.'</li>';
+        }
+        else if($mimeType == 'image/jpeg')
+        {
+        	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	$img = '<div class="text"><a href='.$url.' rel="lightframe[|width:800px; height:600px; scrolling: auto;]">'.$dsid.'</a></div>';
+        	$content.='<li>'.$img.'</li>';
+        	
         }
         else if (!empty($txtValue)) {
           if ($streamInfo[2] === 'R' || $streamInfo[2] === 'E') {
-            $val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
+          	$val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
           }
           else {
             if ($mimeType == 'text/xml') {
-              $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
+            //  $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
               //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+             	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        		$val = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
             }
             else {
-              $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+              //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+              $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	  $val = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
             }
           }
-          $fieldSet = array(
+          /*$fieldSet = array(
             '#title' => $dsid,
             '#attributes' => array(),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#value' => $val
           );
-          $content .= theme('fieldset', $fieldSet);
+          $content .= theme('fieldset', $fieldSet);*/
+          $content.='<li>'.$val.'</li>';
         }
       }
     }
+    $content.='</ul>';
     $tabset['my_tabset'][0] = array(
       // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
@@ -308,7 +329,7 @@ class Esdora {
         '#collapsed' => TRUE,
         '#value' => $lineage,
       );
-      $fieldSetcontent = theme('fieldset', $fieldSetP1);
+      $fieldSetcontent .= theme('fieldset', $fieldSetP1);
       $fieldSetP2 = array(
         '#title' => t("Audit History"),
         '#collapsible' => TRUE,
@@ -332,15 +353,16 @@ class Esdora {
       '#content' => $fieldSetcontent,
 	  '#weight' => '3',
     );
-    $viewerContent = $this->createViewerContent($viewerStreams);
-
+  	// lines added ends here
+	  
+	$viewerContent = $this->createViewerContent($viewerStreams);	
     $tabset['my_tabset'][4] = array(
       '#type' => 'tabpage',
       '#title' => t('External Viewers'),
       '#content' => $viewerContent,
 	  '#weight' => '4',
     );
-    // lines added ends here
+    
     return tabs_render($tabset);
   }
 
@@ -353,17 +375,24 @@ class Esdora {
     foreach ($viewerStreams as $viewer) {
       if (!empty($viewer)) {
         $txtValue = $this->item->get_datastream_dissemination($viewer[0]);
-        $viewerUrl = '<div class="text"><iframe src="' . $txtValue . '" &embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
+        /*$viewerUrl = '<div class="text"><iframe src="' . $txtValue . '" &embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
         $fieldSet = array(
           '#title' => $viewer[0],
           '#attributes' => array(),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
-          '#value' => $viewerUrl
+          '#value' => $viewerUrl,
         );
-        $content .= theme('fieldset', $fieldSet);
+        $content .= theme('fieldset', $fieldSet);*/
+      	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $viewer[0];
+        $val = '<div class="text"><a href='.$txtValue.' rel="lightframe">'.$viewer[0].'</a></div>';
+        $content.='<li>'.$val.'</li>';
       }
     }
+    if(!empty($content))
+    {
+    	$content = '<ul>'.$content.'</ul>';
+    }   
     return $content;
   }
 
@@ -382,7 +411,7 @@ class Esdora {
     $content = do_Curl($url1);
     $rows = explode("\n", $content);
     $lineage = null;
-    if (count($rows) > 2) {
+    /* if (count($rows) > 2) {
       $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Children</th><th>Relation</th><th>Parent</th>';
       $count = 0;
       foreach ($rows as $row) {
@@ -406,8 +435,29 @@ class Esdora {
         $count = $count + 1;
       }
       $lineage.= "</table>";
+    }*/
+    $graph .= 'digraph G{node[shape=ellipse,fontsize=12,style=filled,color=lightblue2,fontname = "Helvetica-Outline"];';
+    if (count($rows) > 2) {
+      $count = 0;
+      foreach ($rows as $row) 
+      { 
+      	if ($count > 0 && $row != null) {
+      		 $entities = explode(",", $row);
+      		 $subject = str_replace("info:fedora/", "", $entities[0]);
+      		 $subjects = explode(".",$subject);
+	      	 $subject = $subjects[count($subjects)-1];
+      		 $object = str_replace("info:fedora/", "", $entities[2]);
+      		 $objects = explode(".",$object);
+	      	 $object = $objects[count($objects)-1];
+			 $graph .= $object.'->'.$subject.';';
+			 //$graph.=$row;
+      	}
+      	$count = $count + 1;
+      }
+      
     }
-
+	
+	//$lineage .= $graph;
     $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
     $query_string .= $encodedPID;
     $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
@@ -417,7 +467,7 @@ class Esdora {
     $url2 .= $query_string;
     $content = do_Curl($url2);
     $rows = explode("\n", $content);
-    if (count($rows) > 2) {
+   /* if (count($rows) > 2) {
       $lineage.= '<table border="2" cellpadding="5px" float:left;"><th>Children</th><th>Relation</th><th>Parent</th>';
       $count = 0;
       foreach ($rows as $row) {
@@ -442,8 +492,30 @@ class Esdora {
       }
       $lineage.= "</table>";
     }
-    //curl_exec($ch);
-    //drupal_set_message(t("Invalid dsID!"));
+    */
+	  if (count($rows) > 2) {
+	      
+	      $count = 0;
+	      foreach ($rows as $row) 
+	      { 
+	      	if ($count > 0 && $row != null) {
+	      		 $entities = explode(",", $row);
+	      		 $subject = str_replace("info:fedora/", "", $entities[0]);
+	      		 $subjects = explode(".",$subject);
+	      		 $subject = $subjects[count($subjects)-1];
+	      		 $object = str_replace("info:fedora/", "", $entities[2]);
+	      		 $objects = explode(".",$object);
+	      		 $object = $objects[count($objects)-1];
+				 $graph .= $object.'->'.$subject.';';
+				 //$graph.=$row;
+	      	}
+	      	$count = $count + 1;
+	      }
+	     
+	    }
+	$graph .='}';
+	$lineage = graphviz_filter_process($graph);
+	//$lineage = $graph;
     return $lineage;
   }
 
