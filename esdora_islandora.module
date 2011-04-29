@@ -43,3 +43,40 @@ function esdora_islandora_help($path, $arg) {
       return t('Use this page to grab a list of items from a Fedora collection.');
   }
 }
+
+/**
+ * 
+ * This is a php call back function referenced in the islandora/xsl/sparcal-to-html.xsl
+ * the call back is a general mechanism for php xslt engine to call any functions from 
+ * within the xsl template, and the function can be located in any loaded php libraries files.
+ * The usage is in the context of the php core class, XsltProcessor. The class need to register the callback: ->registerPHPFunctions()
+ * which may put restrictions on which functions - parseContent() has no restriction, maiking 
+ * it open to all php functions. 
+ * @see ObjectHelper.inc->parseContent($content, $pid, $dsId, $collection, $pageNumber = NULL)
+ * @see XSLTProcessor
+ * @param string $collection_pid: the PID of the collection object
+ */
+function get_child_count($collection_pid) {
+	
+	$query='select count (select $object from <#ri>
+			where $object <fedora-rels-ext:isMemberOf> <info:fedora/' .$collection_pid . '>)
+			from <#ri>
+			where
+			$s $p $o';
+	
+	$query_string = htmlentities(urlencode($query));
+	$content = '';
+    $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+    $url .= "?lang=itql&format=Simple&query=" . $query_string;
+    $content .= (do_curl($url));
+   	if(strlen($content)>0) {
+	   	$tokens = explode('"', trim($content));
+	   	$value = $tokens[1];
+	   	if($value==0) {
+			return "Data Object";
+	   	}else {
+	   		return 'Collection Object (total items: ' . $value . ')';
+	   	}   	
+   }
+   return $content;
+}
