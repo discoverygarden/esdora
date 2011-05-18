@@ -36,7 +36,6 @@ class Esdora {
       return '';
     }
   }
-
   /**
    *
    * @param <type> $xmlString
@@ -192,122 +191,23 @@ class Esdora {
    * @return returns a drupal tab tabset
    */
   public function showFieldSets() {
-    global $base_url;
-    $objectHelper = new ObjectHelper();
-    //global $base_url;
-    global $user;
-    $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
-    $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
-    //lines added by Biva
-    $lineage = $this->getLineage($this->pid);
-    $versions = $this->getVersionTrails($this->pid);
-    // ends here
-    $tabset = array();
-
-    $tabset['my_tabset'] = array(
+  	/*$path = drupal_get_path('module', 'esdora_islandora');
+  	$path.='/ajaxtabs.js';
+  	drupal_add_js($path);
+  	$tabset['my_tabset'] = array(
       '#type' => 'tabset',
     );
-    $itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
-      <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
-    $collectionClass = new CollectionClass();
-    $itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
-
-    //<rdf:Description rdf:about="info:fedora/es:ISLSCP_II.C4_VEGETATION_PERCENTAGE/OPENDAP-VIEW">
-    //<myns:isViewerFor rdf:resource="info:fedora/es:ISLSCP_II.C4_VEGETATION_PERCENTAGE"></myns:isViewerFor> 
-    //</rdf:Description> 
-    $viewerQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
-      <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType';
-    $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
-    global $user;
-    $metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
-    $viewerStreams = $this->getListofStreamsFromItql($viewerResults);
-    $non_data_streams = $metadataStreams;
-    $non_data_streams[] = array('DC', 'text/xml', 'X');
-    $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
-    $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
-    // var_dump($metadataStreams);exit();
-    $streams = $this->getListOfStreams('*', $non_data_streams); //get everything except metadata
-    $content = '<ul>';
-    $config = array('indent' => TRUE,
-      'output-xml' => TRUE,
-      'wrap' => 200);
-    foreach ($metadataStreams as $streamInfo) {
-      if (!empty($streamInfo)) {
-        $dsid = $streamInfo[0];
-        $txtValue = $this->item->get_datastream_dissemination($dsid);
-        $mimeType = $streamInfo[1];
-        //$content.=$mimeType;
-        if ($mimeType == 'application/pdf') {
-        /*
-		$pdfUrl = '<div class="text"><iframe marginheight="0" marginwidth="0" src="http://docs.google.com/viewer?url=' . $base_url . '/fedora/repository/' .
-              $this->pid . '/' . $dsid . '/preview.pdf' . '&embedded=TRUE" style="width:600px; height:500px;" frameborder="0"></iframe></div>';
-         
-         $fieldSet = array(
-            '#title' => $dsid,
-            '#attributes' => array(),
-            '#collapsible' => TRUE,
-            '#collapsed' => TRUE,
-            '#value' => $pdfUrl,
-          );
-          $content .= theme('fieldset', $fieldSet);*/
-          // Adding a light box instead of fieldset
-          	$url= 'http://docs.google.com/viewer?url='.'https://esdora.ornl.gov'.'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
-        	$pdf = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
-        	$content.='<li>'.$pdf.'</li>';
-        }
-        else if($mimeType == 'image/jpeg')
-        {
-        	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
-        	//$url="http://www.google.com";
-        	$img = '<div class="text"><a href='.$url.' rel="lightframe[|width:800px; height:600px; scrolling: auto;]">'.$dsid.'</a></div>';
-        	$content.='<li>'.$img.'</li>';
-        	
-        }
-        else if (!empty($txtValue)) {
-          if ($streamInfo[2] === 'R' || $streamInfo[2] === 'E') {
-          	$val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
-          }
-          else {
-            if ($mimeType == 'text/xml') {
-            //  $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
-              //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
-             	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
-        	//$url="http://www.google.com";
-        		$val = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
-            }
-            else {
-              //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
-              $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
-        	//$url="http://www.google.com";
-        	  $val = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
-            }
-          }
-          /*$fieldSet = array(
-            '#title' => $dsid,
-            '#attributes' => array(),
-            '#collapsible' => TRUE,
-            '#collapsed' => TRUE,
-            '#value' => $val
-          );
-          $content .= theme('fieldset', $fieldSet);*/
-          $content.='<li>'.$val.'</li>';
-        }
-      }
-    }
-    $content.='</ul>';
-    $tabset['my_tabset'][0] = array(
+  	 $tabset['my_tabset'][0] = array(
       // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
       '#title' => t('Items'),
       // This will be the content of the tab.
-      '#content' => $streams,
-	  '#weight' => '0',
-    );
+      '#content' => $this->getItems(),
+	);
     $tabset['my_tabset'][1] = array(
       '#type' => 'tabpage',
       '#title' => t('Metadata'),
-      '#content' => $fdgcAsHtml,
-	  '#weight' => '1',
+      '#content' =>$this->getMetadata(),
     );
 
     $tabset['my_tabset'][2] = array(
@@ -315,62 +215,54 @@ class Esdora {
       '#type' => 'tabpage',
       '#title' => t('Description'),
       // This will be the content of the tab.
-      '#content' => $content,
-	  '#weight' => '2',
+      '#content' =>$this->getDescription(),
     );
-
-
-    // Lines added by Biva
-    $fieldSetcontent = "";
-    if ($lineage != null) {
-      $fieldSetP1 = array(
-        '#title' => t("Data History"),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#value' => $lineage,
-      );
-      $fieldSetcontent .= theme('fieldset', $fieldSetP1);
-      $fieldSetP2 = array(
-        '#title' => t("Audit History"),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#value' => $versions,
-      );
-      $fieldSetcontent .= theme('fieldset', $fieldSetP2);
-    }
-    else {
-      $fieldSetP2 = array(
-        '#title' => t("Audit History"),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-        '#value' => $versions,
-      );
-      $fieldSetcontent .= theme('fieldset', $fieldSetP2);
-    }
     $tabset['my_tabset'][3] = array(
+      // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
       '#title' => t('History'),
-      '#content' => $fieldSetcontent,
-	  '#weight' => '3',
-    );
-  	// lines added ends here
-	  
-	$viewerContent = $this->createViewerContent($viewerStreams);	
-    $tabset['my_tabset'][4] = array(
-      '#type' => 'tabpage',
-      '#title' => t('External Viewers'),
-      '#content' => $viewerContent,
-	  '#weight' => '4',
-    );
-    
+      // This will be the content of the tab.
+      '#content' => $this->getHistory(),
+    );   
     return tabs_render($tabset);
+  */
+  	   	
+  	$path = drupal_get_path('module', 'esdora_islandora');
+  	$path.='/ajaxtabs.js';
+  	drupal_add_js($path);
+  	$items = $this->getItems();
+  	$cont= '<button class="Items">Items</button>';
+  	$cont.= '<button class="Metadata">Metadata</button>';
+  	$cont.= '<button class="Description">Description</button>'; 
+  	$cont.= '<button class="History">History</button>'; 	
+  	$cont.= '<div id="div1">'.$items.'</div>';  	
+  	$cont.='<input type="hidden" id="pid" value='.$this->pid.'"/>';
+	return $cont;
+  	
+  }  
+  
+  function getItems()
+  {
+  	global $base_url;
+  	$collectionClass = new CollectionClass();
+  	$itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+  	$metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+  	$non_data_streams = $metadataStreams;
+    $non_data_streams[] = array('DC', 'text/xml', 'X');
+    $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
+    $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
+    // var_dump($metadataStreams);exit();
+    $streams = $this->getListOfStreams('*', $non_data_streams);
+    
+    return $streams;
   }
-
+  
   function createViewerContent($viewerStreams) {
     //var_dump($viewerStreams);exit();
     if (empty($viewerStreams)) {
       return;
     }
+    global $base_url;
     $content = '';
     foreach ($viewerStreams as $viewer) {
       if (!empty($viewer)) {
@@ -395,9 +287,122 @@ class Esdora {
     }   
     return $content;
   }
+  function getMetadata()
+  {
+  	$fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
+  	$fdgcAsHtml = $this->getFdgcAsHtml($fdgcText); 	
+  	
+    return $fdgcAsHtml;
+  	
+  }
+  function initlightBox()
+  {
+  	module_load_install('lightbox2');
+		
+  }
+  function getDescription()
+  {
+  	global $base_url;
+  	global $user;
+  	$content = '<ul>';
+  	$collectionClass = new CollectionClass();
+  	$itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
+    <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
+  	$itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+  	$metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $config = array('indent' => TRUE,
+      'output-xml' => TRUE,
+      'wrap' => 200);
+    foreach ($metadataStreams as $streamInfo) {
+      if (!empty($streamInfo)) {
+        $dsid = $streamInfo[0];
+        $txtValue = $this->item->get_datastream_dissemination($dsid);
+        $mimeType = $streamInfo[1];
+        //$content.=$mimeType;
+        if ($mimeType == 'application/pdf'||$mimeType == 'application/msword') 
+        {
+       		$url= 'http://docs.google.com/viewer?url='.'https://esdora.ornl.gov'.
+       		'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
+        	$pdf = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
+        	$content.='<li>'.$pdf.'</li>';
+        }
+        else if($mimeType == 'image/jpeg')
+        {
+        	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	$img = '<div class="text"><a href='.$url.' rel="lightframe[|width:800px; height:600px; scrolling: auto;]">'.$dsid.'</a></div>';
+        	$content.='<li>'.$img.'</li>';
+        	
+        }
+        else if (!empty($txtValue)) {
+          if ($streamInfo[2] === 'R' || $streamInfo[2] === 'E') {
+          	$val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
+          }
+          else {
+            if ($mimeType == 'text/xml'||$mimeType == 'text/plain') {
+            //  $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
+              //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+             	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        		$val = '<div class="text"><a href='.$url.' rel="lightframe" onclick="'.$this->initlightBox().'">'.$dsid.'</a></div>';
+            }
+            else {
+              //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+              $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	  $val = '<div class="text"><a href='.$url.'>'.$dsid.'</a></div>';
+            }
+          }
+          $content.='<li>'.$val.'</li>';
+        }
+      }
+    }
+   return $content;
+  }
 
+  function getHistory()
+  {
+	  	$fieldSetcontent = "<div>";
+	  	$pid = $this->pid;
+	  	if( module_exists('graphviz_filter'))
+	  	{
+	  		$lineage = $this->getLineageAsGraph($pid);
+	  	}
+	  	else 
+			$lineage= $this->getLineage($pid);
+		$versions = $this->getVersionTrails($pid);
+	    if( $lineage!=null)
+	    {
+	    	$fieldSetP1 = array(
+	          '#title' => t("Data History"),
+	          '#collapsible' => TRUE,
+	          '#collapsed' => TRUE,
+	          '#value' => $lineage,
+	    	);
+	    	$fieldSetcontent.= theme('fieldset', $fieldSetP1);
+	    	$fieldSetP2 = array(
+		          '#title' => t("Audit History"),
+		          '#collapsible' => TRUE,
+		          '#collapsed' => TRUE,
+		          '#value' => $versions,
+		    );
+		    $fieldSetcontent .= theme('fieldset', $fieldSetP2);
+		    
+	    }
+	    else {
+		    $fieldSetP2 = array(
+		          '#title' => t("Audit History"),
+		          '#collapsible' => TRUE,
+		          '#collapsed' => FALSE,
+		          '#value' => $versions,
+		    );
+		    $fieldSetcontent.= theme('fieldset', $fieldSetP2);	    
+	    }
+	    $fieldSetcontent.='</div>';
+	   return $fieldSetcontent;	    
+  }
   //functions added By Biva
-  public function getLineage($pid) {
+  function getLineageAsGraph($pid) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
     $encodedPID = str_replace(":", "%3A", $pid);
     $query_string = "select%20%24subject%20'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
@@ -411,36 +416,14 @@ class Esdora {
     $content = do_Curl($url1);
     $rows = explode("\n", $content);
     $lineage = null;
-    /* if (count($rows) > 2) {
-      $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Children</th><th>Relation</th><th>Parent</th>';
-      $count = 0;
-      foreach ($rows as $row) {
-        if ($count > 0 && $row != null) {
-          $lineage.= "<tr>";
-          $entities = explode(",", $row);
-          foreach ($entities as $entity) {
-            $lineage.= "<td>";
-            $entity = str_replace("info:fedora/", "", $entity);
-            $entity = str_replace("DerivedFrom", "derived from", $entity);
-            $label = preg_split("/:/", $entity);
-            if ($label[1] != null)
-              $lineage.= $label[1];
-            else
-              $lineage.= $entity;
-            //echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            $lineage.= "</td>";
-          }
-          $lineage.= "</tr>";
-        }
-        $count = $count + 1;
-      }
-      $lineage.= "</table>";
-    }*/
+    $isnull = true;
     $graph .= 'digraph G{node[shape=ellipse,fontsize=12,style=filled,color=lightblue2,fontname = "Helvetica-Outline"];';
     if (count($rows) > 2) {
       $count = 0;
+      $isnull = false;
       foreach ($rows as $row) 
       { 
+      	
       	if ($count > 0 && $row != null) {
       		 $entities = explode(",", $row);
       		 $subject = str_replace("info:fedora/", "", $entities[0]);
@@ -467,56 +450,121 @@ class Esdora {
     $url2 .= $query_string;
     $content = do_Curl($url2);
     $rows = explode("\n", $content);
-   /* if (count($rows) > 2) {
-      $lineage.= '<table border="2" cellpadding="5px" float:left;"><th>Children</th><th>Relation</th><th>Parent</th>';
+  	if (count($rows) > 2) 
+  	{	      
       $count = 0;
-      foreach ($rows as $row) {
-        if ($count > 0 && $row != null) {
-          $lineage.= "<tr>";
-          $entities = explode(",", $row);
-          foreach ($entities as $entity) {
-            $lineage.= "<td>";
-            $entity = str_replace("info:fedora/", "", $entity);
-            $entity = str_replace("DerivedFrom", "derived from", $entity);
-            $label = preg_split("/:/", $entity);
-            if ($label[1] != null)
-              $lineage.= $label[1];
-            else
-              $lineage.= $entity;
-            //echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            $lineage.= "</td>";
-          }
-          $lineage.= "</tr>";
-        }
-        $count = $count + 1;
+      $isnull = false;
+      foreach ($rows as $row) 
+      { 
+      	if ($count > 0 && $row != null) {
+      		 $entities = explode(",", $row);
+      		 $subject = str_replace("info:fedora/", "", $entities[0]);
+      		 $subjects = explode(".",$subject);
+      		 $subject = $subjects[count($subjects)-1];
+      		 $object = str_replace("info:fedora/", "", $entities[2]);
+      		 $objects = explode(".",$object);
+      		 $object = $objects[count($objects)-1];
+			 $graph .= $object.'->'.$subject.';';
+			 //$graph.=$row;
+      	}
+      	$count = $count + 1;
       }
-      $lineage.= "</table>";
+     
     }
-    */
-	  if (count($rows) > 2) {
-	      
-	      $count = 0;
-	      foreach ($rows as $row) 
-	      { 
-	      	if ($count > 0 && $row != null) {
-	      		 $entities = explode(",", $row);
-	      		 $subject = str_replace("info:fedora/", "", $entities[0]);
-	      		 $subjects = explode(".",$subject);
-	      		 $subject = $subjects[count($subjects)-1];
-	      		 $object = str_replace("info:fedora/", "", $entities[2]);
-	      		 $objects = explode(".",$object);
-	      		 $object = $objects[count($objects)-1];
-				 $graph .= $object.'->'.$subject.';';
-				 //$graph.=$row;
-	      	}
-	      	$count = $count + 1;
-	      }
-	     
-	    }
 	$graph .='}';
 	$lineage = graphviz_filter_process($graph);
 	//$lineage = $graph;
+	if( $isnull ==true )
+	return null;
+	else
     return $lineage;
+  }
+  
+ function getLineage( $pid )
+  {
+ 	 module_load_include('inc', 'fedora_repository', 'api/fedora_utils');  
+     $encodedPID = str_replace(":", "%3A", $pid);
+  	 $query_string = "select%20%24subject%20'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
+  	 $query_string .= $encodedPID;
+  	 //A%3A
+  	 $query_string .="%3E%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object)";
+
+     $url1 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+     $url1 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
+     $url1 .= $query_string;
+     $content = do_Curl($url1);
+     $rows = explode("\n", $content);
+     $lineage = null;
+     if( count($rows)>2 )
+     {
+	     $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Children</th><th>Relation</th><th>Parent</th>';
+	     $count=0;
+	     foreach ( $rows as $row )
+	     {
+	     	if ( $count > 0 && $row != null)
+	     	{
+		     	$lineage.= "<tr>";
+		     	$entities = explode(",", $row);
+		     	foreach ($entities as $entity)
+		     	{
+		      		$lineage.= "<td>";
+		     		$entity = str_replace("info:fedora/", "", $entity);		     		
+		     		$entity = str_replace("DerivedFrom", "derived from", $entity);
+		   			$label = preg_split("/:/", $entity);
+		   			if ($label[1]!=null)
+		   			$lineage.= $label[1];
+		   			else
+		     		$lineage.= $entity;
+		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		     		$lineage.= "</td>";     		
+		     	}
+		        $lineage.= "</tr>" ;
+	     	}
+	     	$count = $count + 1;      
+	     }
+	     $lineage.= "</table>";
+     }
+     
+     $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+  	 $query_string .= $encodedPID;
+  	 $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
+
+     $url2 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+     $url2 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
+     $url2 .= $query_string;
+     $content = do_Curl($url2);
+     $rows = explode("\n", $content);
+     if( count($rows)>2 )
+     {
+	     $lineage.= '<table border="2" cellpadding="5px" float:left;"><th>Children</th><th>Relation</th><th>Parent</th>';
+	     $count=0;
+	     foreach ( $rows as $row )
+	     {
+	     	if ( $count > 0 && $row != null )
+	     	{
+		     	$lineage.= "<tr>";
+		     	$entities = explode(",", $row);
+		     	foreach ($entities as $entity)
+		     	{
+		      		$lineage.= "<td>";
+		     		$entity = str_replace("info:fedora/", "", $entity);		     		
+		     		$entity = str_replace("DerivedFrom", "derived from", $entity);
+		   			$label = preg_split("/:/", $entity);
+		   			if ($label[1]!=null)
+		   			$lineage.= $label[1];
+		   			else
+		     		$lineage.= $entity;
+		     		//echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		     		$lineage.= "</td>";     		
+		     	}
+		        $lineage.= "</tr>" ;
+	     	}
+	     	$count = $count + 1;      
+	     }
+	     $lineage.= "</table>";
+     }
+     return $lineage;
+    
   }
 
   function getVersionTrails($pid) {
@@ -549,7 +597,6 @@ class Esdora {
         $run+=1;
       }
     }
-    $trails .= "</table>";
     return $trails;
   }
 

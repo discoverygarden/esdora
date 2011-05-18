@@ -3,7 +3,7 @@
 // $Id$
 
 /*
- * Created on Aug 10, 2007
+ * Created 2011
  *
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
@@ -16,9 +16,13 @@
  * Stores this info in the drupal variables table.
  * the name and pid can also be passed as url parameters
  */
+
+
 function esdora_islandora_admin() {
-  return "";
+return "";
+ 
 }
+
 
 function esdora_islandora_admin_settings_submit($form, $form_values) {
   drupal_set_message("Custom form handler.");
@@ -29,7 +33,17 @@ function esdora_islandora_admin_settings_submit($form, $form_values) {
  * calls the fedora_repositorys_admin form
  */
 function esdora_islandora_menu() {
- return "";
+ //return "";
+
+ return array(
+  'ajax/gettabs' => array(
+ 	  'access callback' => 'user_access',
+      'page callback' => 'esdora_islandora_get_tabs',
+      'type' => MENU_CALLBACK,
+  		
+    ),
+
+  );
 }
 
 /**
@@ -43,6 +57,7 @@ function esdora_islandora_help($path, $arg) {
       return t('Use this page to grab a list of items from a Fedora collection.');
   }
 }
+
 
 /**
  * 
@@ -80,3 +95,56 @@ function get_child_count($collection_pid) {
    }
    return $content;
 }
+
+function esdora_islandora_get_tabs(){
+	$pid = $_POST['pid'];
+	$case = $_POST['tab'];
+	$pid = str_replace('"/', "", $pid);
+	$pid= trim($pid);
+	$case = trim($case);
+	module_load_include('inc','esdora_islandora','plugins/esdora');
+	$esdora = new Esdora($pid);
+	$content ='<div>';
+	if( $case == "Items")
+		$content.= $esdora->getItems();	
+	elseif( $case == "Metadata")
+	{
+		$content.= $esdora->getMetadata();	
+	}
+	elseif( $case == "Description")
+		$content.= $esdora->getDescription();
+	elseif( $case == "History")
+		$content.= $esdora->getHistory();			
+	else
+		$content.= 'oops';
+	
+	$content.='</div>';
+	//$content = '<table><tr><td>title</td><td>this is a test</td></tr></table>';
+	echo drupal_json($content);
+}
+
+
+ function magic_tabs_Esdora_callback( $active=0,$pid ) {
+ 	module_load_include('inc', 'esdora_islandora','plugins/esdora');
+ 	$active = 0;
+ 	$esdora = new Esdora($pid);
+ 	  $tabs[] = array(
+	    'title' => t('Items'),
+  	    'content' =>$esdora->getItems(),
+	  );
+	  $tabs[] = array(
+	    'title' => t('Metadata'),
+	    'content' => $esdora->getMetadata(),
+	  );
+	  $tabs[] = array(
+	    'title' => t('Description'),
+	    'content' => $esdora->getDescription(),
+	  );
+	  $tabs[] = array(
+	    'title' => t('History'),
+	    'content' => $esdora->getHistory(),
+	  );
+	 return $tabs;
+}
+
+
