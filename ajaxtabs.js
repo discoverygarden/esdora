@@ -4,7 +4,7 @@ $(document).ready(function(){
 	  pid = $('#pid').val();
 	  ajaxUrl=Drupal.settings.basePath;
 	  ajaxUrl=ajaxUrl.concat("ajax/gettabs");
-	  alert(ajaxUrl);
+	  //alert(ajaxUrl);
 	  $('.Items').click(function(){
 		 $('#div1').html('loading...');
 		 $.ajax({

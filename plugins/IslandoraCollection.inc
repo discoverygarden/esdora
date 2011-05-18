@@ -29,6 +29,23 @@ class IslandoraCollection {
     return $returnValue;
   }
 
+  
+  
+  //TODO: I want to use this query instead, where I put in code, or in query ds of collection object?
+  
+  /*  	$itqlQuery = 'select $object $title $content from <#ri>
+  	
+                             where ($object <dc:title> $title
+                             and $object <fedora-model:hasModel> $content
+                             and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $pid . '>
+                             
+                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>)
+                             minus $content <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+                             order by $title'; //note: compared to the default query (see CollectionClass->getRelatedItems(), 
+  											   //this query took out or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $pid . '>/)
+  											   //because we want to preserve "isMemberOF" for atomic content model	
+  	
+  */
 }
 
 ?>
