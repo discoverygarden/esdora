@@ -15,6 +15,10 @@ class Esdora {
       $this->pid = $pid;
       $this->item = new Fedora_Item($pid);
     }
+
+    $path = drupal_get_path('module', 'esdora_islandora');
+  	$path_compound=$path . '/ajaxtabs_compound.js';
+  	drupal_add_js($path_compound);    
   }
     /**
    * this is function is referenced in the bigfoot cmodel and creates the object level diplay
@@ -60,10 +64,7 @@ class Esdora {
     );   
     return tabs_render($tabset);
   */
-  	   	
-  	$path = drupal_get_path('module', 'esdora_islandora');
-  	$path.='/ajaxtabs.js';
-  	drupal_add_js($path);
+
   	$items = $this->getItems();
   	$cont= '<button class="Items">Items</button>';
   	$cont.= '<button class="Metadata">Metadata</button>';
@@ -79,18 +80,17 @@ class Esdora {
   
   function getItems() //Items tab
   {
+  	
   	global $base_url;
   	$collectionClass = new CollectionClass();
   	
   	$itqlViewerQuery='select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
       <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType';
-    $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
-  	
-  	
-  	$itqlMetaDataQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
+
+    $itqlMetaDataQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
       <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; 
   	
-  	$itqlViwerResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+    $itqlViwerResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
     $itqlMetadataResults = $collectionClass->getRelatedItems($this->pid, $itqlMetaDataQuery, $limit = NULL, $offset = NULL);
   	
   	$ds_list_viewers = $this->getListOfStreamsFromItql($itqlViwerResults);
@@ -469,7 +469,9 @@ class Esdora {
     // $list_of_streams = array();
     global $base_url;
     $html = '';
-    $this->datastreams_list = $this->item->get_datastreams_list_as_SimpleXML();
+    if($this->datastreams_list==FALSE) { //used the cached copy if we have it
+    	$this->datastreams_list = $this->item->get_datastreams_list_as_SimpleXML();
+    }
     if ($this->datastreams_list != FALSE) {
       $html .='<table><tr><td>File</td><td>Checksum</td><td>Checksum Type</td></tr>';
       foreach ($this->datastreams_list->datastreamDef as $ds) {
