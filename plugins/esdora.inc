@@ -473,7 +473,7 @@ class Esdora {
    * @return string
    */
   function getFdgcAsHtml($xmlString) {
-    $fdgcXml = new SimpleXMLElement($xmlString);
+/*    $fdgcXml = new SimpleXMLElement($xmlString);
     $title = $fdgcXml->xpath('//title');
     $links = $fdgcXml->xpath('//onlink');
     $resdesc = $fdgcXml->xpath('//resdesc');
@@ -493,6 +493,30 @@ class Esdora {
     $html .= $this->htmlSnippet("Contact", $contactPerson);
     $html .= $this->htmlSnippet("Citation", $resdesc);
     $html .='</td></tr></table></div></div><br />';
+    return $html;
+*/
+    $fdgcXml = new SimpleXMLElement($xmlString);
+    $title = $fdgcXml->xpath('//title');
+    $links = $fdgcXml->xpath('//onlink');
+    $resdesc = $fdgcXml->xpath('//resdesc');
+    $contactPerson = $fdgcXml->xpath('//cntperp/cntper');
+    $html = '';
+   // $link;
+
+    //$html .= '<table align="left"><tr><td valign="top" align="right" class="fedora_mods_field" width="15%">';
+	$html .= '<table><tr><td align="right" valign="top" class="fedora_mods_field" width="15%">';
+    $html .='<strong>Title</strong></td><td>';
+    foreach ($title as $t) {
+      $html .= $t . '<br />';
+    }
+    $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
+   foreach ($links as $t) {
+      $html .= '<a class="links" href="' . $t . '" target="_blank" onClick="sendRequest('.$t.');">' . $t . '</a><br />';
+      }
+    $html .= $this->htmlSnippet("Contact", $contactPerson);
+    $html .= $this->htmlSnippet("Citation", $resdesc);
+    $html .='</td></tr></table>';
+   // echo $html;
     return $html;
   }
 
