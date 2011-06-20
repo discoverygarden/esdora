@@ -66,12 +66,24 @@ class Esdora {
   */
 
   	$items = $this->getItems();
+	$collectionClass = new CollectionClass(); 
+  	$viewerQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
+      <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType';
+     
+  	$viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);   
+  	$viewerStreams = $this->getListofStreamsFromItql($viewerResults);
   	$cont= '<button class="Items">Items</button>';
   	$cont.= '<button class="Metadata">Metadata</button>';
   	$cont.= '<button class="Description">Description</button>'; 
-  	$cont.= '<button class="History">History</button>'; 	
+  	$cont.= '<button class="History">History</button>'; 
+	$viewerContent = $this->createViewerContent($viewerStreams);	
+  	if($viewerContent!=null)
+  	{
+  		$cont.= '<button class="Viewers">External Viewers</button>'; 			
+  	
+  	}  	
   	$cont.= '<div id="div1">'.$items.'</div>';  	
-  	$cont.='<input type="hidden" id="pid" value='.$this->pid.'"/>';
+  	$cont.='<input type="hidden" id="pid" value="'.$this->pid.'"/>';
 	return $cont;
   }  
   
@@ -80,7 +92,6 @@ class Esdora {
   
   function getItems() //Items tab
   {
-  	
   	global $base_url;
   	$collectionClass = new CollectionClass();
   	
@@ -101,7 +112,7 @@ class Esdora {
     $non_data_streams[] = array('DC', 'text/xml', 'X');
     $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
     $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
-  	//drupal_set_message('<pre>'. print_r($non_data_streams, TRUE) .'</pre>');
+    //drupal_set_message('<pre>'. print_r($non_data_streams, TRUE) .'</pre>');
     $streams = $this->getListOfStreams('*', $non_data_streams);
     
     return $streams;
@@ -109,10 +120,20 @@ class Esdora {
   
   function getMetadata() //metadata tab
   {
+	$fdgcText;
+        $fdgcAsHtml;
+
+	try {
   	$fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
   	$fdgcAsHtml = $this->getFdgcAsHtml($fdgcText); 	
-  	
-    return $fdgcAsHtml;
+        return $fdgcAsHtml;
+  	}
+	catch (Exception $e) {
+	  $msg = 'caught exception: ' . $e->getMessage();
+	  $msg .= '; fgdc='.$fdgcText.'; html='.$fdgcAsHtml.'; pid='.$this->item->pid; 	
+	  return $msg;	
+	}
+
   	
   }
   function initlightBox()
@@ -144,14 +165,15 @@ class Esdora {
         {
        		$url= 'http://docs.google.com/viewer?url='.$base_url.
        		'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
-        	$pdf = '<div class="text"><a href='.$url.' rel="lightframe">'.$dsid.'</a></div>';
+       		
+        	$pdf = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
         	$content.='<li>'.$pdf.'</li>';
         }
         else if($mimeType == 'image/jpeg')
         {
         	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
         	//$url="http://www.google.com";
-        	$img = '<div class="text"><a href='.$url.' rel="lightframe[|width:800px; height:600px; scrolling: auto;]">'.$dsid.'</a></div>';
+        	$img = '<div class="text"><a class="fb_dynamic" href='.$url.'>'.$dsid.'</a></div>';
         	$content.='<li>'.$img.'</li>';
         	
         }
@@ -165,7 +187,7 @@ class Esdora {
               //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
              	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
         	//$url="http://www.google.com";
-        		$val = '<div class="text"><a href='.$url.' rel="lightframe" onclick="'.$this->initlightBox().'">'.$dsid.'</a></div>';
+        		$val = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
             }
             else {
               //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
@@ -245,7 +267,10 @@ class Esdora {
     $rows = explode("\n", $content);
     $lineage = null;
     $isnull = true;
-    $graph .= 'digraph G{node[shape=ellipse,fontsize=12,style=filled,color=lightblue2,fontname = "Helvetica-Outline"];';
+    $html = '<div style="width:inherit;">';
+    $process = array();
+    $cnt = 0;
+    $graph .= 'digraph G{rankdir=LR node[shape=ellipse,fontsize=10,style=filled,color=lightblue2,fontname = "Helvetica-Outline"];';
     if (count($rows) > 2) {
       $count = 0;
       $isnull = false;
@@ -260,7 +285,11 @@ class Esdora {
       		 $object = str_replace("info:fedora/", "", $entities[2]);
       		 $objects = explode(".",$object);
 	      	 $object = $objects[count($objects)-1];
-			 $graph .= $object.'->'.$subject.';';
+			 $graph .= $object.'->'.$subject;
+			 $label='[label="process",fontsize=10, fontname = "Helvetica-Outline"];';
+			 $graph.=$label;
+			 $process[$cnt]=$object.' process '.$subject;
+			 $cnt.=+1;
 			 //$graph.=$row;
       	}
       	$count = $count + 1;
@@ -292,7 +321,11 @@ class Esdora {
       		 $object = str_replace("info:fedora/", "", $entities[2]);
       		 $objects = explode(".",$object);
       		 $object = $objects[count($objects)-1];
-			 $graph .= $object.'->'.$subject.';';
+			 $graph .= $object.'->'.$subject;
+			 $label='[label="process",fontsize=10, fontname = "Helvetica-Outline"];';
+			 $graph.=$label;
+			 $process[$cnt]=$object.' process '.$subject;
+			 $cnt.=+1;
 			 //$graph.=$row;
       	}
       	$count = $count + 1;
@@ -301,11 +334,18 @@ class Esdora {
     }
 	$graph .='}';
 	$lineage = graphviz_filter_process($graph);
+	$html.=$lineage;
+	$html.='</div><br><div>';
+	foreach ($process as $desc)
+	{
+		$html.='<a style="font-size:8;font-family:Helvetica-Outline;font-style:italic;" href="http://www.gogle.com">'.$desc.'</a><br>';
+	}
+	$html.='</div>';
 	//$lineage = $graph;
 	if( $isnull ==true )
 	return null;
 	else
-    return $lineage;
+    return $html;
   }
   
  function getLineage( $pid )
@@ -556,7 +596,7 @@ class Esdora {
         );
         $content .= theme('fieldset', $fieldSet);*/
       	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $viewer[0];
-        $val = '<div class="text"><a href='.$txtValue.' rel="lightframe">'.$viewer[0].'</a></div>';
+        $val = '<div class="text"><a href='.$txtValue.' class="a_link"  target="_blank">'.$viewer[0].'</a></div>';
         $content.='<li>'.$val.'</li>';
       }
     }

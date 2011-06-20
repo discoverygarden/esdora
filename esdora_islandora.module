@@ -33,17 +33,18 @@ function esdora_islandora_admin_settings_submit($form, $form_values) {
  * calls the fedora_repositorys_admin form
  */
 function esdora_islandora_menu() {
- //return "";
-
- return array(
+  module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+  return array(
   'ajax/gettabs/compound' => array(
  	  'access callback' => 'user_access',
+	  'access arguments'=>array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
       'page callback' => 'esdora_islandora_get_tabs_compound',
       'type' => MENU_CALLBACK,
   		
     ),
   'ajax/gettabs/atomic' => array(
  	  'access callback' => 'user_access',
+ 	  'access arguments'=>array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
       'page callback' => 'esdora_islandora_get_tabs_atomic',
       'type' => MENU_CALLBACK,
   		
@@ -103,7 +104,7 @@ function get_child_count($collection_pid) {
 }
 
 function esdora_islandora_get_tabs_compound() {
-	
+	//echo drupal_json('call compound');return;	
 	$pid = $_POST['pid'];
 	$case = $_POST['tab'];
 	$pid = str_replace('"/', "", $pid);
@@ -111,6 +112,7 @@ function esdora_islandora_get_tabs_compound() {
 	$case = trim($case);
 	module_load_include('inc','esdora_islandora','plugins/esdora');
 	$esdora = new Esdora($pid);
+	//echo drupal_json('call hi ' . $case);return;	
 	esdora_islandora_get_tabs($esdora, $case);
 }
 
@@ -127,7 +129,8 @@ function esdora_islandora_get_tabs_atomic() {
 }
 
 function esdora_islandora_get_tabs($esdora_obj, $case){
-	$content ='<div>';
+
+	$content='';
 	if( $case == "Items")
 		$content.= $esdora_obj->getItems();	
 	elseif( $case == "Metadata")
@@ -141,9 +144,7 @@ function esdora_islandora_get_tabs($esdora_obj, $case){
 	else
 		$content.= 'oops';
 	
-	$content.='</div>';
-	
-	//$content = '<table><tr><td>title</td><td>this is a test</td></tr></table>';
+	//$content = 'Hi calling ' . $case ;
 	echo drupal_json($content);
 }
 
