@@ -1,0 +1,52 @@
+@CHARSET "ISO-8859-1";
+#tabs {
+    border-bottom: 1px solid #BBBBBB;
+    border-collapse: collapse;
+    height: auto;
+    line-height: normal;
+    list-style: none outside none;
+    margin: 5px;
+    padding: 0 0 0 1em;
+    white-space: nowrap;
+}
+#tabs li {
+    background-image: none;
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+#tabs li.active a {
+    -moz-border-bottom-colors: none;
+    -moz-border-image: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #FFFFFF;
+    border-color: #BBBBBB #BBBBBB #FFFFFF;
+    border-style: solid;
+    border-width: 1px;
+    height: auto;
+    margin-right: 0.5em;
+    padding: 0 1em;
+    text-decoration: none;
+}
+#tabs li a {
+    background-color: #E6E6E6;
+    border-color: #BBBBBB;
+    border-style: solid solid none;
+    border-width: 1px;
+    height: auto;
+    margin-right: 0.5em;
+    padding: 0 1em;
+    text-decoration: none;
+}
+button
+{
+	background-color: #E6E6E6;
+	color: #005A8C;
+}
+button:visited
+{
+	background-color: #BBBBBB;
+}
+	
