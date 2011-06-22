@@ -122,7 +122,6 @@ function esdora_islandora_get_tabs_atomic() {
 	$pid = str_replace('"/', "", $pid);
 	$pid= trim($pid);
 	$case = trim($case);
-	
 	module_load_include('inc','esdora_islandora','plugins/esdora_atomic');
 	$esdora = new Esdora_Atomic($pid);
 	esdora_islandora_get_tabs($esdora, $case);
@@ -138,7 +137,10 @@ function esdora_islandora_get_tabs($esdora_obj, $case){
 		$content.= $esdora_obj->getMetadata();	
 	}
 	elseif( $case == "Description")
+	{
 		$content.= $esdora_obj->getDescription();
+		
+	}
 	elseif( $case == "History")
 		$content.= $esdora_obj->getHistory();			
 	else

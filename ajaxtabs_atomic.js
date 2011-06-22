@@ -90,6 +90,9 @@ $(document).ready(function(){
 			 $('#viewers').css('display','none');			 
 			
 			 $('#div1').html('loading...');
+			  var dWidth  = $(document).width()*.50;
+			  var dHeight = $(document).height()*.75;
+			 
 			 $.ajax({
 					type:'POST',
 					url:ajaxUrl,
@@ -102,6 +105,16 @@ $(document).ready(function(){
 						 $('.Description').css('background-color','#E6E6E6');
 						 $('.Viewers').css('background-color','#E6E6E6');
 						 Drupal.attachBehaviors('#div1');
+						 $('a.fb_dynamic').live('click',function(e){
+						 e.preventDefault();
+					       $(this).fancybox({  
+								'width':dWidth,  
+								'height':dHeight,  
+								'autoScale'         : false,   
+								'type'          : 'iframe'  
+							});
+					       
+						}); 
 						
 					},
 					dataType:"json",

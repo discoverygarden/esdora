@@ -18,6 +18,8 @@ class Esdora {
 
     $path = drupal_get_path('module', 'esdora_islandora');
   	$path_compound=$path . '/ajaxtabs_compound.js';
+  	drupal_add_js($path_compound); 
+	$path_compound=$path . '/ajaxtabs.css';
   	drupal_add_js($path_compound);    
   }
     /**
@@ -63,8 +65,7 @@ class Esdora {
       '#content' => $this->getHistory(),
     );   
     return tabs_render($tabset);
-  */
-
+  */  
   	$items = $this->getItems();
 	$collectionClass = new CollectionClass(); 
   	$viewerQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
@@ -72,17 +73,17 @@ class Esdora {
      
   	$viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);   
   	$viewerStreams = $this->getListofStreamsFromItql($viewerResults);
-  	$cont= '<button class="Items">Items</button>';
-  	$cont.= '<button class="Metadata">Metadata</button>';
-  	$cont.= '<button class="Description">Description</button>'; 
-  	$cont.= '<button class="History">History</button>'; 
+  	$cont= '<button class="Items" style=" background-color: #D7D6DB;">Items</button>';
+  	$cont.= '<button class="Metadata" style="background-color: #F4F4F4">Metadata</button>';
+  	$cont.= '<button class="Description" style="background-color: #F4F4F4">Description</button>'; 
+  	$cont.= '<button class="History" style="background-color: #F4F4F4">History</button>'; 
 	$viewerContent = $this->createViewerContent($viewerStreams);	
   	if($viewerContent!=null)
   	{
-  		$cont.= '<button class="Viewers">External Viewers</button>'; 			
+  		$cont.= '<button class="Viewers" style="background-color: #F4F4F4">External Viewers</button>'; 			
   	
   	}  	
-  	$cont.= '<div id="div1">'.$items.'</div>';  	
+  	$cont.= '<div id="div1" >'.$items.'</div>';  	
   	$cont.='<input type="hidden" id="pid" value="'.$this->pid.'"/>';
 	return $cont;
   }  
@@ -136,15 +137,22 @@ class Esdora {
 
   	
   }
-  function initlightBox()
+  
+  function getDescription()
   {
-  	module_load_install('lightbox2');
+	if(module_exists("fancybox"))
+		return $this->getDescriptionWFB();
+	else
+		return $this->getDescriptionWOFB();
 		
+	
   }
   
-  function getDescription() //description tab
+  function getDescriptionWFB() //description tab
   {
-  	global $base_url;
+  	
+	
+	global $base_url;
   	global $user;
   	$content = '<ul>';
   	$collectionClass = new CollectionClass();
@@ -194,6 +202,66 @@ class Esdora {
               $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
         	//$url="http://www.google.com";
         	  $val = '<div class="text"><a href='.$url.'>'.$dsid.'</a></div>';
+            }
+          }
+          $content.='<li>'.$val.'</li>';
+        }
+      }
+    }
+   return $content;
+  }
+function getDescriptionWOFB() //description tab
+  {
+  	global $base_url;
+  	global $user;
+  	$content = '<ul>';
+  	$collectionClass = new CollectionClass();
+  	$itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
+    <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
+  	$itqlResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+  	$metadataStreams = $this->getListOfStreamsFromItql($itqlResults);
+    $config = array('indent' => TRUE,
+      'output-xml' => TRUE,
+      'wrap' => 200);
+    foreach ($metadataStreams as $streamInfo) {
+      if (!empty($streamInfo)) {
+        $dsid = $streamInfo[0];
+        $txtValue = $this->item->get_datastream_dissemination($dsid);
+        $mimeType = $streamInfo[1];
+        //$content.=$mimeType;
+        if ($mimeType == 'application/pdf'||$mimeType == 'application/msword') 
+        {
+       		$url= 'http://docs.google.com/viewer?url='.$base_url.
+       		'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
+       		
+        	$pdf = '<div class="text"><a href='.$url.' target="_blank">'.$dsid.'</a></div>';
+        	$content.='<li>'.$pdf.'</li>';
+        }
+        else if($mimeType == 'image/jpeg')
+        {
+        	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	$img = '<div class="text"><a href='.$url.' target="_blank">'.$dsid.'</a></div>';
+        	$content.='<li>'.$img.'</li>';
+        	
+        }
+        else if (!empty($txtValue)) {
+          if ($streamInfo[2] === 'R' || $streamInfo[2] === 'E') {
+          	$val = '<div class="text"><a href="' . $txtValue . '">' . $txtValue . '</a></div>';
+          }
+          else {
+            if ($mimeType == 'text/xml'||$mimeType == 'text/plain') {
+            //  $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
+              //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+             	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        		$val = '<div class="text"><a  href='.$url.' target="_blank">'.$dsid.'</a></div>';
+            }
+            else {
+              //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
+              $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+        	//$url="http://www.google.com";
+        	  $val = '<div class="text"><a href='.$url.' target="_blank">'.$dsid.'</a></div>';
             }
           }
           $content.='<li>'.$val.'</li>';
@@ -253,12 +321,18 @@ class Esdora {
   //============ START HELP FUNCTIONS ========================================================//
   //functions added By Biva
   function getLineageAsGraph($pid) {
+  	
+  	global $base_url;
+  	
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
     $encodedPID = str_replace(":", "%3A", $pid);
-    $query_string = "select%20%24subject%20'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
+     
+   
+   
+    
+    $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
     $query_string .= $encodedPID;
-    //A%3A
-    $query_string .="%3E%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object)";
+    $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
 
     $url1 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
     $url1 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
@@ -269,6 +343,7 @@ class Esdora {
     $isnull = true;
     $html = '<div style="width:inherit;">';
     $process = array();
+    $processName = array();
     $cnt = 0;
     $graph .= 'digraph G{rankdir=LR node[shape=ellipse,fontsize=10,style=filled,color=lightblue2,fontname = "Helvetica-Outline"];';
     if (count($rows) > 2) {
@@ -278,18 +353,23 @@ class Esdora {
       { 
       	
       	if ($count > 0 && $row != null) {
-      		 $entities = explode(",", $row);
+      		$entities = explode(",", $row);
+      		 
+      		 $name = 'process'.($cnt+1);
       		 $subject = str_replace("info:fedora/", "", $entities[0]);
+      		 $object = str_replace("info:fedora/", "", $entities[2]);
+      		
+      		 $process[$cnt]=$subject;
+			 $processName[$cnt]=$name.': '.$object.'->'.$subject;
       		 $subjects = explode(".",$subject);
 	      	 $subject = $subjects[count($subjects)-1];
-      		 $object = str_replace("info:fedora/", "", $entities[2]);
       		 $objects = explode(".",$object);
 	      	 $object = $objects[count($objects)-1];
 			 $graph .= $object.'->'.$subject;
-			 $label='[label="process",fontsize=10, fontname = "Helvetica-Outline"];';
+			 $label='[label="'.$name.'",fontsize=10, fontname = "Helvetica-Outline"];';
+			 
 			 $graph.=$label;
-			 $process[$cnt]=$object.' process '.$subject;
-			 $cnt.=+1;
+			$cnt.=+1;
 			 //$graph.=$row;
       	}
       	$count = $count + 1;
@@ -298,13 +378,14 @@ class Esdora {
     }
 	
 	//$lineage .= $graph;
-    $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+    $query_string = "select%20%24subject%20'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%3Cinfo%3Afedora%2F";
     $query_string .= $encodedPID;
-    $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
+    //A%3A
+    $query_string .="%3E%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object)";
 
     $url2 = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
     $url2 .= "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
-    $url2 .= $query_string;
+    $url2 .= $query_string; 
     $content = do_Curl($url2);
     $rows = explode("\n", $content);
   	if (count($rows) > 2) 
@@ -314,17 +395,20 @@ class Esdora {
       foreach ($rows as $row) 
       { 
       	if ($count > 0 && $row != null) {
+      		$name = 'process'.($cnt+1);
       		 $entities = explode(",", $row);
       		 $subject = str_replace("info:fedora/", "", $entities[0]);
+      		  $object = str_replace("info:fedora/", "", $entities[2]);
+      		
+      		 $process[$cnt]=$subject;
+			  $processName[$cnt]=$name.': '.$object.'->'.$subject;
       		 $subjects = explode(".",$subject);
       		 $subject = $subjects[count($subjects)-1];
-      		 $object = str_replace("info:fedora/", "", $entities[2]);
       		 $objects = explode(".",$object);
       		 $object = $objects[count($objects)-1];
 			 $graph .= $object.'->'.$subject;
-			 $label='[label="process",fontsize=10, fontname = "Helvetica-Outline"];';
+			 $label='[label="'.$name.'",fontsize=10, fontname = "Helvetica-Outline"];';
 			 $graph.=$label;
-			 $process[$cnt]=$object.' process '.$subject;
 			 $cnt.=+1;
 			 //$graph.=$row;
       	}
@@ -336,9 +420,18 @@ class Esdora {
 	$lineage = graphviz_filter_process($graph);
 	$html.=$lineage;
 	$html.='</div><br><div>';
-	foreach ($process as $desc)
+	$count = 0;
+	foreach ($processName as $desc)
 	{
-		$html.='<a style="font-size:8;font-family:Helvetica-Outline;font-style:italic;" href="http://www.gogle.com">'.$desc.'</a><br>';
+		$link = $base_url.'/fedora/repository/' . $this->pid .'/PROCESS';
+		if( module_exists('fancybox'))
+	  	{
+	  		$html.='<a class="fb_dynamic" style="font-size:10;font-family:Helvetica-Outline;font-style:italic;" href="'.$link.'"> '.$desc.'</a><br>';
+	  	}
+	  	else {
+			$html.='<a style="font-size:10;font-family:Helvetica-Outline;font-style:italic;" href="'.$link.'" target="_blank"> '.$desc.'</a><br>';
+	  		
+	  	}
 	}
 	$html.='</div>';
 	//$lineage = $graph;
