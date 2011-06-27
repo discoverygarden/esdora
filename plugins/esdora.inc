@@ -80,7 +80,7 @@ class Esdora {
 	$viewerContent = $this->getViewers();
 		if($viewerContent!=null)
   	{
-  		$cont.= '<button class="Viewers" style="background-color: #F4F4F4">External Viewers</button>'; 			
+  		$cont.= '<button class="Viewers" style="background-color: #F4F4F4">Viewers</button>'; 			
   	
   	}  	
   	$cont.= '<div id="div1" >'.$items.'</div>';  	
