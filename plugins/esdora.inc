@@ -731,10 +731,11 @@ function getDescriptionWOFB() //description tab
     }
     global $base_url;
     $content = '';
+    
     foreach ($viewerStreams as $viewer) {
       if (!empty($viewer)) {
-       // $txtValue = $this->item->get_datastream_dissemination($viewer[0]);
-        /*$viewerUrl = '<div class="text"><iframe src="' . $txtValue . '" &embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
+       $txtValue = $this->item->get_datastream_dissemination($viewer[0]);
+        $viewerUrl = '<div class="text"><iframe src="' . $txtValue . '" &embedded="TRUE" style="width:800px; height:800px;" frameborder="0"></iframe></div>';
         $fieldSet = array(
           '#title' => $viewer[0],
           '#attributes' => array(),
@@ -742,19 +743,21 @@ function getDescriptionWOFB() //description tab
           '#collapsed' => TRUE,
           '#value' => $viewerUrl,
         );
-        $content .= theme('fieldset', $fieldSet);*/
-      	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $viewer[0];
-      	if(module_exists("fancybox"))
-        	$val = '<div class="text"><a href='.$url.' class="fb_dynamic"  target="_blank">'.$viewer[0].'</a></div>';
-        else 
-        	$val= '<div class="text"><a href='.$url.'  target="_blank">'.$viewer[0].'</a></div>';
-        $content.='<li>'.$val.'</li>';
+        $content .= theme('fieldset', $fieldSet);
       }
     }
-    if(!empty($content))
-    {
-    	$content = '<ul>'.$content.'</ul>';
-    }   
+//      	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $viewer[0];
+//      	if(module_exists("fancybox"))
+//        	$val = '<div class="text"><a href='.$url.' class="fb_dynamic"  target="_blank">'.$viewer[0].'</a></div>';
+//        else 
+//        	$val= '<div class="text"><a href='.$url.'  target="_blank">'.$viewer[0].'</a></div>';
+//        $content.='<li>'.$val.'</li>';
+//      }
+//    }
+//    if(!empty($content))
+//    {
+//    	$content = '<ul>'.$content.'</ul>';
+//    }   
     return $content;
   }
   
