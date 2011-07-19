@@ -165,7 +165,7 @@ class Esdora {
 	
 	global $base_url;
   	global $user;
-  	$content = '<ul>';
+  	$content = '<table>';
   	$collectionClass = new CollectionClass();
   	$itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
     <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
@@ -184,16 +184,22 @@ class Esdora {
         {
        		$url= 'http://docs.google.com/viewer?url='.$base_url.
        		'/fedora/repository/' . $this->pid .'/'. $dsid.'&embedded=TRUE';
+       		$downloadURL = $base_url.'/fedora/repository/' . $this->pid.'/'. $dsid;
        		
-        	$pdf = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
-        	$content.='<li>'.$pdf.'</li>';
+        	//$pdf = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
+        	$pdf = '<td>'.$dsid.'</td><td align="center"><a class="fb_dynamic" href='.$url.' ><button type="button">View</button></a></td>'.
+        	'<td align="center"><a href='.$downloadURL.' target="_blank"><button type="button">Download</button></a></td>';
+        	$content.='<tr>'.$pdf.'</tr>';
         }
         else if($mimeType == 'image/jpeg')
         {
         	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
         	//$url="http://www.google.com";
-        	$img = '<div class="text"><a class="fb_dynamic" href='.$url.'>'.$dsid.'</a></div>';
-        	$content.='<li>'.$img.'</li>';
+        	//$img = '<div class="text"><a class="fb_dynamic" href='.$url.'>'.$dsid.'</a></div>';
+        	$img = '<td>'.$dsid.'</td><td align="center"><a class="fb_dynamic" href='.$url.' ><button type="button">View</button></a></td>'.
+        	'<td align="center"><a href='.$url.' target="_blank"><button type="button">Download</button></a></td>';
+        	
+        	$content.='<tr>'.$pdf.'</tr>';
         	
         }
         else if (!empty($txtValue)) {
@@ -205,17 +211,23 @@ class Esdora {
             //  $val = '<div class="text"><pre>' . tidy_repair_string($txtValue, $config, 'UTF8') . '</pre></div>';
               //  $val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
              	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
+             	
         	//$url="http://www.google.com";
-        		$val = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
+        		//$val = '<div class="text"><a class="fb_dynamic" href='.$url.' >'.$dsid.'</a></div>';
+        		$val = '<td>'.$dsid.'</td><td align="center"><a class="fb_dynamic" href='.$url.' ><button type="button">View</button></a></td>'.
+        	'<td align="center"><a href='.$url.' target="_blank"><button type="button">Download</button></a></td>';
+        	
             }
             else {
               //$val = '<div class="text"><pre>' . $txtValue . '</pre></div>';
               $url= $base_url.'/fedora/repository/' . $this->pid .'/'. $dsid;
         	//$url="http://www.google.com";
-        	  $val = '<div class="text"><a href='.$url.'>'.$dsid.'</a></div>';
+        	  //$val = '<div class="text"><a href='.$url.'>'.$dsid.'</a></div>';
+        	  $val = '<td>'.$dsid.'</td><td align="center"><a class="fb_dynamic" href='.$url.' ><button type="button">View</button></a></td>'.
+        	'<td align="center"><a href='.$url.' target="_blank"><button type="button">Download</button></a></td>';
             }
           }
-          $content.='<li>'.$val.'</li>';
+          $content.='<tr>'.$val.'</tr>';
         }
       }
     }

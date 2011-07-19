@@ -153,10 +153,11 @@ $(document).ready(function(){
 									'width':dWidth,  
 									'height':dHeight,  
 									'autoScale'         : false, 
-									'transitionIn' : 'none',
-									'transitionOut' : 'none',
+									'transitionIn'       :   'elastic',
+									'transitionOut'  :   'elastic',
 									'type'          : 'iframe',  
 								});
+						       return false;
 						       
 							}); 
 						},
