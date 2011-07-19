@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml
+END
+ilives_tei2htmlSdef.xml
+K 25
+svn:wc:ra_dav:version-url
+V 129
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_tei2htmlSdef.xml
+END
+ilives_CollectionModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 132
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_CollectionModel.xml
+END
+ilives_jp2Sdep-pageCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_jp2Sdep-pageCModel.xml
+END
+ilives_jp2Sdef.xml
+K 25
+svn:wc:ra_dav:version-url
+V 124
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_jp2Sdef.xml
+END
+ilives_viewerSdep-bookCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_viewerSdep-bookCModel.xml
+END
+ilives_collection.xml
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_collection.xml
+END
+ilives_bookCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_bookCModel.xml
+END
+ilives_tei2htmlSdep-pageCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_tei2htmlSdep-pageCModel.xml
+END
+ilives_viewerSdep-pageCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_viewerSdep-pageCModel.xml
+END
+ilives_figuresCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_figuresCModel.xml
+END
+ilives_viewerSdef.xml
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_viewerSdef.xml
+END
+ilives_pageCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/ilives/xml/ilives_pageCModel.xml
+END

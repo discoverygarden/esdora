@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/tests
+END
+fedora_repository.test
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/tests/fedora_repository.test
+END
+README_TESTING.txt
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/tests/README_TESTING.txt
+END

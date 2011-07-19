@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl
+END
+convertQDC.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/convertQDC.xsl
+END
+browseIndexToResultPage.xslt
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/browseIndexToResultPage.xslt
+END
+refworks.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/refworks.xsl
+END
+sparql_to_html_v1.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/sparql_to_html_v1.xsl
+END
+specdwc.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/specdwc.xsl
+END
+results.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/results.xsl
+END
+sparql_to_html.ORIG.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/sparql_to_html.ORIG.xsl
+END
+sparql_to_html.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/sparql_to_html.xsl
+END
+romeo.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/romeo.xsl
+END
+advanced_search_results.xsl
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/xsl/advanced_search_results.xsl
+END

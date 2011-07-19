@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/nmlt/collection_policies
+END
+nmlt_collection_view.xslt
+K 25
+svn:wc:ra_dav:version-url
+V 153
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/nmlt/collection_policies/nmlt_collection_view.xslt
+END
+nmlt_collection_policy.xml
+K 25
+svn:wc:ra_dav:version-url
+V 154
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/nmlt/collection_policies/nmlt_collection_policy.xml
+END
+query.txt
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/nmlt/collection_policies/query.txt
+END

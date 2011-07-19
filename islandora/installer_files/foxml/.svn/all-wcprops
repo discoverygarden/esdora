@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml
+END
+islandora-collectionCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml/islandora-collectionCModel.xml
+END
+islandora-strictpdfCModel.xml
+K 25
+svn:wc:ra_dav:version-url
+V 146
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml/islandora-strictpdfCModel.xml
+END
+islandora-demos.xml
+K 25
+svn:wc:ra_dav:version-url
+V 136
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml/islandora-demos.xml
+END
+islandora-pdfcollection.xml
+K 25
+svn:wc:ra_dav:version-url
+V 144
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml/islandora-pdfcollection.xml
+END
+islandora-top.xml
+K 25
+svn:wc:ra_dav:version-url
+V 134
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/installer_files/foxml/islandora-top.xml
+END

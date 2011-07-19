@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api
+END
+fedora_collection.inc
+K 25
+svn:wc:ra_dav:version-url
+V 120
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/fedora_collection.inc
+END
+tagging.inc
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/tagging.inc
+END
+fedora_item.inc
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/fedora_item.inc
+END
+fedora_export.inc
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/fedora_export.inc
+END
+fedora_utils.inc
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/fedora_utils.inc
+END
+dublin_core.inc
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/dublin_core.inc
+END
+rels-ext.inc
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/api/rels-ext.inc
+END

@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/fedora_attach
+END
+fedora_attach.info
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/fedora_attach/fedora_attach.info
+END
+fedora_attach.install
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/fedora_attach/fedora_attach.install
+END
+fedora_attach.admin.inc
+K 25
+svn:wc:ra_dav:version-url
+V 140
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/fedora_attach/fedora_attach.admin.inc
+END
+fedora_attach.module
+K 25
+svn:wc:ra_dav:version-url
+V 137
+/svn/daac/!svn/ver/4728/data_server/trunk/esdora-drupal-whole-site/sites/all/modules/islandora/plugins/fedora_attach/fedora_attach.module
+END
