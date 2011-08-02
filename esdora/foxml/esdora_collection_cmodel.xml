@@ -455,7 +455,7 @@
   </ingest_form>
   <datastreams>
     <datastream dsid="DC">
-      <display_method class="IslandoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
     </datastream>
   </datastreams>
   <edit_metadata_method ></edit_metadata_method>
