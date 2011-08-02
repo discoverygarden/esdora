@@ -68,7 +68,7 @@ function esdora_islandora_help($path, $arg) {
 
 /**
  * 
- * This is a php call back function referenced in the islandora/xsl/sparcal-to-html.xsl
+ * This is a php call back function referenced in the islandora/xsl/sparcal_to_html.xsl
  * the call back is a general mechanism for php xslt engine to call any functions from 
  * within the xsl template, and the function can be located in any loaded php libraries files.
  * The usage is in the context of the php core class, XsltProcessor. The class need to register the callback: ->registerPHPFunctions()

@@ -1,7 +1,0 @@
-select $collTitle $collDesc $member $memberTitle $memberDesc
-from   <#ri>
-where  <info:fedora/$COLLECTION_PID> <dc:title>                   $collTitle
-and    <info:fedora/$COLLECTION_PID> <dc:description>             $collDesc
-and    $member                        <fedora-rels-ext:isMemberOf> <info:fedora/$COLLECTION_PID>
-and    $member                        <dc:title>                   $memberTitle
-and    $member                        <dc:description>             $memberDesc

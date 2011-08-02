@@ -455,10 +455,10 @@
   </ingest_form>
   <datastreams>
     <datastream dsid="DC">
-      <display_method class="IslandoraCollection" file="plugins/IslandoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+      <display_method class="IslandoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
     </datastream>
   </datastreams>
-  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+  <edit_metadata_method ></edit_metadata_method>
 </content_model>
       </foxml:xmlContent>
     </foxml:datastreamVersion>

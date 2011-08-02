@@ -23,7 +23,7 @@ class Esdora {
   	drupal_add_js($path_compound);    
   }
     /**
-   * this is function is referenced in the bigfoot cmodel and creates the object level diplay
+   * this is function is referenced in the esdora_data_xxx_cmodel and creates the object level diplay
    *
    * This function iterates through the list of datastreams and creates fieldsets within
    * tabs to display the text and pdf streams.  another tab just lists all the datastreams

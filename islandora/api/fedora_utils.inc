@@ -37,6 +37,7 @@ function do_curl($url, $return_to_variable = 1, $number_of_post_vars = 0, $post 
     $fedora_user = $user->name;
     $fedora_pass = $user->pass;
   }
+
   if (function_exists("curl_init")) {
     $ch = curl_init();
     $user_agent = "Mozilla/4.0 pp(compatible; MSIE 5.01; Windows NT 5.0)";
@@ -65,10 +66,12 @@ function do_curl($url, $return_to_variable = 1, $number_of_post_vars = 0, $post 
 }
 
 function fedora_available() {
-  $baseUrl=variable_get('fedora_base_url', 'http://localhost:8080/fedora');	
-  $response = drupal_http_request($baseUrl.'/describe');
-  return ($response->code == 200);
+
+  $response = do_curl(variable_get('fedora_base_url', 'http://localhost:8080/fedora').'/describe');
+  return strstr($response, 'Repository Information HTML Presentation') !== FALSE;
+
 }
+
 
 /**
  * Returns a UTF-8-encoded transcripiton of the string given in $in_str.
@@ -85,20 +88,41 @@ function fix_encoding($in_str) {
   }
 } 
 
-  function validPid($pid) {
-    $valid = FALSE;
-    if (strlen(trim($pid)) <= 64 && preg_match('/^([A-Za-z0-9]|-|\.)+:(([A-Za-z0-9])|-|\.|~|_|(%[0-9A-F]{2}))+$/', trim($pid))) {
-      $valid = TRUE;
-    }
-
-    return $valid;
+function validPid($pid) {
+  $valid = FALSE;
+  if (strlen(trim($pid)) <= 64 && preg_match('/^([A-Za-z0-9]|-|\.)+:(([A-Za-z0-9])|-|\.|~|_|(%[0-9A-F]{2}))+$/', trim($pid))) {
+    $valid = TRUE;
   }
 
- function validDsid($dsid) {
-    $valid = FALSE;
-    if (strlen(trim($dsid)) <= 64 && preg_match('/^[a-zA-Z0-9\_\-\.]+$/', trim($dsid))) {
-      $valid = TRUE;
-    }
+  return $valid;
+}
 
-    return $valid;
+function validDsid($dsid) {
+  $valid = FALSE;
+  if (strlen(trim($dsid)) <= 64 && preg_match('/^[a-zA-Z0-9\_\-\.]+$/', trim($dsid))) {
+    $valid = TRUE;
   }
+
+  return $valid;
+}
+
+function fixDsid($dsid) {
+  $new_dsid = trim($dsid);
+
+  $find = '/[^a-zA-Z0-9\.\_\-]/';
+  $replace = '';
+  $new_dsid = preg_replace($find, $replace, $new_dsid);
+
+  if( strlen($new_dsid) > 63 )
+    $new_dsid = substr($new_dsid, -63);
+
+  if( preg_match('/^[^a-zA-Z]/', $dsid ) )
+    $new_dsid = 'x' . $new_dsid;
+
+  if( strlen($new_dsid) == 0 )
+    $new_dsid = 'item' . rand(1, 100);
+
+  return $new_dsid;
+
+}
+

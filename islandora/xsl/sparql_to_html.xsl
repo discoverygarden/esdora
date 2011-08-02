@@ -13,112 +13,212 @@
  <xsl:variable name="page" select="$hitPage"/>
  <xsl:variable name="start" select="((number($page) - 1) * number($size)) + 1"/>
  <xsl:variable name="end" select="($start - 1) + number($size)"/>
-  <xsl:variable name="cellsPerRow" select="3"/>
+  <xsl:variable name="cellsPerRow" select="4"/>
  <xsl:variable name="count" select="count(s:sparql/s:results/s:result)"/>
- 
- 
- 
 <xsl:template match="/">
  <xsl:if test="$count>0">
- 
-<table cellpadding="2" cellspacing="1" border="0" width="70%" >
-  <tr style="border-bottom:1px solid #000; margin-bottom:4px;">
-  <th colspan="2">Name</th>
-  <th colspan="2" align="right">Type</th>
-  </tr>
-<xsl:apply-templates select="s:sparql/s:results"/>
-</table>
+<table cellpadding="3" cellspacing="3" width="90%">
+ <tr><td colspan="{$cellsPerRow}">
+ <!-- <div STYLE="text-align: center;">-->
+ <!-- start previous next -->
+   <div class="item-list">
+     <ul class="pager">
+   <xsl:choose>
+    <xsl:when test="$end >= $count and $start = 1">
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+    </xsl:when>
+    <xsl:when test="$end >= $count">
+
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+       <li class="pager-previous">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page - 1"/>
+      </xsl:attribute>
+      &lt;Prev
+     </a></li>
+    </xsl:when>
+    <xsl:when test="$start = 1">
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+     <li class="pager-next">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page + 1"/>
+      </xsl:attribute>
+      Next>
+     </a></li>
+    </xsl:when>
+    <xsl:otherwise>
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+     <li class="pager-previous">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page - 1"/>
+      </xsl:attribute>
+      &lt;Prev
+     </a>&#160;</li>
+     <li class="pager-next">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page + 1"/>
+      </xsl:attribute>
+      Next>
+     </a></li>
+    </xsl:otherwise>
+   </xsl:choose>
+   </ul>
+  </div>
+  <!-- end previous next-->
+  <br clear="all" />
+ </td></tr>
+
+  <!--<xsl:for-each select="/sparql/results/result[position()>=$start and position() &lt;=$end]">
+  <xsl:variable name='OBJECTURI' select="object/@uri"/>
+  <xsl:variable name='PID' select="substring-after($OBJECTURI,'/')"/>
+   <tr>
+  <td>
+    <img>
+     <xsl:attribute name="src"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$PID"/>/TN
+     </xsl:attribute>
+    </img>
+    <a>
+     <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:copy-of select="$PID"/>/-/<xsl:value-of select="title"/>
+     </xsl:attribute>
+    <xsl:value-of select="title"/>
+   </a>
+  </td>
+   </tr>
+  </xsl:for-each>-
+ -->
+ <xsl:apply-templates select="s:sparql/s:results"/>
+</table><br clear="all" />
+<!-- start previous next -->
+   <div class="item-list">
+     <ul class="pager">
+   <xsl:choose>
+    <xsl:when test="$end >= $count and $start = 1">
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+    </xsl:when>
+    <xsl:when test="$end >= $count">
+
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+       <li class="pager-previous">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page - 1"/>
+      </xsl:attribute>
+      &lt;Prev
+     </a></li>
+    </xsl:when>
+    <xsl:when test="$start = 1">
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+     <li class="pager-next">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page + 1"/>
+      </xsl:attribute>
+      Next>
+     </a></li>
+    </xsl:when>
+    <xsl:otherwise>
+     <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+     of <xsl:value-of select="$count"/>&#160;<br />
+     <li class="pager-previous">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page - 1"/>
+      </xsl:attribute>
+      &lt;Prev
+     </a>&#160;</li>
+     <li class="pager-next">
+     <a>
+      <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/<xsl:value-of select="$thisTitle"/>/<xsl:value-of select="$page + 1"/>
+      </xsl:attribute>
+      Next>
+     </a></li>
+    </xsl:otherwise>
+   </xsl:choose>
+   </ul>
+  </div>
+  <!-- end previous next-->
  </xsl:if>
 </xsl:template>
-<xsl:template match="s:sparql/s:results">
-   <xsl:for-each select="s:result">
-   
-  <tr style="border:0px;">
+ <xsl:template match="s:sparql/s:results">
+   <xsl:for-each select="s:result[position() mod $cellsPerRow = 1 and position()>=$start and position() &lt;=$end]">
+    <tr>
+     <xsl:apply-templates select=". | following-sibling::s:result[position() &lt; $cellsPerRow]"/>
+    </tr>
+   </xsl:for-each>
+ </xsl:template>
+ <xsl:template match="s:result">
   <xsl:variable name='OBJECTURI' select="s:object/@uri"/>
   <xsl:variable name='CONTENTURI' select="s:content/@uri"/>
   <xsl:variable name='CONTENTMODEL' select="substring-after($CONTENTURI,'/')"/>
   <xsl:variable name='PID' select="substring-after($OBJECTURI,'/')"/>
-  <xsl:variable name="newTitle">
-	  <xsl:call-template name="replace-string">
-	   <xsl:with-param name="text" select="s:title"/>
-	   <xsl:with-param name="from" select="'_'"/>
-	   <xsl:with-param name="to" select="' '"/>
-	  </xsl:call-template>
-  </xsl:variable>
-  
-  <xsl:variable name="cleanTitle">
+  <xsl:variable name="newTitle" >
+  <xsl:call-template name="replace-string">
+   <xsl:with-param name="text" select="s:title"/>
+   <xsl:with-param name="from" select="'_'"/>
+   <xsl:with-param name="to" select="' '"/>
+  </xsl:call-template>
+   </xsl:variable>
+   <xsl:variable name="cleanTitle">
     <xsl:value-of select="php:functionString('fedora_repository_urlencode_string', $newTitle)"/>
   </xsl:variable>
-  
   <xsl:variable name="linkUrl">
    <xsl:choose>
-    <xsl:when test="($CONTENTMODEL='islandora:collectionCModel')"> <!-- ? the test result not matter? -->
+    <xsl:when test="($CONTENTMODEL='islandora:collectionCModel')">
      <xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:copy-of select="$PID"/>/-/<xsl:value-of select="$cleanTitle"/>
     </xsl:when>
     <xsl:otherwise>
+     <!--the below is an example of going straight to a datastream instead of the details page.  
+     <xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:copy-of select="$PID"/>/OBJ/<xsl:value-of select="s:title"/>-->
      <xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:copy-of select="$PID"/>/-/<xsl:value-of select="$cleanTitle"/>
      </xsl:otherwise>
    </xsl:choose>
    <xsl:value-of select="s:content"/>
   </xsl:variable>
-  
-  <xsl:variable name ="imagUrl">
-	<xsl:choose>
-	<xsl:when test ="($CONTENTMODEL='esdora:defaultCollectionCModel')">  <!-- this is the data object that has this model -->
-  	<xsl:value-of select="$BASEURL"/>/sites/default/files/islandora_img/folder-2-icon.png
-	</xsl:when>
-	<xsl:otherwise>
-  	<xsl:value-of select="$BASEURL"/>/sites/default/files/islandora_img/file-2-icon.png
-	</xsl:otherwise>
-	</xsl:choose>  
-  </xsl:variable>
-
-  <xsl:variable name="childCount">
-    <xsl:value-of select="php:functionString('get_child_count', $PID)"/>
-  </xsl:variable>
-
-  <td colspan="2" width="50%">   
-    <a>
+  <td valign="top" width="25%">
+   <a>
+    <xsl:attribute name="href"><xsl:value-of select="$linkUrl"/>
+    </xsl:attribute>
+   <img>
+    <xsl:attribute name="src"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$PID"/>/TN
+    </xsl:attribute>
+	<xsl:attribute name="alt"><xsl:value-of select="$newTitle" disable-output-escaping="yes"/>
+    </xsl:attribute>
+   </img> </a>  <br clear="all" />
+   <a>
     <xsl:attribute name="href"><xsl:value-of select="$linkUrl"/>
     </xsl:attribute>
     <xsl:value-of select="$newTitle" disable-output-escaping="yes" />
    </a>
-    <br clear="all"/>
-  </td>
-  <!--
-  <td halign="left" colspan="1">
-  	<form>
-  		<xsl:attribute name="action"><xsl:value-of select="$linkUrl"/></xsl:attribute>
-  		<xsl:attribute name="method"><xsl:value-of select="get"/></xsl:attribute>
-  		<input type="submit" value="view details"/>
-  	</form>
-  </td>
-   
-   -->
-   
-   <td colspan="1" width="10%">
-   	<a>
-    <xsl:attribute name="href"><xsl:value-of select="$linkUrl"/>
-    </xsl:attribute>
-    
-   <img width="16" height="16">
-    <xsl:attribute name="src"><xsl:value-of select="$imagUrl"/>
-    </xsl:attribute>
-	<xsl:attribute name="alt"><xsl:value-of select="$newTitle" disable-output-escaping="yes"/>
-    </xsl:attribute>
-   </img>
-   </a>
+  <!-- example of a url that would drill down to the details page if the url above went directly to a datastream
+  <xsl:if test="($CONTENTMODEL!='islandora:collectionCModel')">
+       <br />[[ <a>
+     <xsl:attribute name="href">
+     <xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:copy-of select="$PID"/>/-/<xsl:value-of select="$cleanTitle"/>
+     </xsl:attribute>
+    DETAILS
+    </a> ]]
+   </xsl:if>-->
+  
    </td>
-	<td>
-   	<xsl:value-of select="$childCount"></xsl:value-of>
-   	<!-- 
-   	<xsl:value-of select="$BASEURL"/>/fedora/risearch?lang=itql&format=Sparql&query=select+count+%28select+%24object+from+%3C%23ri%3E+where+%24object+%3Cfedora-rels-ext%3AisMemberOf%3E+%3Cinfo%3Afedora%2F<xsl:copy-of select="$PID"/>%3E%29+from+%3C%23ri%3E+where+%24s+%24p+%24o
-   	-->
-   </td>
-    </tr>
-   </xsl:for-each>
-</xsl:template>
-
+  <xsl:if test="(position() = last()) and (position() &lt; $cellsPerRow)">
+   <xsl:call-template name="FillerCells">
+    <xsl:with-param name="cellCount" select="$cellsPerRow - position()"/>
+   </xsl:call-template>
+  </xsl:if>
+ </xsl:template>
+ <xsl:template name="FillerCells">
+  <xsl:param name="cellCount"/>
+  <td>&#160;</td>
+  <xsl:if test="$cellCount > 1">
+   <xsl:call-template name="FillerCells">
+    <xsl:with-param name="cellCount" select="$cellCount - 1"/>
+   </xsl:call-template>
+  </xsl:if>
+ </xsl:template>
  <xsl:template name="replace-string">
   <xsl:param name="text"/>
   <xsl:param name="from"/>
@@ -144,6 +244,4 @@
    </xsl:otherwise>
   </xsl:choose>
  </xsl:template>
-
-
 </xsl:stylesheet>

@@ -11,6 +11,7 @@ class ContentModel extends XMLDatastream {
   private $mimes = NULL;
   public $pid_namespace;
   public $name;
+  private $xpath;
 
   /**
    * Gets the default DSID to use for ContentModel datastreams.
@@ -37,9 +38,9 @@ class ContentModel extends XMLDatastream {
       $content_models = $objectHelper->get_content_models_list($pid);
       foreach ($content_models as $content_model) {
         if ($content_model != 'fedora-system:FedoraObject-3.0') {
-          $ret = self::loadFromModel($content_model);
+          $ret = $content_model;
           break;
-  }
+        }
       }
     }
     return $ret;
@@ -223,8 +224,9 @@ class ContentModel extends XMLDatastream {
   public function __construct($xmlStr, $pid = NULL, $dsid = NULL, $pid_namespace = NULL, $name = NULL) {
     parent::__construct($xmlStr, $pid, $dsid);
     $this->pid_namespace = $pid_namespace;
-    
     $this->name = ($name == NULL)?'Islandora Content Model':$name;
+    $this->xpath = new DOMXPath($this->xml);
+    $this->xpath->registerNamespace('cm', 'http://www.islandora.ca');
   }
 
   /**
@@ -1160,6 +1162,7 @@ class ContentModel extends XMLDatastream {
         module_load_include('inc', 'fedora_repository', 'formClass');
         $metaDataForm = new formClass();
         $ret = $metaDataForm->updateMetaData($form_state['values']['form_id'], $form_state['values'], $soap_client);
+        $form_state['storage'] = NULL;
         $form_state['redirect'] = $base_url . '/fedora/repository/' . $form_state['values']['pid'];
 
       }
@@ -1437,7 +1440,8 @@ class ContentModel extends XMLDatastream {
    * @param string $pid
    * @return string $output
    */
-  public function displayExtraFieldset($pid) {
+  public function displayExtraFieldset($pid, $page_number) {
+  	
     $output = '';
     if ($this->validate()) {
       $datastreams = $this->xml->getElementsByTagName('datastreams');
@@ -1467,7 +1471,7 @@ class ContentModel extends XMLDatastream {
                     self::$errors[] = 'Execute Form Handler: method \''. $className .'->'. $methodName .'\' does not exist.';
                   } 
                   else {
-                    $output .= $class->$methodName();
+                    $output = $class->$methodName($page_number);
                   }
                 }
               }
@@ -2013,4 +2017,225 @@ class ContentModel extends XMLDatastream {
     }
     return $ret;    
   }
+
+  /**
+   * Find the form element with name $name.
+   * 
+   * @param string $name
+   *   The name of the form element to find.
+   * @return DOMElement
+   *   The form element $name, if found FALSE otherwise.
+   */
+  public function getForm($name) {
+    $result = $this->xpath->query("//cm:form[@name='$name']");
+    return $result->length == 1 ? $result->item(0) : FALSE;
+  }
+
+  /**
+   *
+   * @return array
+   *    An array of form names that exist in this content model.
+   */
+  public function getFormNames() {
+    if (!$this->validate()) {
+      return FALSE;
+    }
+    $names = FALSE;
+    $result = $this->xpath->query('//cm:forms/cm:form/@name'); // Select the name attribute of all forms.
+    for($i = 0; $i < $result->length; $i++) {
+      $attribute = $result->item($i);
+      $name = $attribute->value;
+      $names[$name] = $name;
+    }
+    return $names;
+  }
+
+  /**
+   *
+   * @return array
+   *    An array of form names that exist in this content model.
+   */
+  public function getIngestFormNames() {
+    if (!$this->validate()) {
+      return FALSE;
+    }
+    $result = $this->xpath->query('//cm:forms/cm:form[@ingest_class and @ingest_file and @ingest_module]/@name'); // Select the name attribute of all forms.
+    for($i = 0; $i < $result->length; $i++) {
+      $attribute = $result->item($i);
+      $name = $attribute->value;
+      $names[$name] = $name;
+    }
+    return $names;
+  }
+
+  /**
+   *
+   * @return array
+   *    An array of form names that exist in this content model.
+   */
+  public function getEditFormNames() {
+    if (!$this->validate()) {
+      return FALSE;
+    }
+    $result = $this->xpath->query('//cm:forms/cm:form[@edit_class and @edit_file and @edit_module]/@name'); // Select the name attribute of all forms.
+    for($i = 0; $i < $result->length; $i++) {
+      $attribute = $result->item($i);
+      $name = $attribute->value;
+      $names[$name] = $name;
+    }
+    return $names;
+  }
+
+  /**
+   * Removes the named form.
+   *
+   * @param string $name
+   *   Name of the form to remove.
+   * 
+   * @return boolean
+   *   TRUE on success, FALSE otherwise.
+   */
+  public function removeForm($name) {
+    $result = $this->xpath->query("//cm:form[@name='$name']");
+    if ($result->length == 1) {
+      $form = $result->item(0);
+      $form->parentNode->removeChild($form);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Adds the named form.
+   *
+   * @param string $element
+   *   Name of the form to add.
+   *
+   * @return boolean
+   *   TRUE on success, FALSE otherwise.
+   */
+  public function addForm($element) {
+    $result = $this->xpath->query("//cm:forms");
+    if ($result->length == 0) { // Forms doesn't exist
+      $forms = $this->xml->createElement('forms');
+      $element = $this->xml->importNode($element);
+      $forms->appendChild($element);
+      $result = $this->xpath->query("//cm:content_model");
+      $result->item(0)->appendChild($forms);
+      return TRUE;
+    }
+    else if ($result->length == 1) {
+      $element = $this->xml->importNode($element);
+      $result->item(0)->appendChild($element);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+
+  /**
+   * Edits a form element with attribute name='$name' from the 'forms' element.
+   *
+   * @param String $name
+   */
+  public function editForm($name, $element) {
+    if (!$this->validate()) {
+      return FALSE;
+    }
+    $result = $this->xpath->query("//cm:form[@name='$name']");
+    if($result->length == 1) {
+      $form = $result->item(0);
+      $result = $this->xpath->query("child::node()", $form);
+      $element = $this->xml->importNode($element);
+      for($i = 0; $i < $result->length; $i++) {
+        $child = $result->item($i);
+        $element->appendChild($child);
+      }
+      $form->parentNode->replaceChild($element, $form);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   *
+   * @param <type> $element_definition
+   * @param <type> $parent_element
+   * @return <type>
+   */
+  public function addElementToForm($element, $parent_element) {
+    $element = $this->xml->importNode($element, TRUE);
+    $parent_element->appendChild($element);
+    return TRUE;
+  }
+
+  /**
+   *
+   * @param <type> $element_definition
+   * @param <type> $parent_element
+   */
+  public function editFormElement($new_element, $edit_element) {
+    $new_element = $this->xml->importNode($new_element, TRUE);
+    $name = $new_element->tagName;
+    $result = $new_element->getElementsByTagName('content');
+    if($result->length == 1) {
+      $new_content = $result->item(0);
+      $result = $this->xpath->query("child::cm:content/child::node()", $edit_element);
+      for($i = 0; $i < $result->length; $i++) {
+        $child = $result->item($i);
+        $new_content->appendChild($child);
+      }
+    }
+    $edit_element->parentNode->replaceChild($new_element, $edit_element);
+    return TRUE;
+  }
+
+  /**
+   *
+   * @param <type> $new_element
+   * @param <type> $element
+   */
+  private function insertElementInPlace($new_element, $element) {
+    $next = $element->nextSibling;
+    if ($next) {
+      $element->parentNode->insertBefore($new_element, $next);
+    }
+    else {
+      $element->parentNode->appendChild($new_element);
+    }
+  }
+
+  /**
+   *
+   * @param <type> $form_element
+   * @return <type>
+   */
+  public function incFormElement($form_element) {
+    $prev = $form_element;
+    $name = $prev->getAttribute('name');
+    while ($prev = $prev->previousSibling) {
+      if (get_class($prev) == 'DOMElement') {
+        $form_element->parentNode->insertBefore($form_element, $prev);
+        break;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   *
+   * @param <type> $form_element
+   * @return <type>
+   */
+  public function decFormElement($form_element) {
+    $next = $form_element;
+    while ($next = $next->nextSibling) {
+      if (get_class($next) == 'DOMElement') {
+        $this->insertElementInPlace($form_element, $next);
+        break;
+      }
+    }
+    return TRUE;
+  }
+
 }

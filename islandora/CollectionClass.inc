@@ -26,11 +26,11 @@ class CollectionClass {
    * @param string $pid The pid of the collection to represent.
    * @return CollectionClass
    */
-  function CollectionClass($pid = NULL) {
-    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  function __construct($pid = NULL) {
     if (!empty($pid)) {
       module_load_include('inc', 'fedora_repository', 'ObjectHelper');
       $this->collectionObject = new ObjectHelper($pid);
+      $this->pid = $pid;
     }
   }
 
@@ -81,6 +81,10 @@ class CollectionClass {
                              order by $title';
       }
     }
+    else {
+      // Replace %parent_collection% with the actual collection PID
+      $query_string = preg_replace("/\%parent_collection\%/", "<info:fedora/$pid>", $query_string);
+    }
 
     $query_string = htmlentities(urlencode($query_string));
 
@@ -88,7 +92,7 @@ class CollectionClass {
     $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
     $url .= "?type=tuples&flush=TRUE&format=Sparql&limit=$limit&offset=$offset&lang=itql&stream=on&query=" . $query_string;
     $content .= do_curl($url);
-
+    
     return $content;
   }
 
@@ -306,33 +310,33 @@ class CollectionClass {
     $fullpath = $file;
     //	$form = array();
     $form['step'] = array(
-        '#type' => 'hidden',
-        '#value' => (isset($form_state['values']['step']) ? $form_state['values']['step'] : 0) + 1,
+      '#type' => 'hidden',
+      '#value' => (isset($form_state['values']['step']) ? $form_state['values']['step'] : 0) + 1,
     );
     $form['ingest-file-location'] = array(
-        '#type' => 'hidden',
-        '#value' => $file,
+      '#type' => 'hidden',
+      '#value' => $file,
     );
 
     $form['content_model_name'] = array(
-        '#type' => 'hidden',
-        '#value' => $contentModelDsid
+      '#type' => 'hidden',
+      '#value' => $contentModelDsid
     );
     $form['models'] = array(//content models available
-        '#type' => 'hidden',
-        '#value' => $form_state['values']['models'],
+      '#type' => 'hidden',
+      '#value' => $form_state['values']['models'],
     );
     $form['fullpath'] = array(
-        '#type' => 'hidden',
-        '#value' => $fullpath,
+      '#type' => 'hidden',
+      '#value' => $fullpath,
     );
 
     $form['#attributes']['enctype'] = 'multipart/form-data';
     $form['indicator']['ingest-file-location'] = array(
-        '#type' => 'file',
-        '#title' => t('Upload Document'),
-        '#size' => 48,
-        '#description' => t('Full text'),
+      '#type' => 'file',
+      '#title' => t('Upload Document'),
+      '#size' => 48,
+      '#description' => t('Full text'),
     );
     if ($xml->ingest_form->hide_file_chooser == 'TRUE') {
       $form['indicator']['ingest-file-location']['#type'] = 'hidden';
@@ -360,7 +364,7 @@ class CollectionClass {
       return;
     }
     $username = array(
-        'name' => variable_get('fedora_admin_user', 'fedoraAdmin')
+      'name' => variable_get('fedora_admin_user', 'fedoraAdmin')
     );
     $admin_user = user_load($username);
     module_load_include('inc', 'fedora_repository', 'ConnectionHelper');
@@ -370,12 +374,12 @@ class CollectionClass {
       $pidNameSpace = variable_get('fedora_repository_pid', 'vre:');
       $pidNameSpace = substr($pidNameSpace, 0, strpos($pidNameSpace, ":"));
       $params = array(
-          'numPIDs' => '',
-          'pidNamespace' => $pidNameSpace
+        'numPIDs' => '',
+        'pidNamespace' => $pidNameSpace
       );
       $object = $soapClient->__soapCall('getNextPID', array(
-                  $params
-              ));
+            $params
+          ));
     } catch (exception $e) {
       drupal_set_message(t('Error getting Next PID: !e', array('!e' => $e->getMessage())), 'error');
       return FALSE;
@@ -384,7 +388,7 @@ class CollectionClass {
     $pidNumber = strstr($pid, ":");
     $pid = $pidNameSpace . ':' . 'USER-' . $user->name . '-' . substr($pidNumber, 1);
     $personal_collection_pid = array(
-        'fedora_personal_pid' => $pid
+      'fedora_personal_pid' => $pid
     );
     module_load_include('inc', 'fedora_repository', 'plugins/PersonalCollectionClass');
     $personalCollectionClass = new PersonalCollectionClass();
@@ -394,6 +398,148 @@ class CollectionClass {
     }
     user_save($user, $personal_collection_pid);
     return TRUE;
+  }
+
+  /**
+   * Queries a collection object for an xslt to format how the
+   * collection of objects is displayed.
+   */
+  function getXslContent($pid, $path, $canUseDefault = TRUE) {
+    module_load_include('inc', 'fedora_repository', 'CollectionClass');
+    $collectionClass = new CollectionClass();
+    $xslContent = $collectionClass->getCollectionViewStream($pid);
+    if (!$xslContent && $canUseDefault) { //no xslt so we will use the default sent with the module
+      $xslContent = file_get_contents($path . '/xsl/sparql_to_html.xsl');
+    }
+    return $xslContent;
+  }
+
+  function showFieldSets($page_number) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    global $base_url;
+
+    $tabset = array();
+
+    global $user;
+    $objectHelper = new ObjectHelper();
+    $item = new Fedora_Item($this->pid);
+    $query = NULL;
+    if ($item->exists() && array_key_exists('QUERY', $item->datastreams)) {
+      $query = $item->get_datastream_dissemination('QUERY');
+    }
+    
+    $results = $this->getRelatedItems($this->pid, $query);
+    
+    $collection_items = $this->renderCollection($results, $this->pid, NULL, NULL, $page_number);
+    $collection_item = new Fedora_Item($this->pid);
+    // Check the form post to see if we are in the middle of an ingest operation.
+    $show_ingest_tab = (!empty($_POST['form_id']) && $_POST['form_id'] == 'fedora_repository_ingest_form');
+    $add_to_collection = $this->getIngestInterface();
+
+    $tabset['view_tab'] = array(
+      '#type' => 'tabpage',
+      '#title' => 'View',
+      '#content' => $collection_items
+    );
+    
+    $tabset['add_tab'] = array(
+      // #type and #title are the minimum requirements.
+      '#type' => 'tabpage',
+      '#title' => t('Add'),
+      '#selected' => $show_ingest_tab,
+      // This will be the content of the tab.
+      '#content' => $add_to_collection,
+    );
+    return $tabset;
+  }
+
+  function getIngestInterface() {
+    global $base_url;
+    $objectHelper = new ObjectHelper();
+    module_load_include('inc', 'Fedora_Repository', 'CollectionPolicy');
+    $collectionPolicyExists = $objectHelper->getMimeType($this->pid, CollectionPolicy::getDefaultDSID());
+    if (user_access(ObjectHelper :: $INGEST_FEDORA_OBJECTS) && $collectionPolicyExists) {
+      if (!empty($collectionPolicyExists)) {
+        $allow = TRUE;
+        if (module_exists('fedora_fesl')) {
+          $allow = fedora_fesl_check_roles($this->pid, 'write');
+        }
+        if ($allow) {
+          $ingestObject = drupal_get_form('fedora_repository_ingest_form', $this->pid);
+        }
+      }
+    }
+    else {
+      $ingestObject = '';
+    }
+
+    return $ingestObject;
+  }
+
+  function renderCollection($content, $pid, $dsId, $collection, $pageNumber = NULL) {
+    $path = drupal_get_path('module', 'fedora_repository');
+    global $base_url;
+    $collection_pid = $pid; //we will be changing the pid later maybe
+    $objectHelper = new ObjectHelper();
+    $parsedContent = NULL;
+    $contentModels = $objectHelper->get_content_models_list($pid);
+    $isCollection = FALSE;
+    //if this is a collection object store the $pid in the session as it will come in handy
+    //after a purge or ingest to return to the correct collection.
+
+    $fedoraItem = NULL;
+
+
+
+    $collectionName = $collection;
+    if (!$pageNumber) {
+      $pageNumber = 1;
+    }
+
+    if (!isset($collectionName)) {
+      $collectionName = variable_get('fedora_repository_name', 'Collection');
+    }
+    $xslContent = $this->getXslContent($pid, $path);
+
+    //get collection list and display using xslt-------------------------------------------
+    $objectList = '';
+    if (isset($content) && $content != FALSE) {
+      $input = new DomDocument();
+      $input->loadXML(trim($content));
+      $results = $input->getElementsByTagName('result');
+      if ($results->length > 0) {
+        try {
+          $proc = new XsltProcessor();
+          $proc->setParameter('', 'collectionPid', $collection_pid);
+          $proc->setParameter('', 'collectionTitle', $collectionName);
+          $proc->setParameter('', 'baseUrl', $base_url);
+          $proc->setParameter('', 'path', $base_url . '/' . $path);
+          $proc->setParameter('', 'hitPage', $pageNumber);
+          $proc->registerPHPFunctions();
+          $xsl = new DomDocument();
+          $xsl->loadXML($xslContent);
+          // php xsl does not seem to work with namespaces so removing it below
+          // I may have just been being stupid here
+          // $content = str_ireplace('xmlns="http://www.w3.org/2001/sw/DataAccess/rf1/result"', '', $content);
+
+          $xsl = $proc->importStylesheet($xsl);
+          $newdom = $proc->transformToDoc($input);
+
+          $objectList = $newdom->saveXML(); //is the xml transformed to html as defined in the xslt associated with the collection object
+
+          if (!$objectList) {
+            throw new Exception("Invalid XML.");
+          }
+        } catch (Exception $e) {
+          drupal_set_message(t('!e', array('!e' => $e->getMessage())), 'error');
+          return '';
+        }
+      }
+    }
+    else {
+      drupal_set_message(t("No Objects in this collection or bad query."));
+    }
+    return $objectList;
   }
 
 }
