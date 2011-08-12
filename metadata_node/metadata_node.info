@@ -1,0 +1,4 @@
+; $Id$
+name = Metadata Record
+description = Metadata Node: new content type with XML file attachment
+core = 6.x

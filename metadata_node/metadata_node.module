@@ -1,0 +1,216 @@
+<?php
+
+
+define(TYPE, 'metadata_node');
+define(DATA_FOLDER, 'metadata_records');
+define(METADATA_FORM_NAME, 'FGDC_1');
+/**
+* Implementation of hook_node_info().
+*/
+function metadata_node_node_info() {
+  return array(
+    TYPE => array(
+      'name' => t('Metadata Record'),
+      'module' => 'metadata_node',
+      'description' => "Create medata data record using a form created by XML Form Builder.",
+    )
+  );
+}
+
+/**
+* Implementation of hook_perm().
+*/
+function metadata_node_perm() {
+  return array('create metadata_node', 'edit own metadata_node');
+}
+
+/**
+* Implementation of hook_access().
+*/
+function metadata_node_access($op, $node) {
+  global $user;
+
+  if ($op == 'create') {
+    // Only users with permission to do so may create this node type.
+    return user_access('create metadata_node');
+  }
+
+  // Users who create a node may edit or delete it later, assuming they have the
+  // necessary permissions.
+  if ($op == 'update' || $op == 'delete') {
+    if (user_access('edit own metadata_node') && ($user->uid == $node->uid)) {
+      return TRUE;
+    }
+  }
+}
+
+/**
+* Implementation of hook_form().
+*/
+function metadata_node_form(&$node, $form_state) {
+    //note: even just return empty array, this funct is needed 
+    //in order for form_alter to work
+    return array();
+}
+
+
+
+/**
+ * implement hook_form_alter
+ * remove some of the default node entries 
+ */
+function metadata_node_form_alter(&$form, &$form_state, $form_id) {
+    //drupal_set_message("Form id: $form_id");
+    switch ($form_id) {
+        case 'metadata_node_node_form':
+            unset($form['author']);
+            unset($form['menu']);
+            unset($form['options']);
+            unset($form['comment_settings']);
+            unset($form['buttons']);
+
+            $my_form=get_predefined_form($form_state, METADATA_FORM_NAME);
+            $my_form['submit']['#submit'][]='metadata_node_form_submit';
+            $my_form['submit']['#weight']=200;//higher the number lower the position
+            //unset($my_form['submit']);
+            
+            $form=array_merge($my_form, $form);
+            //$form['buttons']['submit']['#submit'][] = 'metadata_node_form_submit';
+            break;
+    }
+}
+
+/**
+ * handler for submit button
+ */
+function metadata_node_form_submit(array $form, array &$form_state) {
+  module_load_include('inc', 'xml_form_api', 'XMLForm');
+  drupal_set_message('submit');
+  try {
+    $xml_form = new XMLForm($form_state);
+    $doc = $xml_form->submit($form, $form_state);
+    $document = $doc->document;
+    dom_document_pretty_print($document);
+    $title = get_docTitle($document);
+    $file_created = create_file($title, $document, false); //@todo, need to get published info from existing node
+    if(isset ($file_created)) {
+        create_node($title, $file_created); //@TODO need to edit if we are editing
+    }
+    else {
+        drupal_set_message('failed to save metadata records. Check logs for details.');
+    }
+  } catch (Exception $e) {
+    $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
+    drupal_set_message($msg, 'error');
+    $form_state['rebuild'] = true;
+  }
+}
+
+/**
+ * create a file and return the file name
+ * the content is the XML as string contained in $document
+ * @param type $document 
+ */
+function create_file($title, DOMDocument $document, $isPublished) {
+    $file_name=null;
+    try {
+        $file_name = htmlentities($title);
+        trim($file_name);
+        $file_path = file_directory_path();
+        $file_name = $file_path . '/' . DATA_FOLDER . '/' . $file_name . '.xml';
+        $needles   = array("\r\n", "\n", "\r", '\t', ' ');
+        $replace = '_';
+        $file_name = str_replace($needles, $replace, $file_name);
+        $xml_string = $document -> saveXML();
+        if($isPublished) {
+            file_save_data($xml_string, $file_name, FILE_EXISTS_RENAME);
+        }
+        else {
+            file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
+        }
+    }catch (Exception $e) {
+        drupal.setMessage('error:' . $e->getMessage());
+    }
+    return $file_name;
+}
+
+function get_docTitle(DOMDocument $document) {
+    $domNodeList =  $document->getElementsByTagName('title');
+    $domNode = $domNodeList ->item(0);
+    return $domNode->textContent;
+}
+
+function create_node($title, $file_name) {
+  global $user;
+  //  Create new node @TODO use stdClass
+  $node = array();
+  $node['name'] = $user->name;
+  $node['type'] = TYPE;
+  //  FORMATS ON CCK NODES APPLY TO FIELDS, SO NO FORMAT SET HERE 
+  $node['format'] = 0;
+  //  DISABLE READ/WRITE COMMENTS 
+  $node['comment'] = 0;
+  //  UNPUBLISHED
+  $node['status'] = 0;
+  //  NOT PROMOTED TO FRONT PAGE 
+  $node['promote'] = 0;
+  //  NOT STICKY 
+  $node['sticky'] = 0;
+  //  NODE FIELDS HERE
+  $node['title'] = $title;
+  $node['body'] = $file_name;
+  //  THIS IS A CCK FIELD
+ // $node['field_my_integer]['0']['value] = $an_integer;
+    $node = (object)$node;
+  $node = node_submit($node);
+  node_save($node);
+}
+
+/**
+* Implementation of hook_help().
+*/
+function metadata_node_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#metadata_node':
+      return '<p>' . t('ADMIN-HELP-TEXT') . '</p>';
+      break;
+  }
+} 
+
+//helper function to connect to xml form builder
+function get_predefined_form(array &$form_state, $form_name) {
+      module_load_include('inc', 'xml_form_builder', 'FormBuilder');
+  if (!FormBuilder::FormExists($form_name) || !FormBuilder::HasFormDefinition($form_name)) {
+    drupal_set_message(t("Form '$form_name' does not exist, or it does not have a complete definition."));
+    drupal_not_found();
+    exit();
+  }
+  try {
+    module_load_include('inc', 'xml_form_api', 'XMLForm');
+    $xml_form = new XMLForm($form_state);
+    if (!$xml_form->isInitialized()) { // Was initialized from storage.
+      module_load_include('inc', 'xml_form_api', 'XMLFormDefinition');
+      module_load_include('inc', 'xml_form_api', 'XMLDocument');
+      $xml_definition = FormBuilder::GetFormDefinition($form_name);
+      $form = XMLFormDefinition::GetDrupalForm($xml_definition);
+      $properties = XMLFormDefinition::GetFormProperties($xml_definition);
+      $properties = $properties['document'];
+      try {
+        $document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema']);
+      } catch (Exception $e) {
+        drupal_set_message($e->getMessage(), 'error');
+        return array(); // Empty Form.
+      }
+      $xml_form->initialize($form, $document);
+    }
+    $output = $xml_form->toArray();
+  } catch (Exception $e) {
+    $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
+    drupal_set_message($msg, 'error');
+    return array();
+  }
+  return $output;
+
+}
+
+?>

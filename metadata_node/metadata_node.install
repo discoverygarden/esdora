@@ -1,0 +1,29 @@
+<?php
+define(DATA_FOLDER, 'metadata_records');
+
+
+/**
+ * implement hook_install
+ */
+function metadata_node_install() {
+    $file_path = file_directory_path();
+    drupal_set_message($file_path);
+    $metadata_folder=DATA_FOLDER;
+    $folder=$file_path . '/' . $metadata_folder;
+    if(!file_exists($folder)) {
+        //create it
+        mkdir($folder, 0777);
+        drupal_set_message('created');
+    }
+}
+
+function metadata_node_uninstall() {
+    $file_path = file_directory_path();
+    drupal_set_message($file_path);
+    $metadata_folder=DATA_FOLDER;
+    $folder=$file_path . '/' . $metadata_folder;
+    if(file_exists($folder)) {
+        //create it
+        rmdir($folder);
+    }
+}
