@@ -4,6 +4,10 @@
 define(TYPE, 'metadata_node');
 define(DATA_FOLDER, 'metadata_records');
 define(METADATA_FORM_NAME, 'FGDC_1');
+define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
+
+
+////////////////////////////// NODE CREATION AND CONTENT_TYPE, METADAT FORM, FILE SAVE /////////
 /**
 * Implementation of hook_node_info().
 */
@@ -21,7 +25,7 @@ function metadata_node_node_info() {
 * Implementation of hook_perm().
 */
 function metadata_node_perm() {
-  return array('create metadata_node', 'edit own metadata_node');
+  return array('create metadata_node', 'edit own metadata_node', 'view metadata_node');
 }
 
 /**
@@ -69,11 +73,17 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
             unset($form['comment_settings']);
             unset($form['buttons']);
 
-            $my_form=get_predefined_form($form_state, METADATA_FORM_NAME);
+            $nid=$form['nid']['#value'];
+            $vid=$form['vid']['#value'];
+            $uid=$form['uid']['#value'];
+            $xml_file_path=null;
+            if($nid>0) {
+                $xml_file_path=$form['#node']->body;
+            }
+            $my_form=get_predefined_form($form_state, METADATA_FORM_NAME, $nid, $xml_file_path);
             $my_form['submit']['#submit'][]='metadata_node_form_submit';
             $my_form['submit']['#weight']=200;//higher the number lower the position
             //unset($my_form['submit']);
-            
             $form=array_merge($my_form, $form);
             //$form['buttons']['submit']['#submit'][] = 'metadata_node_form_submit';
             break;
@@ -85,24 +95,25 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
  */
 function metadata_node_form_submit(array $form, array &$form_state) {
   module_load_include('inc', 'xml_form_api', 'XMLForm');
-  drupal_set_message('submit');
   try {
     $xml_form = new XMLForm($form_state);
     $doc = $xml_form->submit($form, $form_state);
     $document = $doc->document;
-    dom_document_pretty_print($document);
+    //dom_document_pretty_print($document);
+    //exit();
     $title = get_docTitle($document);
     $file_created = create_file($title, $document, false); //@todo, need to get published info from existing node
     if(isset ($file_created)) {
-        create_node($title, $file_created); //@TODO need to edit if we are editing
+        create_node($title, $file_created);
+        drupal_set_message('Metadata record created successfully. Record title: ' . $title);
     }
     else {
-        drupal_set_message('failed to save metadata records. Check logs for details.');
+        drupal_set_message('Failed to save metadata records. Check logs for details.');
     }
   } catch (Exception $e) {
     $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
     drupal_set_message($msg, 'error');
-    $form_state['rebuild'] = true;
+    //$form_state['rebuild'] = true;
   }
 }
 
@@ -112,12 +123,23 @@ function metadata_node_form_submit(array $form, array &$form_state) {
  * @param type $document 
  */
 function create_file($title, DOMDocument $document, $isPublished) {
+    global $user;
     $file_name=null;
     try {
         $file_name = htmlentities($title);
         trim($file_name);
         $file_path = file_directory_path();
-        $file_name = $file_path . '/' . DATA_FOLDER . '/' . $file_name . '.xml';
+        $folder = $file_path . '/' . DATA_FOLDER;
+        if(!file_exists($folder)) {
+            drupal_set_message('Directory ' . $folder .' does not exist. Contact administrator.');
+            exit();
+        }
+        $user_file_dir = $folder . '/' . $user->name;
+        if(!file_exists($user_file_dir)) {
+            //create it
+            mkdir($user_file_dir, 0777);
+        }
+        $file_name =  $user_file_dir. '/' . $file_name . '.xml';
         $needles   = array("\r\n", "\n", "\r", '\t', ' ');
         $replace = '_';
         $file_name = str_replace($needles, $replace, $file_name);
@@ -159,9 +181,6 @@ function create_node($title, $file_name) {
   //  NODE FIELDS HERE
   $node['title'] = $title;
   $node['body'] = $file_name;
-  //  THIS IS A CCK FIELD
- // $node['field_my_integer]['0']['value] = $an_integer;
-    $node = (object)$node;
   $node = node_submit($node);
   node_save($node);
 }
@@ -178,12 +197,147 @@ function metadata_node_help($path, $arg) {
 } 
 
 //helper function to connect to xml form builder
-function get_predefined_form(array &$form_state, $form_name) {
-      module_load_include('inc', 'xml_form_builder', 'FormBuilder');
+function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_name) {
+  module_load_include('inc', 'xml_form_builder', 'FormBuilder');
   if (!FormBuilder::FormExists($form_name) || !FormBuilder::HasFormDefinition($form_name)) {
     drupal_set_message(t("Form '$form_name' does not exist, or it does not have a complete definition."));
     drupal_not_found();
     exit();
+  }
+  $xml=NULL;
+  if($nid>0) { //in editing mode for a pre-exising node
+      if($xml_file_name==NULL) {
+          drupal_set_message('the metadata node is corruped, its body is missing file path. Treat as new node.');
+      }
+      else {
+         try { 
+//         $handle = fopen($xml_file_name, "r");
+//         $xml = fread($handle, filesize($xml_file_name));
+//         fclose($handle);
+         
+         $dom = new DOMDocument();
+         if($dom->load($xml_file_name)) {
+             $xml=$dom->saveXML();
+         }
+         
+         } catch (Exception $e) {
+             drupal_set_message('Could not open file to read: ' . $e->getMessage());
+         }
+      }
+  }
+  if($xml==NULL) {
+      try {
+      //load a template instance so the record will validate against the schema, 
+      //but a user  must manually check for correctness
+      $path = drupal_get_path('module', 'metadata_node');
+      $template_fgdc = file_get_contents($path . '/' . 'reference-fgdc-record.xml');
+      $xml=$template_fgdc;
+     /*   $xml = '<?xml version="1.0"?>
+<metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../../../../esdora/sites/default/files/fgdc-std-001-1998.xsd"
+ xmlns:fgdc="http://localhost/">
+  <idinfo xmlns="">
+    <citation>
+      <citeinfo>
+        <origin>enter one or more orign</origin>
+        <pubdate>20111111</pubdate>
+        <title>Change Me</title>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>Change Me</abstract>
+      <purpose>Some </purpose>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>20001010</begdate>
+          <enddate>20101010</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>currentness: ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>Update as required</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-101.01</westbc>
+        <eastbc>100.0</eastbc>
+        <northbc>90</northbc>
+        <southbc>-89.5</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>Ecology</themekt>
+        <themekey>Vegetation</themekey>
+      </theme>
+    </keywords>
+    <accconst>access contraints None</accconst>
+    <useconst>use contraints None </useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Jerry Pan </cntper>
+          <cntorg>ORNL </cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>Roswell</city>
+          <state>GA</state>
+          <postal>30075</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+       </cntinfo>
+     </ptcontac>
+  </idinfo>
+  <distinfo xmlns="">
+    <distrib>
+      <cntinfo>
+        <cntperp>
+          <cntper>ORNL DAAC User Services</cntper>
+          <cntorg>Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC), Oak Ridge, Tennessee, USA</cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>roswell</city>
+          <state>TN</state>
+          <postal>30328</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+      </cntinfo>
+    </distrib>
+    <distliab>Not liable</distliab>
+  </distinfo>
+  <metainfo xmlns="">
+    <metd>20110101</metd>
+    <metrd>20111010</metrd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Jerry Pan </cntper>
+          <cntorg>ORNL </cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>Roswell</city>
+          <state>GA</state>
+          <postal>30075</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>
+'; */
+        
+      } catch (Exception $e) {
+          Drupal_set_message('Could not load metadata instance template: '. $e.getMessage() . ' check installation of metadata_node module.');
+      }
   }
   try {
     module_load_include('inc', 'xml_form_api', 'XMLForm');
@@ -195,12 +349,7 @@ function get_predefined_form(array &$form_state, $form_name) {
       $form = XMLFormDefinition::GetDrupalForm($xml_definition);
       $properties = XMLFormDefinition::GetFormProperties($xml_definition);
       $properties = $properties['document'];
-      try {
-        $document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema']);
-      } catch (Exception $e) {
-        drupal_set_message($e->getMessage(), 'error');
-        return array(); // Empty Form.
-      }
+      $document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema'], $xml);
       $xml_form->initialize($form, $document);
     }
     $output = $xml_form->toArray();
@@ -211,6 +360,82 @@ function get_predefined_form(array &$form_state, $form_name) {
   }
   return $output;
 
+}
+
+/////////////////////// BLOCK DEFINITION: LIST EXISTING RECORDS AND EDITING FUNCITONS //////////
+
+
+/**
+ * implementating hook_block()
+ */
+function metadata_node_block($op='list', $delta=0, $edit=array()) {
+    global $base_url;
+    global $user;
+    switch ($op) {
+        case 'list' :
+            $blocks[0]['info']=t('My Metadata Records');
+            $blocks[0]['cache']=BLOCK_NO_CACHE;
+            $blocks[1]['info']=t('All Metadata Records');
+            $blocks[1]['cache']=BLOCK_NO_CACHE;
+            
+            return $blocks;
+        
+        case 'configure':
+            $form['num_records'] = array(
+                '#type' => 'textfield',
+                '#title'=> t('Number of metadata records to display'),
+                '#default_value' => variable_get(NUMBER_OF_RECORDS_BLOCK, 20),
+            );
+            return $form;
+       case 'view' :
+           $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
+           if($delta == 1 && user_access('view metadata_node')) {
+               //query the db
+               $result = db_query_range('SELECT nr.title, nr.body, n.status from {node_revisions} nr, {node} n ORDER BY nr.timestamp', 
+                      0, $num_of_records);
+               $destination = drupal_get_destination();
+               $items = array();
+               
+               while ($node = db_fetch_object($result)) {
+                   $file_path_name = $node->body;
+                   $edit_url=''; //@TODO
+                   $pos = strrpos($file_path_name, '/');
+                   $file_name = substr($file_path_name, $pos+1);
+                   $items[] =$file_name . l('download', $base_url . '/' . $node->body) .
+                            l(' edit', $edit_url);
+               }
+               $block['subject'] = t('Metadata Records');
+               $block['content'] = theme('item_list', $items);
+           }
+           elseif ($delta==0 && user_access('edit own metadata_node')) {
+               //query the db
+               $arg = array();
+               $arg[] = $user->uid;
+               $result = db_query_range(
+                      "SELECT DISTINCT nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' ORDER BY nr.timestamp",
+                      $user->uid,
+                      TYPE, 
+                      0, 
+                      $num_of_records);
+               $destination = drupal_get_destination();
+               $items = array();
+               
+               while ($node = db_fetch_object($result)) {
+                   $title=$node->title;
+                   if(!empty ($title)) {
+                   $file_path_name = $node->body;
+                   $edit_url=''; //@TODO
+                   $pos = strrpos($file_path_name, '/');
+                   $file_name = substr($file_path_name, $pos+1);
+                   $items[] =$file_name . ': ' . l('download', $base_url . '/' . $file_path_name) . ': ' .
+                            l(' edit', $edit_url);
+                   }
+               }
+               $block['subject'] = t('Metadata Records');
+               $block['content'] = theme('item_list', $items);               
+           }
+           return $block;
+    }
 }
 
 ?>
