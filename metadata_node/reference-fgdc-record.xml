@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://www.fgdc.gov/schemas/metadata/fgdc-std-001-1998.xsd"
+ xmlns:fgdc="http://localhost/">
+  <idinfo xmlns="">
+    <citation>
+      <citeinfo>
+        <origin>enter one or more orign</origin>
+        <pubdate>20111111</pubdate>
+        <title>Change Me</title>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>Change Me</abstract>
+      <purpose>Some </purpose>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>20001010</begdate>
+          <enddate>20101010</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>currentness: ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>Update as required</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-101.01</westbc>
+        <eastbc>100.0</eastbc>
+        <northbc>90</northbc>
+        <southbc>-89.5</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>Ecology</themekt>
+        <themekey>Vegetation</themekey>
+      </theme>
+    </keywords>
+    <accconst>access contraints None</accconst>
+    <useconst>use contraints None </useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Jerry Pan </cntper>
+          <cntorg>ORNL </cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>Roswell</city>
+          <state>GA</state>
+          <postal>30075</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+       </cntinfo>
+     </ptcontac>
+  </idinfo>
+  <distinfo xmlns="">
+    <distrib>
+      <cntinfo>
+        <cntperp>
+          <cntper>ORNL DAAC User Services</cntper>
+          <cntorg>Oak Ridge National Laboratory (ORNL) Distributed Active Archive Center (DAAC), Oak Ridge, Tennessee, USA</cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>roswell</city>
+          <state>TN</state>
+          <postal>30328</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+      </cntinfo>
+    </distrib>
+    <distliab>Not liable</distliab>
+  </distinfo>
+  <metainfo xmlns="">
+    <metd>20110101</metd>
+    <metrd>20111010</metrd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Jerry Pan </cntper>
+          <cntorg>ORNL </cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>street</addrtype>
+          <city>Roswell</city>
+          <state>GA</state>
+          <postal>30075</postal>
+        </cntaddr>
+        <cntvoice>555-1212</cntvoice>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>
