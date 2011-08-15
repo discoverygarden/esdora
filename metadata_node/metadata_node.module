@@ -3,7 +3,7 @@
 
 define(TYPE, 'metadata_node');
 define(DATA_FOLDER, 'metadata_records');
-define(METADATA_FORM_NAME, 'FGDC_2');
+define(METADATA_FORM_NAME, 'Metadata_Editor');
 define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
 
 
@@ -309,7 +309,7 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                $arg = array();
                $arg[] = $user->uid;
                $result = db_query_range(
-                      "SELECT DISTINCT nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' ORDER BY nr.timestamp",
+                      "SELECT DISTINCT nr.nid, nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' ORDER BY nr.timestamp",
                       $user->uid,
                       TYPE, 
                       0, 
@@ -319,12 +319,14 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                
                while ($node = db_fetch_object($result)) {
                    $title=$node->title;
+                   $nid=$node->nid;
                    if(!empty ($title)) {
                    $file_path_name = $node->body;
-                   $edit_url=''; //@TODO
+                   $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
+                   $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
                    $pos = strrpos($file_path_name, '/');
                    $file_name = substr($file_path_name, $pos+1);
-                   $items[] =$file_name . ': ' . l('download', $base_url . '/' . $file_path_name) . ': ' .
+                   $items[] =$title . ': ' . l('download', $base_url . '/' . $file_path_name) . ': ' .
                             l(' edit', $edit_url);
                    }
                }
