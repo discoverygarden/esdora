@@ -296,7 +296,8 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                
                while ($node = db_fetch_object($result)) {
                    $file_path_name = $node->body;
-                   $edit_url=''; //@TODO
+                   $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
+                   $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
                    $pos = strrpos($file_path_name, '/');
                    $file_name = substr($file_path_name, $pos+1);
                    $items[] =$file_name . l('download', $base_url . '/' . $node->body) .
