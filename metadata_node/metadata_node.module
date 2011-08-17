@@ -288,7 +288,8 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
            $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
            if($delta == 1 && user_access('view metadata_node')) {
                //query the db
-               $result = db_query_range('SELECT nr.title, nr.body, n.status from {node_revisions} nr, {node} n ORDER BY nr.timestamp', 
+               $result = db_query_range("SELECT nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", 
+                      TYPE, 
                       0, $num_of_records);
                $destination = drupal_get_destination();
                $items = array();
@@ -306,10 +307,8 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
            }
            elseif ($delta==0 && user_access('edit own metadata_node')) {
                //query the db
-               $arg = array();
-               $arg[] = $user->uid;
                $result = db_query_range(
-                      "SELECT DISTINCT nr.nid, nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' ORDER BY nr.timestamp",
+                      "SELECT DISTINCT nr.nid, nr.title, nr.body, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp",
                       $user->uid,
                       TYPE, 
                       0, 
