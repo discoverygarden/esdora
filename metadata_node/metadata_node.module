@@ -99,16 +99,22 @@ function metadata_node_form_submit(array $form, array &$form_state) {
     $xml_form = new XMLForm($form_state);
     $doc = $xml_form->submit($form, $form_state);
     $document = $doc->document;
-    //dom_document_pretty_print($document);
-    //exit();
     $title = get_docTitle($document);
-    $file_created = create_file($title, $document, false); //@todo, need to get published info from existing node
-    if(isset ($file_created)) {
-        create_node($title, $file_created);
-        drupal_set_message('Metadata record created successfully. Record title: ' . $title);
+    $node = $form['#node'];
+    $nid = $node->nid;
+    $file_created = create_update_file($title, $document, $node); 
+    if(!isset ($nid)) {
+        if(isset ($file_created)) {
+            create_node($title, $file_created);
+            drupal_set_message('Metadata record saved successfully. Record title: ' . $title);
+        }
+        else {
+            drupal_set_message('Not not created because file save failed.');
+        }
     }
-    else {
-        drupal_set_message('Failed to save metadata records. Check logs for details.');
+    elseif ($nid>0) {
+        node_save($node); //just to get a new timestamp
+        drupal_set_message('Metadata record saved successfully. Record title: ' . $title);
     }
   } catch (Exception $e) {
     $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
@@ -118,11 +124,49 @@ function metadata_node_form_submit(array $form, array &$form_state) {
 }
 
 /**
- * create a file and return the file name
+ * create or update a file and return the file name
  * the content is the XML as string contained in $document
  * @param type $document 
  */
-function create_file($title, DOMDocument $document, $isPublished) {
+function create_update_file($title, DOMDocument $document, $node) {
+   if(isset ($node)) {
+        $nid = $node->nid;
+        $vid = $node->vid;
+        if($nid>0) { //should be true if $node exists
+            return update_file($title, $document, $node);
+        }    
+   }
+   return create_file($title, $document);
+}
+
+function update_file($title, DOMDocument $document, &$node) {
+    global $user;
+    $file_name=null;
+    $published=$node->status;
+    try {
+        $file_name=$node->body;
+        if(!file_exists($file_name)) {
+            drupal_set_message('Metadata record file ' . $file_name .' does not exist on server. Please contact administrator.');
+            return '';
+        }
+        $xml_string = $document -> saveXML();
+        if($published) {
+            file_save_data($xml_string, $file_name, FILE_EXISTS_RENAME);
+        }
+        else {
+            file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
+        }
+        //@TODO
+        //if title changed, update the node title, move file to new name, update node body, do not save here, the caller is to save
+        //
+        
+    }catch (Exception $e) {
+        drupal.setMessage('error:' . $e->getMessage());
+    }
+    return $file_name;    
+}
+
+function create_file($title, DOMDocument $document) {
     global $user;
     $file_name=null;
     try {
@@ -144,12 +188,7 @@ function create_file($title, DOMDocument $document, $isPublished) {
         $replace = '_';
         $file_name = str_replace($needles, $replace, $file_name);
         $xml_string = $document -> saveXML();
-        if($isPublished) {
-            file_save_data($xml_string, $file_name, FILE_EXISTS_RENAME);
-        }
-        else {
-            file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
-        }
+        file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
     }catch (Exception $e) {
         drupal.setMessage('error:' . $e->getMessage());
     }
