@@ -831,6 +831,53 @@ function getDescriptionWOFB() //description tab
     }
 
     return $list_of_streams;
-  }  
+  }
+
+
+  /**
+   *
+   * @param <type> $relationship
+   * @param <type> $object
+   * @param <type> $dsid
+   * @param <type> $namespaceURI
+   */
+  function add_relationship_internal($relationship, $object,$dsid, $namespaceURI = RELS_EXT_URI) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $item = new Fedora_Item($this->pid);
+    $ds_list = $item->get_datastreams_list_as_array();
+    if (empty($ds_list['RELS-INT'])) {
+      $rels_int = '<rdf:RDF xmlns:fedora="info:fedora/fedora-system:def/relations-internal#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"></rdf:RDF>';
+      $item->add_datastream_from_string($rels_int, $id, 'Fedora internal relationship metadata', 'text/xml', 'X');
+    }
+
+    $rels = $item->get_datastream_dissemination('RELS-INT');
+    
+    if (substr($object, 0, 12) != 'info:fedora/') {
+      $object = "info:fedora/$object";
+    }
+
+    $relsxml = new DomDocument();
+
+    $relsxml->loadXML($rels);
+    $rdf_element = $relsxml->getElementsByTagNameNS('http://www.w3.org/1999/02/22-rdf-syntax-ns#', 'RDF');
+
+    /*this is what the xml looks like
+     * <rdf:Description rdf:about="info:fedora/es:ISLSCP_II.TDS_C4_VEGETATION_PERCENTAGE/zero__historic_landcover_readme.txt">
+    <myns:isMetaDataFor rdf:resource="info:fedora/es:ISLSCP_II.TDS_C4_VEGETATION_PERCENTAGE"></myns:isMetaDataFor>
+  </rdf:Description>
+     */
+
+    // Create the new relationship node.
+    $newrel = $relsxml->createElement('rdf:Description');
+    $newrel->setAttribute('rdf:about', $object.'/'.$dsid);
+    $newstmt = $relsxml->createElementNS($namespaceURI,'esdora:'.$relationship);
+    $newstmt->setAttribute('rdf:resource', $object);
+    $newrel->appendChild($newstmt);
+    $rdf_element->item(0)->appendChild($newrel);
+    $test = $relsxml->saveXML();
+    $item->modify_datastream_by_value( $relsxml->saveXML(), 'RELS-INT', "internal Relationship Metadata", 'text/xml');
+    
+  }
+
 
 }
