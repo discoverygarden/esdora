@@ -186,8 +186,8 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id){
  * This is the form handler that gets called now that we have implemented hood form alter
  */
 function esdora_rels_int_handler(&$form, &$form_state){
-   module_load_include('inc', 'esdora', 'plugins/esdora');
-   $esdora = new ESDORA($form_state['values']['pid']);
+   module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+   $esdora = new Esdora($form_state['values']['pid']);
   if($form_state['values']['is_metadata'] === 1){
     $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'],$form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
   }
