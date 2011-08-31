@@ -841,9 +841,9 @@ function getDescriptionWOFB() //description tab
    * @param <type> $dsid
    * @param <type> $namespaceURI
    */
-  function add_relationship_internal($relationship, $object,$dsid, $namespaceURI) {
+  static function add_relationship_internal($relationship, $object,$dsid, $namespaceURI) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $item = new Fedora_Item($this->pid);
+    $item = new Fedora_Item($object);
     $ds_list = $item->get_datastreams_list_as_array();
     if (empty($ds_list['RELS-INT'])) {
       $rels_int = '<rdf:RDF xmlns:fedora="info:fedora/fedora-system:def/relations-internal#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"></rdf:RDF>';
