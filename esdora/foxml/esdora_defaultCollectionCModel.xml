@@ -1,0 +1,2119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="esdora:defaultCollectionCModel"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="EsdoraDefaultCollectionCModel"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="fedoraAdmin"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2011-03-01T00:12:52.636Z"/>
+<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2011-08-31T14:26:45.610Z"/>
+</foxml:objectProperties>
+<foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2011-03-01T00:12:52.636Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+<foxml:xmlContent>
+<audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+<audit:record ID="AUDREC1">
+<audit:process type="Fedora API-M"/>
+<audit:action>ingest</audit:action>
+<audit:componentID></audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-03-01T14:56:58.331Z</audit:date>
+<audit:justification>Ingested from local file /Users/aoneill/dev/iiv/iiv/etc/fedora-objects/ilives_bookCModel.xml</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC2">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyObject</audit:action>
+<audit:componentID></audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-03-19T16:46:40.544Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC3">
+<audit:process type="Fedora API-M"/>
+<audit:action>ingest</audit:action>
+<audit:componentID></audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-07-21T13:49:26.696Z</audit:date>
+<audit:justification>initial object ingestion.</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC4">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-07-31T00:04:51.461Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC5">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:37:00.758Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC6">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:38:32.866Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC7">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:39:36.449Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC8">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:47:19.326Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC9">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>RELS-EXT</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:48:47.832Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC10">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-29T13:53:38.321Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC11">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-31T13:07:39.549Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC12">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>ISLANDORACM</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2011-08-31T14:26:45.610Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+</audit:auditTrail>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DS-COMPOSITE-MODEL" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="DS-COMPOSITE-MODEL.7" LABEL="Datastream Composite Model" CREATED="2009-03-11T19:16:18.656Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:FedoraDSCompositeModel-1.0" SIZE="1003">
+<foxml:xmlContent>
+<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">           <comment xmlns="info:fedora/fedora-system:def/comment#">             This DS-COMPOSITE-MODEL datastream is included as a starting point to             assist in the creation of a content model. The DS-COMPOSITE-MODEL             should define the datastreams that are required for any objects             conforming to this content model.             For more information about content models, see:             http://fedora-commons.org/confluence/x/dgBI.             For examples of completed content model objects, see the demonstration             objects included with your Fedora distribution, such as:             demo:CMImage, demo:UVA_STD_IMAGE, demo:DualResImageCollection,             demo:TEI_TO_PDFDOC, and demo:XML_TO_HTMLDOC.             For more information about the demonstration objects, see:             http://fedora-commons.org/confluence/x/AwFI.           </comment>         </dsCompositeModel>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="DC.2" LABEL="Dublin Core Record for this object" CREATED="2011-03-01T17:57:45.873Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="461">
+<foxml:xmlContent>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>ESDORA Content Model</dc:title>
+  <dc:identifier>esdora:defaultDataCModel</dc:identifier>
+  <dc:identifier>esdora:defaultCollectionCModel</dc:identifier>
+</oai_dc:dc>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="ISLANDORACM" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="ISLANDORACM.0" LABEL="Islandora content model information" CREATED="2011-03-01T23:15:37.658Z" MIMETYPE="text/xml" SIZE="23269">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">   <mimetypes>     <type>text/xml</type>     <type>application/xml</type>     <type>text/plain</type>   </mimetypes>   <ingest_rules></ingest_rules>   <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">     <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>     <form_elements>       <element label="Collection Specifics" name="collection" required="false" type="fieldset">         <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>       </element>       <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">         <description>Please select a list of content models that are allowed in this collection.</description>         <authoritative_list>           <item field="High Resolution Image">uofm:highResImage</item>         </authoritative_list>         <parameters>           <parameter name="#multiple">TRUE</parameter>         </parameters>       </element>       <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">         <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>       </element>       <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">         <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>       </element>       <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">         <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>         <authoritative_list>           <item field="Pull images randomly from the collection">collection</item>           <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>         </authoritative_list>       </element>       <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator1][image1" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator2][image2" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator3][image3" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator4][image4" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator5][image5" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Image" name="collection][rotator6][image6" required="false" type="file">         <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>       </element>       <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">         <description>The title that will be displayed along with the image.</description>       </element>       <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">         <description>A brief one-line description that will be displayed alongside the image. </description>       </element>       <element label="Title" name="mods_title" required="true" type="textfield">         <description>A descriptive title of the object.</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>         </parameters>       </element>       <element label="Identifier" name="mods_identifier" required="false" type="textfield">         <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>         </parameters>       </element>       <element label="Format" name="mods_format" required="true" type="select">         <description>Choose the format of the original item that was digitized.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>         </parameters>         <authoritative_list>           <item>text</item>           <item>cartographic</item>           <item>notated music</item>           <item>sound recording</item>           <item>sound recording - musical</item>           <item>sound-recording - non musical</item>           <item>still image</item>           <item>moving image</item>           <item>three dimensional object</item>           <item>software</item>           <item>multimedia</item>           <item>mixed material</item>         </authoritative_list>       </element>       <element label="Description" name="mods_description" required="true" type="textarea">         <description>A summary of the content of the resource.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>         </parameters>       </element>       <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>         </parameters>       </element>       <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">         <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>         </parameters>       </element>       <element label="Note" name="mods_note" required="false" type="textarea">         <description>Add a note about the digital object.</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>         </parameters>       </element>       <element label="Subject(s)" name="subject" required="false" type="fieldset">         <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>       </element>       <element label="Spatial" name="subject][place" required="false" type="fieldset">         <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Country" name="subject][place][mods_country" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#autocomplete_path">autocomplete_gacs</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>         </parameters>       </element>       <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#autocomplete_path">autocomplete_gacs</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>         </parameters>       </element>       <element label="City" name="subject][place][mods_city" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>         </parameters>       </element>       <element label="Temporal" name="subject][time" required="false" type="fieldset">         <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>         </parameters>       </element>       <element label="Date" name="subject][time][date" required="false" type="datepicker">         <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>         </parameters>       </element>       <element label="Person" name="subject][person" required="false" type="fieldset">         <description>Is the digital object about a person? If yes then please include:</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>         </parameters>       </element>       <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>         </parameters>       </element>       <element label="Topic" name="subject][topic" required="false" type="fieldset">         <description>Is the digital object about a thing?</description>         <parameters>           <parameter name="#collapsed">TRUE</parameter>           <parameter name="#collapsible">TRUE</parameter>         </parameters>       </element>       <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">         <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>         </parameters>       </element>       <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">         <description>Please select the authority from which the terms below originate.</description>         <authoritative_list>           <item field="Library of Congress Subject Headings">lcsh</item>         </authoritative_list>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>         </parameters>       </element>       <element label="Title" name="subject][title" required="false" type="fieldset">         <description>Is the digital object about another title? </description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">         <description>The other title that this object is about.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>         </parameters>       </element>       <element label="Language(s)" name="mods_language" required="false" type="list">         <description>Please identify the language(s) of the resource.  Find as you type.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#autocomplete_path">autocomplete_language</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>         </parameters>       </element>       <element label="Entities" name="mods_people" required="false" type="people">         <description>Please enter a list of entities that are related to this object by the specified roles.</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Physical Location" name="physlocation" required="false" type="fieldset">         <description>Physical location of the object.</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>         </parameters>       </element>       <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">         <description>optional.  eg Archives Number.</description>         <parameters>           <parameter name="#sticky">TRUE</parameter>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>         </parameters>       </element>       <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">         <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>         <parameters>           <parameter name="#collapsible">TRUE</parameter>           <parameter name="#collapsed">TRUE</parameter>         </parameters>       </element>       <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>         </parameters>       </element>       <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>         </parameters>       </element>       <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>         </parameters>       </element>       <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">         <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>         <parameters>           <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>         </parameters>       </element>       <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">         <authoritative_list>           <item>issued</item>           <item>created</item>           <item>captured</item>           <item>copyright</item>         </authoritative_list>         <parameters>           <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>         </parameters>       </element>       <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">         <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>         <parameters>           <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>         </parameters>       </element>       <element name="MAX_FILE_SIZE" required="false" type="hidden">         <parameters>           <parameter name="#value">8000000</parameter>         </parameters>       </element>     </form_elements>   </ingest_form>   <datastreams>     <datastream dsid="DC">       <display_method class="IslandoraCollection" file="plugins/IslandoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>     </datastream>   </datastreams>   <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method> </content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.1" LABEL="Islandora content model information" CREATED="2011-07-31T00:04:51.461Z" MIMETYPE="text/xml" SIZE="23263">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>text/xml</type>
+    <type>application/xml</type>
+    <type>text/plain</type>
+  </mimetypes>
+  <ingest_rules></ingest_rules>
+  <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">
+    <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>
+    <form_elements>
+      <element label="Collection Specifics" name="collection" required="false" type="fieldset">
+        <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>
+      </element>
+      <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">
+        <description>Please select a list of content models that are allowed in this collection.</description>
+        <authoritative_list>
+          <item field="High Resolution Image">uofm:highResImage</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#multiple">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">
+        <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>
+      </element>
+      <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">
+        <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>
+      </element>
+      <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">
+        <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>
+        <authoritative_list>
+          <item field="Pull images randomly from the collection">collection</item>
+          <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>
+        </authoritative_list>
+      </element>
+      <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator1][image1" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator2][image2" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator3][image3" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator4][image4" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator5][image5" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator6][image6" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Title" name="mods_title" required="true" type="textfield">
+        <description>A descriptive title of the object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Identifier" name="mods_identifier" required="false" type="textfield">
+        <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Format" name="mods_format" required="true" type="select">
+        <description>Choose the format of the original item that was digitized.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>
+        </parameters>
+        <authoritative_list>
+          <item>text</item>
+          <item>cartographic</item>
+          <item>notated music</item>
+          <item>sound recording</item>
+          <item>sound recording - musical</item>
+          <item>sound-recording - non musical</item>
+          <item>still image</item>
+          <item>moving image</item>
+          <item>three dimensional object</item>
+          <item>software</item>
+          <item>multimedia</item>
+          <item>mixed material</item>
+        </authoritative_list>
+      </element>
+      <element label="Description" name="mods_description" required="true" type="textarea">
+        <description>A summary of the content of the resource.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>
+        </parameters>
+      </element>
+      <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">
+        <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>
+        </parameters>
+      </element>
+      <element label="Note" name="mods_note" required="false" type="textarea">
+        <description>Add a note about the digital object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>
+        </parameters>
+      </element>
+      <element label="Subject(s)" name="subject" required="false" type="fieldset">
+        <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>
+      </element>
+      <element label="Spatial" name="subject][place" required="false" type="fieldset">
+        <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Country" name="subject][place][mods_country" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>
+        </parameters>
+      </element>
+      <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>
+        </parameters>
+      </element>
+      <element label="City" name="subject][place][mods_city" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>
+        </parameters>
+      </element>
+      <element label="Temporal" name="subject][time" required="false" type="fieldset">
+        <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="subject][time][date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Person" name="subject][person" required="false" type="fieldset">
+        <description>Is the digital object about a person? If yes then please include:</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Topic" name="subject][topic" required="false" type="fieldset">
+        <description>Is the digital object about a thing?</description>
+        <parameters>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#collapsible">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">
+        <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>
+        </parameters>
+      </element>
+      <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">
+        <description>Please select the authority from which the terms below originate.</description>
+        <authoritative_list>
+          <item field="Library of Congress Subject Headings">lcsh</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title" required="false" type="fieldset">
+        <description>Is the digital object about another title? </description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">
+        <description>The other title that this object is about.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Language(s)" name="mods_language" required="false" type="list">
+        <description>Please identify the language(s) of the resource.  Find as you type.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_language</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Entities" name="mods_people" required="false" type="people">
+        <description>Please enter a list of entities that are related to this object by the specified roles.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation" required="false" type="fieldset">
+        <description>Physical location of the object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>
+        </parameters>
+      </element>
+      <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">
+        <description>optional.  eg Archives Number.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>
+        </parameters>
+      </element>
+      <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">
+        <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>
+        </parameters>
+      </element>
+      <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>
+        </parameters>
+      </element>
+      <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">
+        <authoritative_list>
+          <item>issued</item>
+          <item>created</item>
+          <item>captured</item>
+          <item>copyright</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>
+        </parameters>
+      </element>
+      <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">
+        <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>
+        </parameters>
+      </element>
+      <element name="MAX_FILE_SIZE" required="false" type="hidden">
+        <parameters>
+          <parameter name="#value">8000000</parameter>
+        </parameters>
+      </element>
+    </form_elements>
+  </ingest_form>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+    </datastream>
+  </datastreams>
+  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.2" LABEL="Islandora content model information" CREATED="2011-08-29T13:37:00.758Z" MIMETYPE="text/xml" SIZE="23474">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>text/xml</type>
+    <type>application/xml</type>
+    <type>text/plain</type>
+  </mimetypes>
+  <ingest_rules></ingest_rules>
+  <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">
+    <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>
+    <form_elements>
+      <element label="Collection Specifics" name="collection" required="false" type="fieldset">
+        <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>
+      </element>
+      <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">
+        <description>Please select a list of content models that are allowed in this collection.</description>
+        <authoritative_list>
+          <item field="High Resolution Image">uofm:highResImage</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#multiple">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">
+        <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>
+      </element>
+      <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">
+        <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>
+      </element>
+      <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">
+        <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>
+        <authoritative_list>
+          <item field="Pull images randomly from the collection">collection</item>
+          <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>
+        </authoritative_list>
+      </element>
+      <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator1][image1" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator2][image2" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator3][image3" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator4][image4" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator5][image5" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator6][image6" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Title" name="mods_title" required="true" type="textfield">
+        <description>A descriptive title of the object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Identifier" name="mods_identifier" required="false" type="textfield">
+        <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Format" name="mods_format" required="true" type="select">
+        <description>Choose the format of the original item that was digitized.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>
+        </parameters>
+        <authoritative_list>
+          <item>text</item>
+          <item>cartographic</item>
+          <item>notated music</item>
+          <item>sound recording</item>
+          <item>sound recording - musical</item>
+          <item>sound-recording - non musical</item>
+          <item>still image</item>
+          <item>moving image</item>
+          <item>three dimensional object</item>
+          <item>software</item>
+          <item>multimedia</item>
+          <item>mixed material</item>
+        </authoritative_list>
+      </element>
+      <element label="Description" name="mods_description" required="true" type="textarea">
+        <description>A summary of the content of the resource.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>
+        </parameters>
+      </element>
+      <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">
+        <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>
+        </parameters>
+      </element>
+      <element label="Note" name="mods_note" required="false" type="textarea">
+        <description>Add a note about the digital object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>
+        </parameters>
+      </element>
+      <element label="Subject(s)" name="subject" required="false" type="fieldset">
+        <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>
+      </element>
+      <element label="Spatial" name="subject][place" required="false" type="fieldset">
+        <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Country" name="subject][place][mods_country" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>
+        </parameters>
+      </element>
+      <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>
+        </parameters>
+      </element>
+      <element label="City" name="subject][place][mods_city" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>
+        </parameters>
+      </element>
+      <element label="Temporal" name="subject][time" required="false" type="fieldset">
+        <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="subject][time][date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Person" name="subject][person" required="false" type="fieldset">
+        <description>Is the digital object about a person? If yes then please include:</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Topic" name="subject][topic" required="false" type="fieldset">
+        <description>Is the digital object about a thing?</description>
+        <parameters>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#collapsible">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">
+        <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>
+        </parameters>
+      </element>
+      <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">
+        <description>Please select the authority from which the terms below originate.</description>
+        <authoritative_list>
+          <item field="Library of Congress Subject Headings">lcsh</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title" required="false" type="fieldset">
+        <description>Is the digital object about another title? </description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">
+        <description>The other title that this object is about.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Language(s)" name="mods_language" required="false" type="list">
+        <description>Please identify the language(s) of the resource.  Find as you type.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_language</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Entities" name="mods_people" required="false" type="people">
+        <description>Please enter a list of entities that are related to this object by the specified roles.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation" required="false" type="fieldset">
+        <description>Physical location of the object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>
+        </parameters>
+      </element>
+      <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">
+        <description>optional.  eg Archives Number.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>
+        </parameters>
+      </element>
+      <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">
+        <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>
+        </parameters>
+      </element>
+      <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>
+        </parameters>
+      </element>
+      <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">
+        <authoritative_list>
+          <item>issued</item>
+          <item>created</item>
+          <item>captured</item>
+          <item>copyright</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>
+        </parameters>
+      </element>
+      <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">
+        <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>
+        </parameters>
+      </element>
+      <element name="MAX_FILE_SIZE" required="false" type="hidden">
+        <parameters>
+          <parameter name="#value">8000000</parameter>
+        </parameters>
+      </element>
+    </form_elements>
+  </ingest_form>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+    </datastream>
+    <datastream dsid="COLLECTION_POLICY">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+    </datastream>
+  </datastreams>
+  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.3" LABEL="Islandora content model information" CREATED="2011-08-29T13:38:32.866Z" MIMETYPE="text/xml" SIZE="23447">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>text/xml</type>
+    <type>application/xml</type>
+    <type>text/plain</type>
+  </mimetypes>
+  <ingest_rules></ingest_rules>
+  <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">
+    <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>
+    <form_elements>
+      <element label="Collection Specifics" name="collection" required="false" type="fieldset">
+        <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>
+      </element>
+      <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">
+        <description>Please select a list of content models that are allowed in this collection.</description>
+        <authoritative_list>
+          <item field="High Resolution Image">uofm:highResImage</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#multiple">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">
+        <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>
+      </element>
+      <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">
+        <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>
+      </element>
+      <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">
+        <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>
+        <authoritative_list>
+          <item field="Pull images randomly from the collection">collection</item>
+          <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>
+        </authoritative_list>
+      </element>
+      <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator1][image1" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator2][image2" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator3][image3" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator4][image4" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator5][image5" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator6][image6" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Title" name="mods_title" required="true" type="textfield">
+        <description>A descriptive title of the object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Identifier" name="mods_identifier" required="false" type="textfield">
+        <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Format" name="mods_format" required="true" type="select">
+        <description>Choose the format of the original item that was digitized.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>
+        </parameters>
+        <authoritative_list>
+          <item>text</item>
+          <item>cartographic</item>
+          <item>notated music</item>
+          <item>sound recording</item>
+          <item>sound recording - musical</item>
+          <item>sound-recording - non musical</item>
+          <item>still image</item>
+          <item>moving image</item>
+          <item>three dimensional object</item>
+          <item>software</item>
+          <item>multimedia</item>
+          <item>mixed material</item>
+        </authoritative_list>
+      </element>
+      <element label="Description" name="mods_description" required="true" type="textarea">
+        <description>A summary of the content of the resource.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>
+        </parameters>
+      </element>
+      <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">
+        <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>
+        </parameters>
+      </element>
+      <element label="Note" name="mods_note" required="false" type="textarea">
+        <description>Add a note about the digital object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>
+        </parameters>
+      </element>
+      <element label="Subject(s)" name="subject" required="false" type="fieldset">
+        <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>
+      </element>
+      <element label="Spatial" name="subject][place" required="false" type="fieldset">
+        <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Country" name="subject][place][mods_country" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>
+        </parameters>
+      </element>
+      <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>
+        </parameters>
+      </element>
+      <element label="City" name="subject][place][mods_city" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>
+        </parameters>
+      </element>
+      <element label="Temporal" name="subject][time" required="false" type="fieldset">
+        <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="subject][time][date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Person" name="subject][person" required="false" type="fieldset">
+        <description>Is the digital object about a person? If yes then please include:</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Topic" name="subject][topic" required="false" type="fieldset">
+        <description>Is the digital object about a thing?</description>
+        <parameters>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#collapsible">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">
+        <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>
+        </parameters>
+      </element>
+      <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">
+        <description>Please select the authority from which the terms below originate.</description>
+        <authoritative_list>
+          <item field="Library of Congress Subject Headings">lcsh</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title" required="false" type="fieldset">
+        <description>Is the digital object about another title? </description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">
+        <description>The other title that this object is about.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Language(s)" name="mods_language" required="false" type="list">
+        <description>Please identify the language(s) of the resource.  Find as you type.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_language</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Entities" name="mods_people" required="false" type="people">
+        <description>Please enter a list of entities that are related to this object by the specified roles.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation" required="false" type="fieldset">
+        <description>Physical location of the object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>
+        </parameters>
+      </element>
+      <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">
+        <description>optional.  eg Archives Number.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>
+        </parameters>
+      </element>
+      <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">
+        <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>
+        </parameters>
+      </element>
+      <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>
+        </parameters>
+      </element>
+      <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">
+        <authoritative_list>
+          <item>issued</item>
+          <item>created</item>
+          <item>captured</item>
+          <item>copyright</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>
+        </parameters>
+      </element>
+      <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">
+        <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>
+        </parameters>
+      </element>
+      <element name="MAX_FILE_SIZE" required="false" type="hidden">
+        <parameters>
+          <parameter name="#value">8000000</parameter>
+        </parameters>
+      </element>
+    </form_elements>
+  </ingest_form>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+    </datastream>
+    <datastream dsid="COLLECTION_POLICY">
+      <display_method class="CollectionClass" file="CollectionClass.inc" method="showFieldSets" module=""></display_method>
+    </datastream>
+  </datastreams>
+  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.4" LABEL="Islandora content model information" CREATED="2011-08-29T13:39:36.449Z" MIMETYPE="text/xml" SIZE="23263">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>text/xml</type>
+    <type>application/xml</type>
+    <type>text/plain</type>
+  </mimetypes>
+  <ingest_rules></ingest_rules>
+  <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">
+    <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>
+    <form_elements>
+      <element label="Collection Specifics" name="collection" required="false" type="fieldset">
+        <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>
+      </element>
+      <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">
+        <description>Please select a list of content models that are allowed in this collection.</description>
+        <authoritative_list>
+          <item field="High Resolution Image">uofm:highResImage</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#multiple">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">
+        <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>
+      </element>
+      <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">
+        <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>
+      </element>
+      <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">
+        <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>
+        <authoritative_list>
+          <item field="Pull images randomly from the collection">collection</item>
+          <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>
+        </authoritative_list>
+      </element>
+      <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator1][image1" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator2][image2" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator3][image3" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator4][image4" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator5][image5" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator6][image6" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Title" name="mods_title" required="true" type="textfield">
+        <description>A descriptive title of the object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Identifier" name="mods_identifier" required="false" type="textfield">
+        <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Format" name="mods_format" required="true" type="select">
+        <description>Choose the format of the original item that was digitized.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>
+        </parameters>
+        <authoritative_list>
+          <item>text</item>
+          <item>cartographic</item>
+          <item>notated music</item>
+          <item>sound recording</item>
+          <item>sound recording - musical</item>
+          <item>sound-recording - non musical</item>
+          <item>still image</item>
+          <item>moving image</item>
+          <item>three dimensional object</item>
+          <item>software</item>
+          <item>multimedia</item>
+          <item>mixed material</item>
+        </authoritative_list>
+      </element>
+      <element label="Description" name="mods_description" required="true" type="textarea">
+        <description>A summary of the content of the resource.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>
+        </parameters>
+      </element>
+      <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">
+        <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>
+        </parameters>
+      </element>
+      <element label="Note" name="mods_note" required="false" type="textarea">
+        <description>Add a note about the digital object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>
+        </parameters>
+      </element>
+      <element label="Subject(s)" name="subject" required="false" type="fieldset">
+        <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>
+      </element>
+      <element label="Spatial" name="subject][place" required="false" type="fieldset">
+        <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Country" name="subject][place][mods_country" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>
+        </parameters>
+      </element>
+      <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>
+        </parameters>
+      </element>
+      <element label="City" name="subject][place][mods_city" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>
+        </parameters>
+      </element>
+      <element label="Temporal" name="subject][time" required="false" type="fieldset">
+        <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="subject][time][date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Person" name="subject][person" required="false" type="fieldset">
+        <description>Is the digital object about a person? If yes then please include:</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Topic" name="subject][topic" required="false" type="fieldset">
+        <description>Is the digital object about a thing?</description>
+        <parameters>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#collapsible">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">
+        <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>
+        </parameters>
+      </element>
+      <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">
+        <description>Please select the authority from which the terms below originate.</description>
+        <authoritative_list>
+          <item field="Library of Congress Subject Headings">lcsh</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title" required="false" type="fieldset">
+        <description>Is the digital object about another title? </description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">
+        <description>The other title that this object is about.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Language(s)" name="mods_language" required="false" type="list">
+        <description>Please identify the language(s) of the resource.  Find as you type.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_language</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Entities" name="mods_people" required="false" type="people">
+        <description>Please enter a list of entities that are related to this object by the specified roles.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation" required="false" type="fieldset">
+        <description>Physical location of the object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>
+        </parameters>
+      </element>
+      <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">
+        <description>optional.  eg Archives Number.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>
+        </parameters>
+      </element>
+      <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">
+        <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>
+        </parameters>
+      </element>
+      <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>
+        </parameters>
+      </element>
+      <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">
+        <authoritative_list>
+          <item>issued</item>
+          <item>created</item>
+          <item>captured</item>
+          <item>copyright</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>
+        </parameters>
+      </element>
+      <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">
+        <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>
+        </parameters>
+      </element>
+      <element name="MAX_FILE_SIZE" required="false" type="hidden">
+        <parameters>
+          <parameter name="#value">8000000</parameter>
+        </parameters>
+      </element>
+    </form_elements>
+  </ingest_form>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+    </datastream>
+  </datastreams>
+  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.5" LABEL="Islandora content model information" CREATED="2011-08-29T13:53:38.321Z" MIMETYPE="text/xml" SIZE="23320">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Collection" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>text/xml</type>
+    <type>application/xml</type>
+    <type>text/plain</type>
+  </mimetypes>
+  <ingest_rules></ingest_rules>
+  <ingest_form dsid="MODS" hide_file_chooser="true" page="2" redirect="false">
+    <form_builder_method class="UofMCollectionFormBuilder" file="plugins/UofMCollectionFormBuilder.inc" handler="handleCollectionForm" method="buildQDCForm" module="fedora_repository"></form_builder_method>
+    <form_elements>
+      <element label="Collection Specifics" name="collection" required="false" type="fieldset">
+        <description>This section lists the details of the collection.  Custom search terms are also possible, but they must be modified by an administrator.</description>
+      </element>
+      <element label="Allowed Content Models" name="collection][allowed_models" required="true" type="select">
+        <description>Please select a list of content models that are allowed in this collection.</description>
+        <authoritative_list>
+          <item field="High Resolution Image">uofm:highResImage</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#multiple">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Persistent Identifier" name="collection][new_pid" required="true" type="textfield">
+        <description>Please enter a persistent identifier to use for this collection.   The namespace uofm: should be used in most cases.</description>
+      </element>
+      <element label="Thumbnail Image" name="collection][thumbnail" required="false" type="file">
+        <description>A thumbnail image of the collection.  The image will be resized automatically.    &lt;b&gt;Please only upload files less than 2 Mb.   Larger files may cause the collection creation to fail.&lt;/b&gt;</description>
+      </element>
+      <element label="Image Rotator Block" name="collection][rotator" required="false" type="select">
+        <description>Determines the source of the images used in the rotator block that appears at the top of the collection page.</description>
+        <authoritative_list>
+          <item field="Pull images randomly from the collection">collection</item>
+          <item field="Provide a custom list of images,  titles, and descriptions.">custom</item>
+        </authoritative_list>
+      </element>
+      <element label="Custom Rotator Image - 1" name="collection][rotator1" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator1][image1" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator1][title1" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator1][description1" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 2" name="collection][rotator2" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator2][image2" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator2][title2" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator2][description2" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 3" name="collection][rotator3" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator3][image3" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator3][title3" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator3][description3" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 4" name="collection][rotator4" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator4][image4" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator4][title4" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator4][description4" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 5" name="collection][rotator5" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator5][image5" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator5][title5" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator5][description5" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Custom Rotator Image - 6" name="collection][rotator6" required="false" type="fieldset">
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Image" name="collection][rotator6][image6" required="false" type="file">
+        <description>The image to use in the image rotator block.  Will be automatically resized, but the image should be at least as large as the image rotator 472x277 pixels.</description>
+      </element>
+      <element label="Title" name="collection][rotator6][title6" required="false" type="textfield">
+        <description>The title that will be displayed along with the image.</description>
+      </element>
+      <element label="Description" name="collection][rotator6][description6" required="false" type="textfield">
+        <description>A brief one-line description that will be displayed alongside the image. </description>
+      </element>
+      <element label="Title" name="mods_title" required="true" type="textfield">
+        <description>A descriptive title of the object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Identifier" name="mods_identifier" required="false" type="textfield">
+        <description>Please enter a standard number assigned to the resource.  This field is optional, as an identifier in the Handle system will be automatically assigned.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:identifier[@type=&apos;local&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Format" name="mods_format" required="true" type="select">
+        <description>Choose the format of the original item that was digitized.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:typeOfResource</parameter>
+        </parameters>
+        <authoritative_list>
+          <item>text</item>
+          <item>cartographic</item>
+          <item>notated music</item>
+          <item>sound recording</item>
+          <item>sound recording - musical</item>
+          <item>sound-recording - non musical</item>
+          <item>still image</item>
+          <item>moving image</item>
+          <item>three dimensional object</item>
+          <item>software</item>
+          <item>multimedia</item>
+          <item>mixed material</item>
+        </authoritative_list>
+      </element>
+      <element label="Description" name="mods_description" required="true" type="textarea">
+        <description>A summary of the content of the resource.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:abstract</parameter>
+        </parameters>
+      </element>
+      <element label="Creative Commons Copyright" name="mods_cc" required="false" type="copyright">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;Creative Commons License&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Freeform Copyright Declaration" name="mods_rights" required="false" type="textarea">
+        <description>You may choose to provide additional notes to the license above, or in the case where you would not like to use Creative Commons, then you must provide a copyright notice here.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:accessCondition[@type=&apos;restriction on access; use and reproduction&apos;]/</parameter>
+        </parameters>
+      </element>
+      <element label="Note" name="mods_note" required="false" type="textarea">
+        <description>Add a note about the digital object.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:note</parameter>
+        </parameters>
+      </element>
+      <element label="Subject(s)" name="subject" required="false" type="fieldset">
+        <description>&lt;b&gt;&lt;font color=&quot;red&quot;&gt;*&lt;/font&gt;&lt;/b&gt; At least one subject is required.  Please expand the appropriate fieldset(s) below and fill in the necessary information. </description>
+      </element>
+      <element label="Spatial" name="subject][place" required="false" type="fieldset">
+        <description>Is the digital object about a place?  If yes, then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Country" name="subject][place][mods_country" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:country</parameter>
+        </parameters>
+      </element>
+      <element label="State/Province" name="subject][place][mods_province" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_gacs</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:province</parameter>
+        </parameters>
+      </element>
+      <element label="City" name="subject][place][mods_city" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:hierarchicalGeographic/mods:city</parameter>
+        </parameters>
+      </element>
+      <element label="Temporal" name="subject][time" required="false" type="fieldset">
+        <description>Is the digital object about a time? If yes then fill in to the most specific level that the object is about.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="subject][time][date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:temporal</parameter>
+        </parameters>
+      </element>
+      <element label="Person" name="subject][person" required="false" type="fieldset">
+        <description>Is the digital object about a person? If yes then please include:</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="First Name" name="subject][person][mods_fname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;given&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Last Name" name="subject][person][mods_lname" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:name/mods:namePart[@type=&apos;family&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Topic" name="subject][topic" required="false" type="fieldset">
+        <description>Is the digital object about a thing?</description>
+        <parameters>
+          <parameter name="#collapsed">TRUE</parameter>
+          <parameter name="#collapsible">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Topics" name="subject][topic][mods_topics" required="false" type="list">
+        <description>Please enter a semicolon separated list of topics, or enter then one at a time and press enter between each.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic</parameter>
+        </parameters>
+      </element>
+      <element label="Authority" name="subject][topic][mods_topicAuthority" required="false" type="other_select">
+        <description>Please select the authority from which the terms below originate.</description>
+        <authoritative_list>
+          <item field="Library of Congress Subject Headings">lcsh</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:topic[1]/@authority</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title" required="false" type="fieldset">
+        <description>Is the digital object about another title? </description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Title" name="subject][title][mods_subjtitle" required="false" type="textfield">
+        <description>The other title that this object is about.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:subject/mods:titleInfo/mods:title</parameter>
+        </parameters>
+      </element>
+      <element label="Language(s)" name="mods_language" required="false" type="list">
+        <description>Please identify the language(s) of the resource.  Find as you type.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#autocomplete_path">autocomplete_language</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:language/mods:languageTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Entities" name="mods_people" required="false" type="people">
+        <description>Please enter a list of entities that are related to this object by the specified roles.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation" required="false" type="fieldset">
+        <description>Physical location of the object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Physical Location" name="physlocation][mods_physicalLocation" required="false" type="textfield">
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:physicalLocation</parameter>
+        </parameters>
+      </element>
+      <element label="Shelf Locator" name="physlocation][mods_shelfLocator" required="false" type="textfield">
+        <description>optional.  eg Archives Number.</description>
+        <parameters>
+          <parameter name="#sticky">TRUE</parameter>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:location/mods:shelfLocator</parameter>
+        </parameters>
+      </element>
+      <element label="Publication/Origin Information" name="pubinfo" required="false" type="fieldset">
+        <description>Enter information if applicable about the publication/release/copyright of the original (not the digitized) object.</description>
+        <parameters>
+          <parameter name="#collapsible">TRUE</parameter>
+          <parameter name="#collapsed">TRUE</parameter>
+        </parameters>
+      </element>
+      <element label="Place" name="pubinfo][mods_pubinfo_place" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:place/mods:placeTerm[@type=&apos;text&apos;]</parameter>
+        </parameters>
+      </element>
+      <element label="Publisher" name="pubinfo][mods_pubinfo_publisher" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:publisher</parameter>
+        </parameters>
+      </element>
+      <element label="Edition" name="pubinfo][mods_pubinfo_edition" required="false" type="textfield">
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:edition</parameter>
+        </parameters>
+      </element>
+      <element label="Date" name="pubinfo][mods_pubinfo_date" required="false" type="datepicker">
+        <description>Format is MM/DD/YYYY.   Please enter the most specific level possible.  If a month or day is unknown,  enter &apos;??&apos;.   If entering a range or century, enter as a free-form text field.</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">(//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]</parameter>
+        </parameters>
+      </element>
+      <element label="Date Type" name="pubinfo][mods_pubinfo_dateType" required="false" type="other_select">
+        <authoritative_list>
+          <item>issued</item>
+          <item>created</item>
+          <item>captured</item>
+          <item>copyright</item>
+        </authoritative_list>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">php:functionString(&quot;substr&quot;, local-name((//mods:issuedDate|//mods:createdDate|//mods:copyrightDate|//mods:capturedDate)[1]), 0, -4)</parameter>
+        </parameters>
+      </element>
+      <element label="Journal Frequency" name="pubinfo][mods_pubinfo_journalFreq" required="false" type="textfield">
+        <description>The frequency that this journal is published. (Leave blank for monographic issuance).</description>
+        <parameters>
+          <parameter name="#edit_metadata_xpath">/mods:mods/mods:originInfo/mods:frequency</parameter>
+        </parameters>
+      </element>
+      <element name="MAX_FILE_SIZE" required="false" type="hidden">
+        <parameters>
+          <parameter name="#value">8000000</parameter>
+        </parameters>
+      </element>
+    </form_elements>
+  </ingest_form>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+      <datastream dsid="COLLECTION_POLICY"></datastream>
+    </datastream>
+  </datastreams>
+  <edit_metadata_method class="ModsFormBuilder" dsid="MODS" file="plugins/ModsFormBuilder.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_repository"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.6" LABEL="Islandora content model information" CREATED="2011-08-31T13:07:39.549Z" MIMETYPE="text/xml" SIZE="1268">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Esdora Compound Model" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>application/zip</type>
+    <type>application/x-zip</type>
+  </mimetypes>
+  <ingest_rules>
+    <rule>
+      <applies_to>text/xml</applies_to>
+      <ingest_methods>
+        <ingest_method></ingest_method>
+      </ingest_methods>
+    </rule>
+  </ingest_rules>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+      <datastream dsid="COLLECTION_POLICY"></datastream>
+    </datastream>
+  </datastreams>
+  <ingest_form dsid="DC" page="2">
+    <form_builder_method class="EsdoraAtomisticIngest" file="plugins/EsdoraAtomisticIngest.inc" handler="handleZipIngestForm" method="buildDrupalForm" module="esdora_islandora"></form_builder_method>
+    <form_elements></form_elements>
+  </ingest_form>
+  <edit_metadata_method class="IslandoraBook" dsid="MODS" file="book.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_ilives"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+<foxml:datastreamVersion ID="ISLANDORACM.7" LABEL="Islandora content model information" CREATED="2011-08-31T14:26:45.610Z" MIMETYPE="text/xml" SIZE="1268">
+<foxml:xmlContent>
+<content_model xmlns="http://www.islandora.ca" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Esdora Compound Model" xsi:schemaLocation="http://www.islandora.ca http://localhost/islandoracm.xsd">
+  <mimetypes>
+    <type>application/zip</type>
+    <type>application/x-zip</type>
+  </mimetypes>
+  <ingest_rules>
+    <rule>
+      <applies_to>text/xml</applies_to>
+      <ingest_methods>
+        <ingest_method></ingest_method>
+      </ingest_methods>
+    </rule>
+  </ingest_rules>
+  <datastreams>
+    <datastream dsid="DC">
+      <display_method class="EsdoraCollection" file="plugins/EsdoraCollection.inc" method="showCollection" module="esdora_islandora"></display_method>
+      <datastream dsid="COLLECTION_POLICY"></datastream>
+    </datastream>
+  </datastreams>
+  <ingest_form dsid="DC" page="2">
+    <form_builder_method class="EsdoraAtomisticIngest" file="plugins/EsdoraAtomisticIngest.inc" handler="handleZipIngestForm" method="buildDrupalForm" module="esdora_islandora"></form_builder_method>
+    <form_elements></form_elements>
+  </ingest_form>
+  <edit_metadata_method class="IslandoraBook" dsid="MODS" file="book.inc" handler="handleEditMetadataForm" method="buildEditMetadataForm" module="fedora_ilives"></edit_metadata_method>
+</content_model>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="RELS-EXT.7" LABEL="RDF Statements about this object" CREATED="2011-08-29T13:48:47.832Z" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" SIZE="423">
+<foxml:xmlContent>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description rdf:about="info:fedora/esdora:defaultCollectionCModel">
+    <hasModel xmlns="info:fedora/fedora-system:def/model#" rdf:resource="info:fedora/fedora-system:ContentModel-3.0"></hasModel>
+    <hasService xmlns="info:fedora/fedora-system:def/model#" rdf:resource="info:fedora/ilives:viewerSdef"></hasService>
+  </rdf:Description>
+</rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>
