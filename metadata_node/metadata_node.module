@@ -285,10 +285,14 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
       $form = XMLFormDefinition::GetDrupalForm($xml_definition);
       $properties = XMLFormDefinition::GetFormProperties($xml_definition);
       $properties = $properties['document'];
-      $document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema'], $xml);
+      $root_name = $properties['root_name']; // @todo change to name.
+      $namespaces = new Namespaces($properties['namespaces'], $properties['default_uri']);
+      $schema_uri = $properties['schema_uri'];
+      $document = new XMLDocument($root_name, $namespaces, $schema_uri, $xml);
+//$document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema'], $xml);
       $xml_form->initialize($form, $document);
     }
-    $output = $xml_form->toArray();
+    $output = $xml_form->toArray($form_state);
   } catch (Exception $e) {
     $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
     drupal_set_message($msg, 'error');
@@ -313,9 +317,9 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
         
       ),
       array(
-        'data' => t(''),
+        'data' => t('Download'),
       ),
-      array('data' => t('')),
+      array('data' => t('Edit')),
     );
     switch ($op) {
         case 'list' :
@@ -363,7 +367,7 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
 								      array('data' => l(' edit', $edit_url)),
 								    );
                }
-               $block['subject'] = t('Metadata Records');
+               //$block['subject'] = t('Metadata Records');
                $block['content'] = theme('table',$header, $items);
            }
            elseif ($delta==0 && user_access('edit own metadata_node')) {
@@ -390,33 +394,16 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                   // $items[] =$title . ': ' . l('download', $base_url . '/' . $file_path_name) . ': ' .
                     //        l(' edit', $edit_url);
                      $items[] = array(
-								      array(
-								        'data' => $file_name,
-								        
-								      ),
-								      array(
-								        'data' => l('download', $base_url . '/' . $node->body),
-								      ),
-								      array('data' => l(' edit', $edit_url)),
-								    );
+                         array('data' => $file_name,),
+                         array('data' => l('download', $base_url . '/' . $node->body),),
+                         array('data' => l(' edit', $edit_url)) );
                    }
                }
-               $block['subject'] = t('Metadata Records');
+               //$block['subject'] = t('Metadata Records');
                $block['content'] = theme('table', $items);               
            }
            return $block;
     }
 }
-function metadata_node_menu(){
-	$items['metadata_records'] = array(
-      'page callback' => 'metadata_node_test',
-		'access arguments' => array('access content'),
-				'type' => MENU_CALLBACK,
-    );
-    return $items;
-}
-function metadata_node_test()
-{
-	return "";
-}
+
 ?>

@@ -79,7 +79,7 @@ class EsdoraCollection extends CollectionClass {
       drupal_set_message(t("No Objects in this collection or bad query."));
     }
 
-    return $returnValue . $objectList;
+    return $returnValue . $collectionList;
   }
 
  function getXslContent($pid, $path, $canUseDefault = TRUE) {
