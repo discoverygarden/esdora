@@ -88,7 +88,7 @@ function metadata_node_form(&$node, $form_state) {
  * remove some of the default node entries 
  */
 function metadata_node_form_alter(&$form, &$form_state, $form_id) {
-    drupal_set_message("Form id: $form_id");
+    //drupal_set_message("Form id: $form_id");
     switch ($form_id) {
         case 'metadata_node_node_form':
             unset($form['author']);
