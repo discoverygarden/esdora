@@ -27,7 +27,7 @@ function metadata_node_node_info() {
  */
 
 function metadata_node_view($node, $teaser = FALSE, $page = FALSE) {
-    drupal_set_message('body=' . $node->body);
+    //drupal_set_message('body=' . $node->body);
     $file_path = $node->body;
     $dom = new DOMDocument();
     //todo guard against invalid file or null
