@@ -2,7 +2,7 @@
 <metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="http://www.fgdc.gov/schemas/metadata/fgdc-std-001-1998.xsd"
  xmlns:fgdc="http://localhost/">
-  <idinfo xmlns="">
+  <idinfo>
     <citation>
       <citeinfo>
         <origin>enter one or more orign</origin>
@@ -59,7 +59,38 @@
        </cntinfo>
      </ptcontac>
   </idinfo>
-  <distinfo xmlns="">
+  <dataqual>
+    <logic>Change Me</logic>
+    <complete>Change Me</complete>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>Change Me</origin>
+            <pubdate>20110901</pubdate>
+            <title>Change Me</title>
+          </citeinfo>
+        </srccite>
+        <typesrc>Online</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>20100101</begdate>
+              <enddate>20110101</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Unknow</srccurr>
+        </srctime>
+        <srccitea/>
+        <srccontr>Unknown</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>What was done?</procdesc>
+        <procdate>20110101</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <distinfo>
     <distrib>
       <cntinfo>
         <cntperp>

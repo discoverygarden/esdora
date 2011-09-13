@@ -22,6 +22,30 @@ function metadata_node_node_info() {
 }
 
 /**
+ * Implementation of hook_view() 
+ * 
+ */
+
+function metadata_node_view($node, $teaser = FALSE, $page = FALSE) {
+    drupal_set_message('body=' . $node->body);
+    $file_path = $node->body;
+    $dom = new DOMDocument();
+    //todo guard against invalid file or null
+    $xml='';
+    if($dom->load($file_path)) {
+         $xml=$dom->saveXML();
+    }
+    
+    $content = htmlentities($xml);
+    $content = append_to_new_line($content, '<br/>');
+    $content = "<code class='prettyprint xml' style='overflow: scroll; position: relative;'>$content</code>";
+
+    $node = node_prepare($node, $teaser);
+    $node->content['body']['#value']=$content;
+    return $node;
+}
+
+/**
 * Implementation of hook_perm().
 */
 function metadata_node_perm() {
@@ -64,7 +88,7 @@ function metadata_node_form(&$node, $form_state) {
  * remove some of the default node entries 
  */
 function metadata_node_form_alter(&$form, &$form_state, $form_id) {
-    //drupal_set_message("Form id: $form_id");
+    drupal_set_message("Form id: $form_id");
     switch ($form_id) {
         case 'metadata_node_node_form':
             unset($form['author']);
@@ -357,15 +381,10 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                    //$items[] =$file_name . l('download', $base_url . '/' . $node->body) .
                           //  l(' edit', $edit_url);
                    $items[] = array(
-								      array(
-								        'data' => $file_name,
-								        
-								      ),
-								      array(
-								        'data' => l('download', $base_url . '/' . $node->body),
-								      ),
-								      array('data' => l(' edit', $edit_url)),
-								    );
+                       array('data' => $file_name),
+		       array('data' => l('download', $base_url . '/' . $node->body)),
+                       array('data' => l(' edit', $edit_url)),
+                   );
                }
                //$block['subject'] = t('Metadata Records');
                $block['content'] = theme('table',$header, $items);
