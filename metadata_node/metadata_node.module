@@ -16,7 +16,7 @@ function metadata_node_node_info() {
     TYPE => array(
       'name' => t('Metadata Record'),
       'module' => 'metadata_node',
-      'description' => "Create medata data record using a form created by XML Form Builder.",
+      'description' => "Create metadata data record using a form created by XML Form Builder.",
     )
   );
 }
