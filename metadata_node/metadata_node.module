@@ -129,13 +129,13 @@ function metadata_node_form_submit(array $form, array &$form_state) {
         if (!isset($nid)) {
             if (isset($file_created)) {
                 create_node($title, $file_created);
-                drupal_set_message('Metadata record saved successfully. Record title: ' . $title);
+                drupal_set_message('New Metadata record created successfully. Record title: ' . $title);
             } else {
-                drupal_set_message('Not not created because file save failed.');
+                drupal_set_message('Metadata record not created because file save failed. Please contact your administrator.');
             }
         } elseif ($nid > 0) {
             node_save($node); //just to get a new timestamp
-            drupal_set_message('Metadata record saved successfully. Record title: ' . $title);
+            drupal_set_message('Metadata record modified successfully. Record title: ' . $title);
         }
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
