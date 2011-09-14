@@ -150,7 +150,7 @@ function metadata_node_form_submit(array $form, array &$form_state) {
  * @param type $document 
  */
 function create_update_file($title, DOMDocument $document, $node) {
-    if (isset($node)) {
+        if (isset($node)) {
         $nid = $node->nid;
         $vid = $node->vid;
         if ($nid > 0) { //should be true if $node exists
@@ -258,9 +258,12 @@ function metadata_node_help($path, $arg) {
 
 //helper function to connect to xml form builder
 function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_name) {
-    module_load_include('inc', 'xml_form_builder', 'FormBuilder');
-    if (!FormBuilder::FormExists($form_name) || !FormBuilder::HasFormDefinition($form_name)) {
-        drupal_set_message(t("Form '$form_name' does not exist, or it does not have a complete definition."));
+
+    module_load_include('inc', 'xml_form_builder', 'XMLFormDatabase');
+    module_load_include('inc', 'xml_form_api', 'XMLForm');
+    module_load_include('inc', 'xml_form_api', 'XMLFormDefinition');
+    if (!XMLFormDatabase::Exists($form_name)) {
+        drupal_set_message(t('The form "%name" does not exist, or it does not have a complete definition."', array('%name' => $form_name)));
         drupal_not_found();
         exit();
     }
@@ -270,10 +273,6 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
             drupal_set_message('the metadata node is corruped, its body is missing file path. Treat as new node.');
         } else {
             try {
-//         $handle = fopen($xml_file_name, "r");
-//         $xml = fread($handle, filesize($xml_file_name));
-//         fclose($handle);
-
                 $dom = new DOMDocument();
                 if ($dom->load($xml_file_name)) {
                     $xml = $dom->saveXML();
@@ -292,26 +291,11 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
             $xml = $template_fgdc;
         } catch (Exception $e) {
             Drupal_set_message('Could not load metadata instance template: ' . $e . getMessage() . ' check installation of metadata_node module.');
+            exit();
         }
     }
     try {
-        module_load_include('inc', 'xml_form_api', 'XMLForm');
-        $xml_form = new XMLForm($form_state);
-        if (!$xml_form->isInitialized()) { // Was initialized from storage.
-            module_load_include('inc', 'xml_form_api', 'XMLFormDefinition');
-            module_load_include('inc', 'xml_form_api', 'XMLDocument');
-            $xml_definition = FormBuilder::GetFormDefinition($form_name);
-            $form = XMLFormDefinition::GetDrupalForm($xml_definition);
-            $properties = XMLFormDefinition::GetFormProperties($xml_definition);
-            $properties = $properties['document'];
-            $root_name = $properties['root_name']; // @todo change to name.
-            $namespaces = new Namespaces($properties['namespaces'], $properties['default_uri']);
-            $schema_uri = $properties['schema_uri'];
-            $document = new XMLDocument($root_name, $namespaces, $schema_uri, $xml);
-//$document = new XMLDocument($properties['root'], $properties['namespaces'], $properties['schema'], $xml);
-            $xml_form->initialize($form, $document);
-        }
-        $output = $xml_form->toArray($form_state);
+        $output = xml_form_builder_get_form($form_state, $form_name, $xml);
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
