@@ -1,9 +1,9 @@
 <?php
 
-define(TYPE, 'metadata_node');
-define(DATA_FOLDER, 'metadata_records');
-define(METADATA_FORM_NAME, 'Metadata_Editor');
-define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
+define('TYPE', 'metadata_node');
+define('DATA_FOLDER', 'metadata_records');
+define('METADATA_FORM_NAME', 'Metadata_Editor');
+define('NUMBER_OF_RECORDS_BLOCK', 'metadata_node_block_num');
 
 ////////////////////////////// NODE CREATION AND CONTENT_TYPE, METADAT FORM, FILE SAVE /////////
 /**
