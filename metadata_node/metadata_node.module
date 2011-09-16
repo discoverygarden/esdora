@@ -295,13 +295,14 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
         }
     }
     try {
-        $output = xml_form_builder_get_form($form_state, $form_name, $xml);
+        $drupal_form = xml_form_builder_get_form($form_state, $form_name, $xml);
+        return $drupal_form;
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
         return array();
     }
-    return $output;
+    return null;
 }
 
 /////////////////////// BLOCK DEFINITION: LIST EXISTING RECORDS AND EDITING FUNCITONS //////////
