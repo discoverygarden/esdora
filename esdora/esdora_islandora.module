@@ -16,13 +16,9 @@
  * Stores this info in the drupal variables table.
  * the name and pid can also be passed as url parameters
  */
-
-
 function esdora_islandora_admin() {
-return "";
- 
+  return "";
 }
-
 
 function esdora_islandora_admin_settings_submit($form, $form_values) {
   drupal_set_message("Custom form handler.");
@@ -35,21 +31,18 @@ function esdora_islandora_admin_settings_submit($form, $form_values) {
 function esdora_islandora_menu() {
   module_load_include('inc', 'fedora_repository', 'ObjectHelper');
   return array(
-  'ajax/gettabs/compound' => array(
- 	  'access callback' => 'user_access',
-	  'access arguments'=>array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
+    'ajax/gettabs/compound' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
       'page callback' => 'esdora_islandora_get_tabs_compound',
       'type' => MENU_CALLBACK,
-  		
     ),
-  'ajax/gettabs/atomic' => array(
- 	  'access callback' => 'user_access',
- 	  'access arguments'=>array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
+    'ajax/gettabs/atomic' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
       'page callback' => 'esdora_islandora_get_tabs_atomic',
       'type' => MENU_CALLBACK,
-  		
     ),
-    
   );
 }
 
@@ -65,7 +58,6 @@ function esdora_islandora_help($path, $arg) {
   }
 }
 
-
 /**
  * 
  * This is a php call back function referenced in the islandora/xsl/sparcal_to_html.xsl
@@ -79,79 +71,76 @@ function esdora_islandora_help($path, $arg) {
  * @param string $collection_pid: the PID of the collection object
  */
 function get_child_count($collection_pid) {
-	
-	$query='select count (select $object from <#ri>
-			where $object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' .$collection_pid . '>)
+
+  $query = 'select count (select $object from <#ri>
+			where $object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $collection_pid . '>)
 			from <#ri>
 			where
 			$s $p $o';
-	
-	$query_string = htmlentities(urlencode($query));
-	$content = '';
-    $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
-    $url .= "?lang=itql&format=Simple&query=" . $query_string;
-    $content .= (do_curl($url));
-   	if(strlen($content)>0) {
-	   	$tokens = explode('"', trim($content));
-	   	$value = $tokens[1];
-	   	if($value==0) {
-			return "Data Object";
-	   	}else {
-	   		return 'Collection Object (total items: ' . $value . ')';
-	   	}   	
-   }
-   return $content;
+
+  $query_string = htmlentities(urlencode($query));
+  $content = '';
+  $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+  $url .= "?lang=itql&format=Simple&query=" . $query_string;
+  $content .= ( do_curl($url));
+  if (strlen($content) > 0) {
+    $tokens = explode('"', trim($content));
+    $value = $tokens[1];
+    if ($value == 0) {
+      return "Data Object";
+    }
+    else {
+      return 'Collection Object (total items: ' . $value . ')';
+    }
+  }
+  return $content;
 }
 
 function esdora_islandora_get_tabs_compound() {
-	//echo drupal_json('call compound');return;	
-	$pid = $_POST['pid'];
-	$case = $_POST['tab'];
-	$pid = str_replace('"/', "", $pid);
-	$pid= trim($pid);
-	$case = trim($case);
-	module_load_include('inc','esdora_islandora','plugins/esdora');
-	$esdora = new Esdora($pid);
-	//echo drupal_json('call hi ' . $case);return;	
-	esdora_islandora_get_tabs($esdora, $case);
+  //echo drupal_json('call compound');return;
+  $pid = $_POST['pid'];
+  $case = $_POST['tab'];
+  $pid = str_replace('"/', "", $pid);
+  $pid = trim($pid);
+  $case = trim($case);
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $esdora = new Esdora($pid);
+  //echo drupal_json('call hi ' . $case);return;
+  esdora_islandora_get_tabs($esdora, $case);
 }
 
 function esdora_islandora_get_tabs_atomic() {
-	$pid = $_POST['pid'];
-	$case = $_POST['tab'];
-	$pid = str_replace('"/', "", $pid);
-	$pid= trim($pid);
-	$case = trim($case);
-	module_load_include('inc','esdora_islandora','plugins/esdora_atomic');
-	$esdora = new Esdora_Atomic($pid);
-	esdora_islandora_get_tabs($esdora, $case);
+  $pid = $_POST['pid'];
+  $case = $_POST['tab'];
+  $pid = str_replace('"/', "", $pid);
+  $pid = trim($pid);
+  $case = trim($case);
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora_atomic');
+  $esdora = new Esdora_Atomic($pid);
+  esdora_islandora_get_tabs($esdora, $case);
 }
 
-function esdora_islandora_get_tabs($esdora_obj, $case){
+function esdora_islandora_get_tabs($esdora_obj, $case) {
 
-	$content='';
-	if( $case == "Items")
-		$content.= $esdora_obj->getItems();	
-	elseif( $case == "Metadata")
-	{
-		$content.= $esdora_obj->getMetadata();	
-	}
-	elseif( $case == "Description")
-	{
-		$content.= $esdora_obj->getDescription();
-		
-	}
-	elseif( $case == "History")
-		$content.= $esdora_obj->getHistory();	
-	elseif($case =="Viewers")		
-	{		
-		$content.= $esdora_obj->getViewers();	
-	}
-	else
-		$content.= 'oops';
-	
-	//$content = 'Hi calling ' . $case ;
-	echo drupal_json($content);
+  $content = '';
+  if ($case == "Items")
+    $content.= $esdora_obj->getItems();
+  elseif ($case == "Metadata") {
+    $content.= $esdora_obj->getMetadata();
+  }
+  elseif ($case == "Description") {
+    $content.= $esdora_obj->getDescription();
+  }
+  elseif ($case == "History")
+    $content.= $esdora_obj->getHistory();
+  elseif ($case == "Viewers") {
+    $content.= $esdora_obj->getViewers();
+  }
+  else
+    $content.= 'oops';
+
+  //$content = 'Hi calling ' . $case ;
+  echo drupal_json($content);
 }
 
 /**
@@ -161,22 +150,54 @@ function esdora_islandora_get_tabs($esdora_obj, $case){
  * @param <type> $form_id
  * alter the add datastream form so we can mark the file as metadata if required
  */
-function esdora_islandora_form_alter(&$form, &$form_state, $form_id){
-  if ($form_id === "add_stream_form"){
+function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id === "add_stream_form") {
     $form['is_metadata'] = array(
-  '#type' => 'checkbox',
-  '#weight' => '-1',
-  '#title' => t('is this metadata'),
-  '#description' => t('If this file is not actual data but describes the data please mark it as metadata by checking the checkbox'));
-  
-  $form['stream_id']= array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
-    '#type' => 'textfield',
-    '#title' => 'datastream id',
-    '#weight' => '-1',
-    '#description' => 'machine readable datastream id'
-  );
+      '#type' => 'checkbox',
+      '#weight' => '-1',
+      '#title' => t('is this metadata'),
+      '#description' => t('If this file is not actual data but describes the data please mark it as metadata by checking the checkbox'));
+
+    $form['stream_id'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
+      '#type' => 'textfield',
+      '#title' => 'datastream id',
+      '#weight' => '-1',
+      '#description' => 'machine readable datastream id'
+    );
+    $form['#submit'][] = 'esdora_rels_int_handler'; //add a new handler
   }
-  $form['#submit'][] = 'esdora_rels_int_handler';//add a new handler
+
+  if ($form_id == "fedora_repository_ingest_form") {
+    //the below depend on certain content models and form names. with xml form builder form names are arbitrary so this is tightly tied to a certain setup
+    //we have created basically a blank form and given it a name of "import from zip" everything we need is in the zip so we just show the file chooser.
+    //this is really indepentent of the form builder but once we associate a form with a cmodel the formbuilder takes over.
+    if (isset($form_state['values']['models']) && strstr($form_state['values']['models'], '/', TRUE) == 'esdora:defaultDataCModel' && $form_state['values']['forms'] == 'import from zip') {
+      module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
+      $uploader = new IslandoraYuiUploader();
+      $form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
+      $form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
+      $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+      $form['#submit'][] = 'esdora_file_upload_handler'; //add a new handler
+    }
+  }
+}
+
+function esdora_file_upload_handler(&$form,&$form_state) {
+  $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
+  $form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
+  $files_dir = "$tmp_directory/$form_build_id";
+  drupal_set_message('files dir = '.$files_dir);
+  $files = scandir($files_dir);
+  foreach ($files as $file) {//not interested in directories we dumped all uploaded files into one directory
+    if (!is_dir($file) && $file != '.' && $file != '..' && $file != '__MACOSX') {
+      $full_path = "$files_dir/$file"; //we are going to fall through here with only one file they are uploading a zip file
+    }
+  }
+  drupal_set_message('full path = '.$full_path);
+  $form_state['values']['esdora_full_path'] = $full_path;
+  module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
+  $esdora_ingest = new EsdoraIngest();
+  $esdora_ingest->handleZipIngestForm($form_state['values']);
 }
 
 /**
@@ -185,35 +206,36 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id){
  * @param <type> $form_state
  * This is the form handler that gets called now that we have implemented hood form alter
  */
-function esdora_rels_int_handler(&$form, &$form_state){
-   module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
-   $esdora = new Esdora($form_state['values']['pid']);
-  if($form_state['values']['is_metadata'] === 1){
-    $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'],$form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
+function esdora_rels_int_handler(&$form, &$form_state) {
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $esdora = new Esdora($form_state['values']['pid']);
+  if ($form_state['values']['is_metadata'] === 1) {
+    $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'], $form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
   }
 }
 
 /* function magic_tabs_Esdora_callback( $active=0,$pid ) {
- 	module_load_include('inc', 'esdora_islandora','plugins/esdora');
- 	$active = 0;
- 	$esdora = new Esdora($pid);
- 	  $tabs[] = array(
-	    'title' => t('Items'),
-  	    'content' =>$esdora->getItems(),
-	  );
-	  $tabs[] = array(
-	    'title' => t('Metadata'),
-	    'content' => $esdora->getMetadata(),
-	  );
-	  $tabs[] = array(
-	    'title' => t('Description'),
-	    'content' => $esdora->getDescription(),
-	  );
-	  $tabs[] = array(
-	    'title' => t('History'),
-	    'content' => $esdora->getHistory(),
-	  );
-	 return $tabs;
-}
-*/
+  module_load_include('inc', 'esdora_islandora','plugins/esdora');
+  $active = 0;
+  $esdora = new Esdora($pid);
+  $tabs[] = array(
+  'title' => t('Items'),
+  'content' =>$esdora->getItems(),
+  );
+  $tabs[] = array(
+  'title' => t('Metadata'),
+  'content' => $esdora->getMetadata(),
+  );
+  $tabs[] = array(
+  'title' => t('Description'),
+  'content' => $esdora->getDescription(),
+  );
+  $tabs[] = array(
+  'title' => t('History'),
+  'content' => $esdora->getHistory(),
+  );
+  return $tabs;
+  }
+ */
+
 

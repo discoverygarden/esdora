@@ -57,7 +57,8 @@ class EsdoraAtomisticIngest extends EsdoraIngest{
     }
     $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt",$object);
     $text = file("$tmpDir/$new_object_label/DOI.txt");
-    $this->add_doi_to_dc($object,$text[0]);//
+    //$this->add_doi_to_dc($object,$text[0]);//
+    $this->update_dc($object,$text[0],$file);
     $this->deleteDirectory($tmpDir);
     unlink($fileName);
   }
