@@ -142,6 +142,7 @@ function metadata_node_form_submit(array $form, array &$form_state) {
         drupal_set_message($msg, 'error');
         //$form_state['rebuild'] = true;
     }
+    drupal_goto('/node/81');
 }
 
 /**
@@ -295,14 +296,13 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
         }
     }
     try {
-        xml_form_builder_get_form($form_state, $form_name, $xml);
-        $output = $xml_form->toArray($form_state);
+        return xml_form_builder_get_form($form_state, $form_name, $xml);
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
         return array();
     }
-    return $output;
+    return null;
 }
 
 /////////////////////// BLOCK DEFINITION: LIST EXISTING RECORDS AND EDITING FUNCITONS //////////

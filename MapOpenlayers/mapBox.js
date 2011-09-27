@@ -48,7 +48,7 @@ $(document).ready(function(){
 	                  		$('#coordinates').html(result);
 	                  		 
 	                  	},
-	                  	dataType:"json",
+	                  	dataType:"json"
 	                  });
 	               
 	            }

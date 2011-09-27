@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * Implementation of hook_requirements().
+ *
+ * @return
+ *   An array describing the status of the site regarding available updates.
+ *   If there is no update data, only one record will be returned, indicating
+ *   that the status of core can't be determined. If data is available, there
+ *   will be two records: one for core, and another for all of contrib
+ *   (assuming there are any contributed modules or themes enabled on the
+ *   site). In addition to the fields expected by hook_requirements ('value',
+ *   'severity', and optionally 'description'), this array will contain a
+ *   'reason' attribute, which is an integer constant to indicate why the
+ *   given status is being returned (UPDATE_NOT_SECURE, UPDATE_NOT_CURRENT, or
+ *   UPDATE_UNKNOWN). This is used for generating the appropriate e-mail
+ *   notification messages during update_cron(), and might be useful for other
+ *   modules that invoke update_requirements() to find out if the site is up
+ *   to date or not.
+ *
+ * @see _update_message_text()
+ * @see _update_cron_notify()
+ */
+
+function islandora_solr_search_requirements($phase) {
+  $t = get_t();
+  $requirements = array();
+  module_load_include('php', 'islandora_solr_search', 'SolrPhpClient/Apache/Solr/Service');
+  if ($phase == 'install') {
+
+
+    if (!class_exists(Apache_Solr_Service)) {
+      $requirements['islandora_solr_search'] = array(
+          'title' => $t('Missing Apache Client'),
+          'description' => $t('This module requires the ' . l('Apache Solr php client', 'http://code.google.com/p/solr-php-client') . '.  Please install the client directory in the root directory of this module before continuing.'),
+          'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
+

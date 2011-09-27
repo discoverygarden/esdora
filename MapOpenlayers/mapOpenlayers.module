@@ -22,6 +22,11 @@ function mapOpenlayers_menu() {
 			    'access arguments' => array('access content'),
 				'type' => MENU_CALLBACK,
 			  ),
+                          'mapsearch/clear' => array(
+			    'page callback' => 'mapOpenlayers_clear',
+			    'access arguments' => array('access content'),
+				'type' => MENU_CALLBACK,
+			  ),
 			    'mapsearch/map'=> array(
 			    'title' => 'MapOpenlayers Test Page',
 			    'description' => 'Test Page for MapOpenlayers.',
@@ -36,22 +41,28 @@ function mapOpenlayers_menu() {
 function mapOpenlayers_standalone()
 {
 		
-        
-	$_SESSION['mapCoor'] = null;
-	$output = '<p><div id="map"></div></p>';
+        $output = '<p><div id="map"></div></p>';
 	$output.= '<p><div><button id="refresh">refresh</button><span style="float:right" id="coordinates"></span></div></p>';	
 	$path = drupal_get_path('module', 'mapOpenlayers');
   	drupal_add_js($path.'/mapBox.js');
   	drupal_add_js($path.'/OpenLayers.js');
   	drupal_add_css($path.'/default_style.css');
-  	return $output;
+        $settings = array(
+            'mc'=> $_SESSION['mapCoor'],
+        );
+        drupal_add_js(array('mapOpenlayers'=>$settings),'setting');
+    	return $output;
   	 
 }
 function mapOpenlayers_page()
 {
 	$map = $_POST['box'];
-	$map = trim($map);	
-	$_SESSION['mapCoor'] = $map;
+	$map = trim($map);
+        $_SESSION['mapCoor'] = $map;
 	
 	echo drupal_json($_SESSION['mapCoor']);
+}
+function mapOpenlayers_clear()
+{
+        $_SESSION['mapCoor']=null;
 }

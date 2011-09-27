@@ -1,0 +1,83 @@
+<?php
+
+// $Id$
+
+
+/**
+ * @file
+ * Configuration module for islandora_solr_search.module
+ */
+
+
+/**
+ * Implements hook_islandora_solr_primary_display()
+ */
+function islandora_solr_config_islandora_solr_primary_display() {
+  return array(
+    // 'machien-name' = array(
+    //   'name' => 'Human Readable Name',
+    //   'module' => 'module_name',
+    //   'file' => 'FileName.inc',
+    //   'class' => 'ClassName',
+    //   'function' => 'function_name',
+    //   'description' => 'A description of the display profile',
+    // );
+    'simple_table' => array(
+      'name' => t('Simple Table'),
+      'module' => 'islandora_solr_config',
+      'file' => 'IslandoraSolrResultsTable.inc',
+      'class' => "IslandoraSolrResultsTable",
+      'function' => "displayResults",
+      'description' => t("A simple tabular output"),
+    ),
+    'maps' => array(
+      'name' => t('Maps'),
+      'module' => 'islandora_solr_config',
+      'file' => 'IslandoraSolrResultsTable.inc',
+      'class' => "IslandoraSolrResultsTable",
+      'function' => "displayResults",
+      'description' => t('A tabular output for maps. Depends upon the existence of a TN datastream in fedora objects returned as results.')
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_solr_secondary_display()
+ */
+function islandora_solr_config_islandora_solr_secondary_display() {
+  return array(
+    'csv' => array(
+      'name' => t('CSV'),
+      'module' => 'islandora_solr_config',
+      'file' => 'IslandoraSolrResultsCSV.inc',
+      'class' => 'IslandoraSolrResultsCSV',
+      'function' => 'printCSV',
+      'description' => 'Download complete resultset as a CSV Spreadsheet',
+      'logo' => '<img src="http://www.stdicon.com/crystal/application/vnd.ms-excel?size=32" class="islandora_solr_secondary_display_icon">',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_help()
+ */
+
+function islandora_solr_config_help($path, $arg) {
+
+  switch ($path) {
+    case 'admin/help#islandora_solr_config':
+      return t("When 'Sample Solr Configuration Settings' is selected from the configuration drop-down in the<br />
+        !page the following settings will be used.
+        <ul>
+        <li>Module - islandora_solr_config</l1>
+        <li>File - IslandoraSolrResultsTable.inc</l1>
+        <li>Class - IslandoraSolrResultsTable</l1>
+        <li>Method - displayResults</l1>
+        </ul>
+        ", array('!page' => l("Islandora_solr_search configuration page", 'admin/settings/islandora_solr_search'),)
+
+
+      );
+  }
+}
+
