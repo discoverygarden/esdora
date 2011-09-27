@@ -17,7 +17,7 @@ class EsdoraIngest {
 
   function unzip_file($file) {
     $tmpDir = tempnam(file_directory_path(), "esdora_");
-    unlink($tmpDir); //we want a directory not a file, tempnam actually creates a file
+    unlink($tmpDir); //we want a directory not a file, tempnam actually creates a file there should be an easier way
     $test = mkdir($tmpDir, 0755); //create a directory
     $fileName = $file;
     $file_list = array();
@@ -31,7 +31,7 @@ class EsdoraIngest {
     }
   }
 
-  function createSkeletonObject($label, $pid, $collection_pid, $content_model) {
+  function create_skeleton_object($label, $pid, $collection_pid, $content_model) {
     global $user; //make the fedora object owned by the drupal user that creates it
     $foxml = Fedora_Item::create_object_FOXML($pid, 'A', $label, $user->name);
     $object = Fedora_Item::ingest_from_FOXML($foxml);
@@ -133,10 +133,11 @@ class EsdoraIngest {
         $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added data datastream at ingest');
       }
     }
+    $object->modify_object($new_object_label);//add the label property
     $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt", $object);
     $text = file("$tmpDir/$new_object_label/DOI.txt");
     //$this->add_doi_to_dc($object, $text[0]); //
-    $this->update_dc($object,$text[0],$file);
+    $this->update_dc($object,$text[0],$new_object_label);
     $this->deleteDirectory($tmpDir);
     unlink($fileName);
   }

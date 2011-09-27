@@ -186,14 +186,12 @@ function esdora_file_upload_handler(&$form,&$form_state) {
   $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
   $form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
   $files_dir = "$tmp_directory/$form_build_id";
-  drupal_set_message('files dir = '.$files_dir);
   $files = scandir($files_dir);
   foreach ($files as $file) {//not interested in directories we dumped all uploaded files into one directory
     if (!is_dir($file) && $file != '.' && $file != '..' && $file != '__MACOSX') {
       $full_path = "$files_dir/$file"; //we are going to fall through here with only one file they are uploading a zip file
     }
   }
-  drupal_set_message('full path = '.$full_path);
   $form_state['values']['esdora_full_path'] = $full_path;
   module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
   $esdora_ingest = new EsdoraIngest();
