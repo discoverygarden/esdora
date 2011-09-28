@@ -174,8 +174,10 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
     if (isset($form_state['values']['models']) && strstr($form_state['values']['models'], '/', TRUE) == 'esdora:defaultDataCModel' && $form_state['values']['forms'] == 'import from zip') {
       module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
       $uploader = new IslandoraYuiUploader();
-      $form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
-      $form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
+      //$form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
+      //$form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
+      $form['#attributes'] = array('enctype' => "multipart/form-data");
+      $form['file_upload'] = array('#type' => 'file','#title' => 'upload a zip file');
       $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
       $form['#submit'][] = 'esdora_file_upload_handler'; //add a new handler
     }
@@ -184,18 +186,15 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
 
 function esdora_file_upload_handler(&$form,&$form_state) {
   $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
-  $form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
-  $files_dir = "$tmp_directory/$form_build_id";
-  $files = scandir($files_dir);
-  foreach ($files as $file) {//not interested in directories we dumped all uploaded files into one directory
-    if (!is_dir($file) && $file != '.' && $file != '..' && $file != '__MACOSX') {
-      $full_path = "$files_dir/$file"; //we are going to fall through here with only one file they are uploading a zip file
-    }
+  //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
+  //$files_dir = "$tmp_directory/$form_build_id";
+  if ($file = file_save_upload('file_upload', null, file_directory_path())) {
+    module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
+    $esdora_ingest = new EsdoraIngest();
+    $esdora_ingest->handleZipIngestForm($form_state['values'],$file);
   }
-  $form_state['values']['esdora_full_path'] = $full_path;
-  module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
-  $esdora_ingest = new EsdoraIngest();
-  $esdora_ingest->handleZipIngestForm($form_state['values']);
+  
+  
 }
 
 /**

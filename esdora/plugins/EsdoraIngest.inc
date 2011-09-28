@@ -19,9 +19,9 @@ class EsdoraIngest {
     $tmpDir = tempnam(file_directory_path(), "esdora_");
     unlink($tmpDir); //we want a directory not a file, tempnam actually creates a file there should be an easier way
     $test = mkdir($tmpDir, 0755); //create a directory
-    $fileName = $file;
-    $file_list = array();
-    $cmdString = "unzip -q -o -d $tmpDir \"$file\"";
+    //$fileName = $file;
+    //$file_list = array();
+    $cmdString = "unzip -q -o -d $tmpDir \"$file->filepath\"";
     system($cmdString, $retVal); //unzip the files this command seems to return an int of 0 on success
     if ($retVal === 0) {//
       return $tmpDir;
@@ -75,14 +75,14 @@ class EsdoraIngest {
    *
    * @param <type> $form_values
    */
-  function handleZipIngestForm($form_values) {
+  function handleZipIngestForm($form_values, $uploaded_file) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');
     module_load_include('inc', 'fedora_repository', 'api/dublin_core');
     $pid = $form_values['pid'];
     $collection_pid = $form_values['collection_pid'];
-    $fileName = $form_values['esdora_full_path'];
-    $tmpDir = $this->unzip_file($fileName);
+    //$fileName = $form_values['esdora_full_path'];
+    $tmpDir = $this->unzip_file($uploaded_file);
 
     $files = scandir($tmpDir);
     foreach ($files as $file) {
@@ -92,7 +92,6 @@ class EsdoraIngest {
     }
 
     $object = new Fedora_Item($pid); //$object_array[1];
-    //var_dump($object);exit();
     $files = scandir("$tmpDir/$new_object_label/Metadata");
     foreach ($files as $file) {//metadata files
       $full_path = "$tmpDir/$new_object_label/Metadata/$file";
@@ -139,7 +138,7 @@ class EsdoraIngest {
     //$this->add_doi_to_dc($object, $text[0]); //
     $this->update_dc($object,$text[0],$new_object_label);
     $this->deleteDirectory($tmpDir);
-    unlink($fileName);
+    unlink($uploaded_file->filepath);
   }
 
   function read_dir_add_objects() {
