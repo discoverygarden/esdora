@@ -1,5 +1,5 @@
 ; $Id$
-name = esdora islandora cmodel
+name = esdora
 dependencies[] = fedora_repository
 dependencies[] = tabs
 description = esdora content models.

@@ -12,8 +12,7 @@
 /**
  * Implementation of hook_alter_form.
  * Adds this module's configuration options to islandora_solr_search's configuration page.
- */
-
+ 
 function esdora_solr_config_form_islandora_solr_admin_settings_alter(&$form, &$form_state) {
   $module   = 'esdora_solr_config';
   $file     = 'EsdoraSolrResults.inc';
@@ -23,12 +22,29 @@ function esdora_solr_config_form_islandora_solr_admin_settings_alter(&$form, &$f
   $config_options["${module}~${file}~${class}~${method}"] = 'Esdora';
   $form['islandora_solr_config_options']['#options'] = $config_options;
 }
+ * 
+ */
 
+
+/**
+ * Implements hook_islandora_solr_primary_display()
+ */
+function esdora_solr_config_islandora_solr_primary_display() {
+  return array(
+    'esdora_table' => array(
+      'name' => t('Esdora'),
+      'module' => 'Esdora_solr_config',
+      'file' => 'EsdoraSolrResults.inc',
+      'class' => "EsdoraSolrResults",
+      'function' => "displayResults",
+      'description' => t("A simple tabular output"),
+    ),
+  );
+}
 
 /**
  * Implementation of hook_help()
  */
-
 function esdora_co_solr_config_help($path, $arg) {
 
   switch ($path) {
