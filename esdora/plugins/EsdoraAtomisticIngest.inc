@@ -13,13 +13,13 @@ class EsdoraAtomisticIngest extends EsdoraIngest{
     $collection_pid = $form_values['collection_pid'];
     $fileName = $form_values['ingest-file-location'];
     $tmpDir = $this->unzip_file($fileName);
-    $files = scandir($tmpDir);
-    foreach ($files as $file) {
-      if (is_dir("$tmpDir/$file") && $file != '.' && $file != '..' && $file != '__MACOSX') {
-        $new_object_label = $file; //also part of the file path as this is the top level directory
-      }
-    }
-    $object_array = $this->createSkeletonObject($new_object_label, $pid, $collection_pid,'esdora:defaultCollectionCModel');
+    //$files = scandir($tmpDir);
+    //foreach ($files as $file) {
+     // if (is_dir("$tmpDir/$file") && $file != '.' && $file != '..' && $file != '__MACOSX') {
+     //   $new_object_label = $file; //also part of the file path as this is the top level directory
+     // }
+    //}
+    $object_array = $this->create_skeleton_object($fileName, $pid, $collection_pid,'esdora:defaultCollectionCModel');
     if (!$object_array) {
       drupal_set_message('Error creating object in fedora', 'error');
       return;
@@ -52,12 +52,13 @@ class EsdoraAtomisticIngest extends EsdoraIngest{
     foreach ($files as $file) {//metadata files
       $full_path = "$tmpDir/$new_object_label/Data/$file";
       if (!is_dir($full_path) && $file != '.' && $file != '..' && $file != '__MACOSX') {
-        $object_array = $this->createSkeletonObject($file, Fedora_Item::get_next_PID_in_namespace('es:'), $pid,'esdora:simpleDataCModel');
+        $object_array = $this->create_skeleton_object($file, Fedora_Item::get_next_PID_in_namespace('es:'), $pid,'esdora:simpleDataCModel');
       }
     }
     $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt",$object);
     $text = file("$tmpDir/$new_object_label/DOI.txt");
-    $this->add_doi_to_dc($object,$text[0]);//
+    //$this->add_doi_to_dc($object,$text[0]);//
+    $this->update_dc($object,$text[0],$file);
     $this->deleteDirectory($tmpDir);
     unlink($fileName);
   }

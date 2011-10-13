@@ -17,11 +17,11 @@ class EsdoraIngest {
 
   function unzip_file($file) {
     $tmpDir = tempnam(file_directory_path(), "esdora_");
-    unlink($tmpDir); //we want a directory not a file, tempnam actually creates a file
+    unlink($tmpDir); //we want a directory not a file, tempnam actually creates a file there should be an easier way
     $test = mkdir($tmpDir, 0755); //create a directory
-    $fileName = $file;
-    $file_list = array();
-    $cmdString = "unzip -q -o -d $tmpDir \"$file\"";
+    //$fileName = $file;
+    //$file_list = array();
+    $cmdString = "unzip -q -o -d $tmpDir \"$file->filepath\"";
     system($cmdString, $retVal); //unzip the files this command seems to return an int of 0 on success
     if ($retVal === 0) {//
       return $tmpDir;
@@ -31,7 +31,7 @@ class EsdoraIngest {
     }
   }
 
-  function createSkeletonObject($label, $pid, $collection_pid, $content_model) {
+  function create_skeleton_object($label, $pid, $collection_pid, $content_model) {
     global $user; //make the fedora object owned by the drupal user that creates it
     $foxml = Fedora_Item::create_object_FOXML($pid, 'A', $label, $user->name);
     $object = Fedora_Item::ingest_from_FOXML($foxml);
@@ -42,7 +42,7 @@ class EsdoraIngest {
     }
     $object->add_relationship('isMemberOfCollection', $collection_pid);
     $object->add_relationship('hasModel', $content_model, FEDORA_MODEL_URI);
-    drupal_set_message(t("Successfully added $pid to collection $collection_pid"));
+    drupal_set_message(t("Successfully added @pid to collection @collection_pid",array('@pid'=>$pid,'@collection_pid'=>$collection_pid)));
     return array($label, $object);
   }
 
@@ -52,13 +52,22 @@ class EsdoraIngest {
       $viewer_parts = explode(',', $viewer);
 //TODO: add error checking for text processing
       $object->add_datastream_from_url($viewer_parts[2], $viewer_parts[0], $viewer_parts[1], '', $controlGroup = 'R', 'added viewer stream');
-      Esdora::add_relationship_internal('isViewerFor',$object->pid , $viewer_parts[0], "http://esdora.ornl.gov/ontologies/relationships#");
+      Esdora::add_relationship_internal('isViewerFor', $object->pid, $viewer_parts[0], "http://esdora.ornl.gov/ontologies/relationships#");
     }
   }
 
-  function add_doi_to_dc($object, $doi){
+  /**
+   *
+   * @param <type> $object
+   * @param <type> $doi
+   * @param <type> $title optionally set the title as well
+   */
+  function update_dc($object, $doi, $title = NULL) {
     $dc = new Dublin_Core($object);
-    $dc->add_element( 'dc:identifier', $doi );
+    $dc->add_element('dc:identifier', $doi);
+    if(isset($title)){
+      $dc->set_element('dc:title',$title);
+    }
     $dc->save();
   }
 
@@ -66,27 +75,23 @@ class EsdoraIngest {
    *
    * @param <type> $form_values
    */
-  function handleZipIngestForm($form_values) {
+  function handleZipIngestForm($form_values, $uploaded_file) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');
-     module_load_include('inc', 'fedora_repository', 'api/dublin_core');
+    module_load_include('inc', 'fedora_repository', 'api/dublin_core');
     $pid = $form_values['pid'];
     $collection_pid = $form_values['collection_pid'];
-    $fileName = $form_values['ingest-file-location'];
-    $tmpDir = $this->unzip_file($fileName);
+    //$fileName = $form_values['esdora_full_path'];
+    $tmpDir = $this->unzip_file($uploaded_file);
+
     $files = scandir($tmpDir);
     foreach ($files as $file) {
       if (is_dir("$tmpDir/$file") && $file != '.' && $file != '..' && $file != '__MACOSX') {
         $new_object_label = $file; //also part of the file path as this is the top level directory
       }
     }
-    $object_array = $this->createSkeletonObject($new_object_label, $pid, $collection_pid,'esdora:defaultDataCModel');
-    if (!$object_array) {
-      drupal_set_message('Error creating object in fedora', 'error');
-      return;
-    }
-    $new_object_label = $object_array[0];
-    $object = $object_array[1];
+
+    $object = new Fedora_Item($pid); //$object_array[1];
     $files = scandir("$tmpDir/$new_object_label/Metadata");
     foreach ($files as $file) {//metadata files
       $full_path = "$tmpDir/$new_object_label/Metadata/$file";
@@ -94,22 +99,27 @@ class EsdoraIngest {
         $mime = new MimeClass();
         $m_type = $mime->get_mimetype($file);
         $controlGroup = 'M';
-//if (strpos($file, 'FGDC') === 0) {
-//  $controlGroup = 'X';
-//}
         $stream_id = $file; //substr($file, 0, strrpos($file, '.'));
-        if (is_numeric(substr($stream_id, 0, 1))) {//stream ids cannont start with a number
-          $stream_id = 'n' . $stream_id; //if it starts with a number prfix the id with an n?
+        if (strpos($file, 'FGDC') === 0) {
+          //$controlGroup = 'X';
+          //$datastream_url = drupal_urlencode($full_path); //using the form builder the fgdc.xml gets created as inline xml so we have to modify by value
+          //$url = file_create_url($datastream_url);  // if this is not desired then we may have to remove the fgdc and readd.
+          $content = file_get_contents($full_path);
+          $object->modify_datastream_by_value($content, $file, $file, 'text/xml', $force = FALSE, $logMessage = 'Esdora updated FGDC.xml', $quiet = FALSE);
         }
-        $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added metadata datastream at ingest');
-        module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
-        
+        else {
+          if (is_numeric(substr($stream_id, 0, 1))) {//stream ids cannont start with a number
+            $stream_id = 'n' . $stream_id; //if it starts with a number prfix the id with an n?
+          }
+          $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added metadata datastream at ingest');
+          module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+        }
         Esdora::add_relationship_internal('isMetaDataFor', $pid, $stream_id, "http://esdora.ornl.gov/ontologies/relationships#");
       }
     }
 
     $files = scandir("$tmpDir/$new_object_label/Data");
-    foreach ($files as $file) {//metadata files
+    foreach ($files as $file) {//data files
       $full_path = "$tmpDir/$new_object_label/Data/$file";
       if (!is_dir($full_path) && $file != '.' && $file != '..' && $file != '__MACOSX') {
         $mime = new MimeClass();
@@ -122,11 +132,13 @@ class EsdoraIngest {
         $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added data datastream at ingest');
       }
     }
-    $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt",$object);
+    $object->modify_object($new_object_label);//add the label property
+    $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt", $object);
     $text = file("$tmpDir/$new_object_label/DOI.txt");
-    $this->add_doi_to_dc($object,$text[0]);//
+    //$this->add_doi_to_dc($object, $text[0]); //
+    $this->update_dc($object,$text[0],$new_object_label);
     $this->deleteDirectory($tmpDir);
-    unlink($fileName);
+    unlink($uploaded_file->filepath);
   }
 
   function read_dir_add_objects() {
@@ -148,5 +160,4 @@ class EsdoraIngest {
   }
 
 }
-
 ?>
