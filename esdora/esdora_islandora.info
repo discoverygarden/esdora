@@ -3,6 +3,6 @@ name = esdora islandora cmodel
 dependencies[] = fedora_repository
 dependencies[] = tabs
 description = esdora content models.
-package = Fedora Repository
+package = ESDORA
 version = 6.1dev
 core = 6.x

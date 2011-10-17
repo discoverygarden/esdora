@@ -3,6 +3,6 @@ name = Esdora Solr Configuration
 description = Code for Implementation of Islandora Solr Search Configuration providing custom output.
 dependencies[] = islandora_solr_search
 description = Customizes Islandora solr search
-package = Fedora Repository
+package = ESDORA
 version = 6.1dev
 core = 6.x
