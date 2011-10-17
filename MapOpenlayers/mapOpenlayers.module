@@ -1,5 +1,5 @@
 <?php
-global $m;
+
 /**
  * @file
  * Main MapOpenlayers Test Module file
@@ -17,52 +17,61 @@ function mapOpenlayers_menu() {
 	  
 	  return array(
 	
-			 'mapsearch/test' => array(
-			    'page callback' => 'mapOpenlayers_page',
-			    'access arguments' => array('access content'),
-				'type' => MENU_CALLBACK,
-			  ),
-                          'mapsearch/clear' => array(
-			    'page callback' => 'mapOpenlayers_clear',
-			    'access arguments' => array('access content'),
-				'type' => MENU_CALLBACK,
-			  ),
-			    'mapsearch/map'=> array(
-			    'title' => 'MapOpenlayers Test Page',
-			    'description' => 'Test Page for MapOpenlayers.',
-			    'page callback' => 'mapOpenlayers_standalone',
-			    'access arguments' => array('access content'),
-				'type' => MENU_CALLBACK,
-			  ),
-	  
+                 'mapsearch/dates' => array(
+                    'page callback' => 'mapOpenlayers_date',
+                    'access arguments' => array('access content'),
+                        'type' => MENU_CALLBACK,
+                  ),
+                  'mapsearch/mapCoor' => array(
+                    'page callback' => 'mapOpenlayers_map',
+                    'access arguments' => array('access content'),
+                        'type' => MENU_CALLBACK,
+                  ),
+                    'mapsearch/map'=> array(
+                    'title' => 'MapOpenlayers Test Page',
+                    'description' => 'Test Page for MapOpenlayers.',
+                    'page callback' => 'mapOpenlayers_standalone',
+                    'access arguments' => array('access content'),
+                        'type' => MENU_CALLBACK,
+                  ),
+
 	  );
 }
 
 function mapOpenlayers_standalone()
 {
 		
-        $output = '<p><div id="map"></div></p>';
-	$output.= '<p><div><button id="refresh">refresh</button><span style="float:right" id="coordinates"></span></div></p>';	
-	$path = drupal_get_path('module', 'mapOpenlayers');
+        $path = drupal_get_path('module', 'mapOpenlayers');
   	drupal_add_js($path.'/mapBox.js');
   	drupal_add_js($path.'/OpenLayers.js');
   	drupal_add_css($path.'/default_style.css');
-        $settings = array(
-            'mc'=> $_SESSION['mapCoor'],
-        );
-        drupal_add_js(array('mapOpenlayers'=>$settings),'setting');
-    	return $output;
+        jquery_ui_add('ui.datepicker');
+        
+        $output = '<p><div id="map"></div></p>';
+	$output.= '<p><div><button id="refresh">refresh</button><span style="float:right" id="coordinates"></span></div></p>';	
+        $output.= '<label for="from">From</label>
+                        <input type="text" id="from" name="from"/>
+                        <label for="to">to</label>
+                        <input type="text" id="to" name="to"/>';
+        $output.='<p id="date"></p>';
+	
+        return $output;
   	 
 }
-function mapOpenlayers_page()
+function mapOpenlayers_map()
 {
 	$map = $_POST['box'];
-	$map = trim($map);
-        $_SESSION['mapCoor'] = $map;
-	
-	echo drupal_json($_SESSION['mapCoor']);
+        $map = trim($map);
+        if(empty($_SESSION[mapCoor]))
+            $_SESSION[mapCoor] = $map;
+        echo drupal_json($map);
+        
 }
-function mapOpenlayers_clear()
+function mapOpenlayers_date()
 {
-        $_SESSION['mapCoor']=null;
+        $datefrom = $_POST[datefrom];
+        $dateto = $_POST[dateto];
+        $_SESSION[datefrom]=$datefrom;
+        $_SESSION[dateto]=$dateto;
+        echo drupal_json($datefrom.$dateto);
 }

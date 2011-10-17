@@ -1,11 +1,46 @@
 
-var ajaxUrl;
+//var ajaxUrl;
+//var datefrom;
+//var dateto;
+//var dates;
 $(document).ready(function(){
-	init();
-	$("#refresh").click(function(){
+	 dates = $( "#from, #to" ).datepicker({
+			numberOfMonths: 1,
+                        minDate: new Date(1900,1-1,1),
+                        changeMonth:true,
+                        changeYear:true,
+                        dateFormat:'yy-mm-dd',
+			onSelect: function( selectedDate ) {
+				var option = this.id == "from" ? "minDate" : "maxDate",
+					instance = $( this ).data( "datepicker" ),
+					date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings );
+				dates.not( this ).datepicker( "option", option, date );
+                        },
+                        onClose:function(){
+                            datefrom=$("#from").val();
+                            dateto=$("#to").val();
+                            ajaxUrl=Drupal.settings.basePath;
+                            ajaxUrl=ajaxUrl.concat("mapsearch/dates");       
+                            $.ajax({
+                                        type:'POST',
+                                        url:ajaxUrl,
+                                        data: {"datefrom":datefrom, "dateto": dateto},
+                                        success: function(result){
+                                                $('#date').html(result);   
+                                    },
+                                    dataType:"json"
+                             });        
+			}
+                        
+		});
+       
+        init();     
+        
+        $("#refresh").click(function(){
 		location.reload(); 
-		
-		
 	});
         
 })
@@ -13,7 +48,7 @@ $(document).ready(function(){
  function init()
  {
 	ajaxUrl=Drupal.settings.basePath;
-	ajaxUrl=ajaxUrl.concat("mapsearch/test");
+	ajaxUrl=ajaxUrl.concat("mapsearch/mapCoor");
 	document.namespaces;
 	var map = new OpenLayers.Map('map');
         var layer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
@@ -31,7 +66,7 @@ $(document).ready(function(){
 	                    {keyMask: OpenLayers.Handler.click});
 	                this.box.activate();
 	            },
-
+                    
 	            notice: function (bounds) {
 	                var ll = map.getLonLatFromPixel(new OpenLayers.Pixel(bounds.left, bounds.bottom)); 
 	                var ur = map.getLonLatFromPixel(new OpenLayers.Pixel(bounds.right, bounds.top));
@@ -40,14 +75,13 @@ $(document).ready(function(){
 	                		  ur.lon.toFixed(4) + ", " + 
 	                		  ur.lat.toFixed(4);
 	               //alert(box);
-	               $.ajax({
+                      $.ajax({
 	                  	type:'POST',
 	                  	url:ajaxUrl,
 	                  	data: {"box": box},
 	                  	success: function(result){
 	                  		$('#coordinates').html(result);
-	                  		 
-	                  	},
+                               },
 	                  	dataType:"json"
 	                  });
 	               
