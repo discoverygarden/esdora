@@ -9,7 +9,7 @@
  * Extention of IslandoraSolrResults for templating purposes.
  * This overrides the displayResults function to provide an alternate display type.
  */
-
+module_load_include('inc','islandora_solr_search','IslandoraSolrResults');
 class EsdoraSolrResults
 extends IslandoraSolrResults {
 
@@ -35,12 +35,14 @@ extends IslandoraSolrResults {
    *   html output for the resultset. Note: we currently create this 
    *   output manually, should refactor to use drupal forms api.
    */
-  function displayResults($results){
+  function printResults($results){
 
     global $base_url;
     if(empty($results)) {
       return "no results";
     }
+
+   
 
     $moduleRoot=drupal_get_path('module','islandora_solr_search');
     drupal_add_css($moduleRoot.'/css/uofm.css');
@@ -53,8 +55,6 @@ extends IslandoraSolrResults {
     $output.='<div class="results"/><table border="0" cellpadding="10" cellspacing="0" width="100%">';
 		$arg = join('/',arg());
     foreach($results->response->docs as $doc) {
-
-
       $pid=$doc->PID;//htmlspecialchars(preg_replace('/\//',':',$doc->id),ENT_QUOTES,'utf-8');
       //Title,Subject,Format,Author,Type,Description,PID
       $title = $doc->Title;
