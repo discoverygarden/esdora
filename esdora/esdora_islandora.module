@@ -19,6 +19,39 @@
 function esdora_islandora_admin() {
   return "";
 }
+/**
+ * we want to update the purge datastream so we can remove any rels-int statments about this datastream
+ * we will then call the fedora_repository_purge_stream function from ours
+ * @param <type> $items
+ *
+ *  $items['fedora/repository/purgeStream'] = array(
+      'title' => t('Purge data stream'),
+      'page callback' => 'fedora_repository_purge_stream',
+      'type' => MENU_CALLBACK,
+      'access arguments' => array('purge objects and datastreams')
+    );
+ */
+function esdora_islandora_menu_alter(&$items){
+  $items['fedora/repository/purgeStream']['page callback'] = 'esdora_islandora_prepare_stream_for_removall';
+  $items['fedora/repository/purgeStream']['module'] = 'esdora_islandora';
+}
+
+/**
+ *
+ * @param <type> $pid
+ * @param <type> $dsId
+ * @param <type> $name
+ */
+function esdora_islandora_prepare_stream_for_removall($pid = NULL, $dsid = NULL, $name = NULL){
+  //call our function then call islandora's purge stream
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $value = Esdora::remove_relationship_internal($pid, $dsid);
+  //TODO: not sure what gets returned on succes from this function but we should check the value and let the user no if removing the relationhip failed
+  return fedora_repository_purge_stream($pid, $dsid, $name);
+}
+
+
+
 
 function esdora_islandora_admin_settings_submit($form, $form_values) {
   drupal_set_message("Custom form handler.");
