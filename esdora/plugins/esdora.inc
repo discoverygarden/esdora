@@ -909,7 +909,6 @@ function getDescriptionWOFB() //description tab
       $dom=dom_import_simplexml($node);
       $dom->parentNode->removeChild($dom);
     }
-    $test = $relsxml->saveXML();
     return $item->modify_datastream_by_value( $relsxml->saveXML(), 'RELS-INT', "internal Relationship Metadata", 'text/xml');
 
   }
