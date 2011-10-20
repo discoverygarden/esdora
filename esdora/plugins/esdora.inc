@@ -886,6 +886,10 @@ function getDescriptionWOFB() //description tab
    */
   static function remove_relationship_internal($pid,$dsid){
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');//if this is in the api we can remove this
+    if(empty($pid) || empty($disid)){
+      drupal_set_message (t('Cannot remove relationship as either the PID or DSID is not set'));
+      return ' ';
+    }
     $item = new Fedora_Item($pid);
     $ds_list = $item->get_datastreams_list_as_array();
     if (empty($ds_list['RELS-INT'])) {
