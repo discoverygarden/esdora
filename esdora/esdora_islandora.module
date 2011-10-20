@@ -46,7 +46,7 @@ function esdora_islandora_prepare_stream_for_removall($pid = NULL, $dsid = NULL,
   //call our function then call islandora's purge stream
   module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
   $value = Esdora::remove_relationship_internal($pid, $dsid);
-  //TODO: not sure what gets returned on succes from this function but we should check the value and let the user no if removing the relationhip failed
+  //TODO: not sure what gets returned on succes from this function but we should check the value and let the user knwo if removing the relationhip failed
   return fedora_repository_purge_stream($pid, $dsid, $name);
 }
 
@@ -182,6 +182,7 @@ function esdora_islandora_get_tabs($esdora_obj, $case) {
  * @param <type> $form_state
  * @param <type> $form_id
  * alter the add datastream form so we can mark the file as metadata if required
+ * we also alter the ingest form to add a file upload for zip ingest
  */
 function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id === "add_stream_form") {
@@ -194,10 +195,40 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
     $form['stream_id'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
       '#type' => 'textfield',
       '#title' => 'datastream id',
-      '#weight' => '-1',
-      '#description' => 'machine readable datastream id'
+      '#weight' => '0',
+      '#description' => 'machine readable datastream id',
     );
-    $form['#submit'][] = 'esdora_rels_int_handler'; //add a new handler
+    $form['is_viewer'] = array(
+      '#type' => 'fieldset',
+      '#weight' => '-2',
+      '#title' => t('Is this a reference to a viewer.'),
+      '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+      '#description' => t('Enter a URL to an external viewer.  Marking this as Metadata or uploading a file will be ingnored as a Viewer cannot be Metadata and there will not be a file associated with this datastream.'));
+
+    $form['is_viewer']['viewer_url'] = array(
+      '#type' => 'textfield',
+      '#title' => t('The URL for the viewer'),
+      '#description' => t('A URL for a viewer for this object'),
+    );
+
+    //is derived from should not live in this form should be its own  probably in the details section i'll remove this when i find a home for it
+    /*$form['is_derived_from'] = array(
+      '#type' => 'fieldset',
+      '#title' => 'Is this Object derived from other Objects',
+      '#weight' => '-1',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#description' => 'Is this Object derived from other Objects',
+    );
+    $form['is_derived_from']['derived_from_pid'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
+      '#type' => 'textfield',
+      '#title' => 'PID of the object this is derived from',
+      //'#weight' => '-1',
+      '#description' => 'A PID from a Fedora object that this object is derived from.  This information will be stored in the relationship stream'
+    );*/
+    $form['#submit'][0] = 'esdora_rels_int_handler'; //add a new handler Actually replacing the orginal here but we call it from our function now, this should not affect other handlers as they would still be called after bit is a bit of a hack
+    $form['#validate'][0] = 'esdora_rels_int_handler_validate';//same for this function
   }
 
   if ($form_id == "fedora_repository_ingest_form") {
@@ -205,10 +236,12 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
     //we have created basically a blank form and given it a name of "import from zip" everything we need is in the zip so we just show the file chooser.
     //this is really indepentent of the form builder but once we associate a form with a cmodel the formbuilder takes over.
     if (isset($form_state['values']['models']) && strstr($form_state['values']['models'], '/', TRUE) == 'esdora:defaultDataCModel' && $form_state['values']['forms'] == 'import from zip') {
-      module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
-      $uploader = new IslandoraYuiUploader();
+      //module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
+      //$uploader = new IslandoraYuiUploader();
       //$form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
       //$form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
+
+      //moved away from the flash yuiuploader for now using normal file upload
       $form['#attributes'] = array('enctype' => "multipart/form-data");
       $form['file_upload'] = array('#type' => 'file','#title' => 'upload a zip file');
       $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
@@ -217,6 +250,11 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+/**
+ *
+ * @param <type> $form
+ * @param <type> $form_state
+ */
 function esdora_file_upload_handler(&$form,&$form_state) {
   $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
   //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
@@ -230,6 +268,18 @@ function esdora_file_upload_handler(&$form,&$form_state) {
   
 }
 
+function esdora_rels_int_handler_validate(&$form, &$form_state){
+  if(empty($form_state['values']['viewer_url'])){//if the viewer_url is populated we are adding a redirect stream only
+    $files = $_FILES["files"]["name"];
+    $file_name = $files['add-stream-file-location'];
+    if(empty($file_name) && !($form_state['values']['submit']=='OK')){//islandora is doing something with the form instead of a redirect. it changes the submit button ot OK and when you click it redirects
+      form_set_error('', t('No File uploaded. Please Choose a file.'));
+      return FALSE;
+    }
+     add_stream_form_validate(&$form, &$form_state);
+ }
+}
+
 /**
  *
  * @param <type> $form
@@ -239,6 +289,26 @@ function esdora_file_upload_handler(&$form,&$form_state) {
 function esdora_rels_int_handler(&$form, &$form_state) {
   module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
   $esdora = new Esdora($form_state['values']['pid']);
+  if(!empty($form_state['values']['viewer_url'])){
+    $viewer_url = $form_state['values']['viewer_url'];
+    $filtered_url = $viewer_url; //filter_var($viewer_url, FILTER_VALIDATE_URL);
+    if(!isset($filtered_url)){
+      drupal_set_message(t('You must enter a valid URL in the URL for Viewer textbox'));
+      //TODO: we should check to see if they attached a file and delete it if they did maybe or at least verify that we are not leaving files hanging around shouldn't happen very often but could
+      return ' ';
+    }
+    module_load_include('inc','fedora_repository','plugins/fedora_item');
+    $pid = $form_state['values']['pid'];
+    $dsid = $form_state['values']['stream_id'];
+    $dsLabel = $form_state['values']['stream_label'];
+    $item = new Fedora_Item($pid);
+    $item->add_datastream_from_url($filtered_url, $dsid, $dsLabel, NULL, 'R');
+    $esdora->add_relationship_internal('isViewerFor',$pid,$dsid,"http://esdora.ornl.gov/ontologies/relationships#");
+    //drupal_set_message(t('Successfully added viewer to @pid'),array('@pid'=>$pid));
+    return ' ';//we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
+  }
+  //call the orginal handler where this is where this gets brittle if the orginal form handler changes this may break (the add stream form is core so shouldn't change unless it is major refactor like going from 6 to 7 which would require changes
+  add_stream_form_submit(&$form, &$form_state);
   if ($form_state['values']['is_metadata'] === 1) {
     $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'], $form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
   }

@@ -737,7 +737,6 @@ function getDescriptionWOFB() //description tab
   }
   
   function createViewerContent($viewerStreams) {
-    //var_dump($viewerStreams);exit();
     if (empty($viewerStreams)) {
       return;
     }
@@ -886,7 +885,7 @@ function getDescriptionWOFB() //description tab
    * @return <type>
    */
   static function remove_relationship_internal($pid,$dsid){
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');//if this is in the api we can remove this
     $item = new Fedora_Item($pid);
     $ds_list = $item->get_datastreams_list_as_array();
     if (empty($ds_list['RELS-INT'])) {
@@ -909,6 +908,7 @@ function getDescriptionWOFB() //description tab
       $dom=dom_import_simplexml($node);
       $dom->parentNode->removeChild($dom);
     }
+    //should only modify this if we've change anything need a flag
     return $item->modify_datastream_by_value( $relsxml->saveXML(), 'RELS-INT', "internal Relationship Metadata", 'text/xml');
 
   }
