@@ -47,9 +47,12 @@ $(document).ready(function(){
 
  function init()
  {
+     
+     $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
+
 	ajaxUrl=Drupal.settings.basePath;
 	ajaxUrl=ajaxUrl.concat("mapsearch/mapCoor");
-	document.namespaces;
+	//document.namespaces;
 	var map = new OpenLayers.Map('map');
         var layer = new OpenLayers.Layer.WMS( "OpenLayers WMS",
                 "http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic'} );
@@ -92,5 +95,8 @@ $(document).ready(function(){
 
         map.addLayer(layer);
         map.addControl(control);
-        map.setCenter(new OpenLayers.LonLat(0, 0), 3);
+        map.setCenter(new OpenLayers.LonLat(-85, 0), 2, false);
+        map.zoomOut();
+        //map.zoomToMaxExtent();
+    
 }

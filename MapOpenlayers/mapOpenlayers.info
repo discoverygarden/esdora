@@ -1,7 +1,0 @@
-; $Id$
-name = MapOpenlayers
-description = 
-version = 6.1dev
-core = 6.x
-package = ESDORA
-
