@@ -737,7 +737,6 @@ function getDescriptionWOFB() //description tab
   }
   
   function createViewerContent($viewerStreams) {
-    //var_dump($viewerStreams);exit();
     if (empty($viewerStreams)) {
       return;
     }
@@ -877,6 +876,41 @@ function getDescriptionWOFB() //description tab
     $test = $relsxml->saveXML();
     $item->modify_datastream_by_value( $relsxml->saveXML(), 'RELS-INT', "internal Relationship Metadata", 'text/xml');
     
+  }
+
+  /**
+   *
+   * @param <type> $pid
+   * @param <type> $dsid
+   * @return <type>
+   */
+  static function remove_relationship_internal($pid,$dsid){
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');//if this is in the api we can remove this
+    $item = new Fedora_Item($pid);
+    $ds_list = $item->get_datastreams_list_as_array();
+    if (empty($ds_list['RELS-INT'])) {
+     return TRUE; //nothing to remove as no RELS-INT but we don't want to flag an error so return success
+    }
+
+    $rels = $item->get_datastream_dissemination('RELS-INT');
+
+    if (substr($object, 0, 12) != 'info:fedora/') {
+      $pid = "info:fedora/$pid";
+    }
+    $attr = $pid.'/'.$dsid;//this is the value of the rdf:about attribute we are looking for
+    $relsxml = simplexml_load_string($rels);
+    $relsxml->registerXPathNamespace('rdf', "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+    $nodes = $relsxml->xpath('//rdf:Description[@rdf:about="'.$attr.'"]');
+    $nodes_to_remove = array();
+    foreach($nodes as $node){
+      //if there are issues when we have a one datastream in more then one rels-int statement we may have to look at the comment below
+      //$nodes_to_remove[] = $node;//put the nodes in an array so we can remove them see this post http://stackoverflow.com/questions/262351/remove-a-child-with-a-specific-attribute-in-simplexml-for-php
+      $dom=dom_import_simplexml($node);
+      $dom->parentNode->removeChild($dom);
+    }
+    //should only modify this if we've change anything need a flag
+    return $item->modify_datastream_by_value( $relsxml->saveXML(), 'RELS-INT', "internal Relationship Metadata", 'text/xml');
+
   }
 
 
