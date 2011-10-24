@@ -40,7 +40,22 @@ class EsdoraCollection extends CollectionClass {
     if ($item->exists() && array_key_exists('QUERY', $item->datastreams)) {
       $query = $item->get_datastream_dissemination('QUERY');
     }
-    
+    if($query == NULL) {
+        //because of the multiple models in the collection object, 
+        //need a slightly different query form Islandora, for all ESDORA colleciton object
+        //that does not have the QUERY datastream
+        $query= 'select $object $title $content
+                from <#ri>
+                where 
+                ($object <dc:title> $title
+                and $object <fedora-model:hasModel> $content
+                and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/'. $this->pid . '>
+                    or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>)
+                and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>)
+                minus $content <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+                minus $content <mulgara:is> <info:fedora/islandora:collectionCModel>
+                order by $title';
+    }
     $collectionList='';
     $content = $this->getRelatedItems($this->pid, $query);
     
