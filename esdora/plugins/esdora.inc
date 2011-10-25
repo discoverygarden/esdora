@@ -796,10 +796,44 @@ class Esdora {
 
   /**
    *
-   * @param <type> $relationship
-   * @param <type> $object
-   * @param <type> $dsid
-   * @param <type> $namespaceURI
+   * @param Fedora_Item $item
+   */
+  static function add_oai_to_rels($item){
+    $ds_list = $item->get_datastreams_list_as_array();
+    $pid = $item->pid;
+    if (empty($ds_list['RELS-EXT'])) {
+      $item->add_datastream_from_string('        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/' . $this->pid . '">
+          </rdf:Description>
+        </rdf:RDF>', 'RELS-EXT', 'Fedora object-to-object relationship metadata', 'text/xml', 'X');
+    }
+
+    $relsextxml = new DomDocument();
+    $relsext = $item->get_datastream_dissemination('RELS-EXT');
+    $relsextxml->loadXML($relsext);
+    $description = $relsextxml->getElementsByTagNameNS('http://www.w3.org/1999/02/22-rdf-syntax-ns#', 'Description');
+    if ($description->length == 0) {
+      $description = $relsextxml->getElementsByTagNameNS('http://www.w3.org/1999/02/22-rdf-syntax-ns#', 'description');
+    }
+    $description = $description->item(0);
+
+    // Create the new relationship node.
+    $newrel = $relsextxml->createElementNS("http://www.openarchives.org/OAI/2.0/",'itemID');
+
+    $newrel->nodeValue = $pid;
+
+    $description->appendChild($newrel);
+    $value = $relsextxml->saveXML();
+    return $item->modify_datastream_by_value($relsextxml->saveXML(), 'RELS-EXT', "Fedora Object-to-Object Relationship Metadata", 'text/xml');
+
+  }
+
+  /**
+   *
+   * @param string $relationship
+   * @param string $object
+   * @param string $dsid
+   * @param string $namespaceURI
    */
   static function add_relationship_internal($relationship, $object, $dsid, $namespaceURI) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');

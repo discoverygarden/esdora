@@ -31,7 +31,19 @@ class EsdoraIngest {
     }
   }
 
+  
+
+  /**
+   *
+   * @global object $user
+   * @param string $label
+   * @param string $pid
+   * @param string $collection_pid
+   * @param string $content_model
+   * @return array
+   */
   function create_skeleton_object($label, $pid, $collection_pid, $content_model) {
+    module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
     global $user; //make the fedora object owned by the drupal user that creates it
     $foxml = Fedora_Item::create_object_FOXML($pid, 'A', $label, $user->name);
     $object = Fedora_Item::ingest_from_FOXML($foxml);
@@ -42,6 +54,7 @@ class EsdoraIngest {
     }
     $object->add_relationship('isMemberOfCollection', $collection_pid);
     $object->add_relationship('hasModel', $content_model, FEDORA_MODEL_URI);
+    Esdora::add_oai_to_rels($object);
     drupal_set_message(t("Successfully added @pid to collection @collection_pid",array('@pid'=>$pid,'@collection_pid'=>$collection_pid)));
     return array($label, $object);
   }
@@ -132,6 +145,7 @@ class EsdoraIngest {
         $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added data datastream at ingest');
       }
     }
+    Esdora::add_oai_to_rels($object);
     $object->modify_object($new_object_label);//add the label property
     $this->add_viewer_streams("$tmpDir/$new_object_label/viewers.txt", $object);
     $text = file("$tmpDir/$new_object_label/DOI.txt");
