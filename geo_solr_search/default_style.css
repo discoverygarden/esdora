@@ -3,16 +3,17 @@ div.olMap{z-index:0;cursor:default;margin:0!important;padding:0!important;}div.o
 
 #map {
     border : 0px ;
-    height : 300px;
-    width : 650px;
+    height : 200px;
+    width : 350px;
+    
 }
 #tb{
 	border: 0px ;
-	align:center;
+/*	align:center;*/
 }
 #tb tr td
 {
 	border: 0px; 
-	vertical-align: middle;
+        vertical-align: middle;
 	padding: 0 0 0 0;
 }

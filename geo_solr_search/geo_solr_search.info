@@ -1,0 +1,8 @@
+; $Id$
+name = Geo Search
+description = Search Solr with Bounding Box and Start End Dates
+dependencies[] = islandora_solr_search
+version = 6.1dev
+core = 6.x
+package = ESDORA
+
