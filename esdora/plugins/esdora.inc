@@ -285,6 +285,13 @@ class Esdora {
   function getHistory() { //histroy tab
     $fieldSetcontent = "<div>";
     $pid = $this->pid;
+    $fieldSetDF = array(
+      '#title' => t('Derivative Form'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#value' => drupal_get_form('esdora_islandora_derivative_form',$this->pid),
+    );
+     $fieldSetcontent .= theme('fieldset', $fieldSetDF);
     if (module_exists('graphviz_filter')) {
       $lineage = $this->getLineageAsGraph($pid);
     }
