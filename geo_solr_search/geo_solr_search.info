@@ -2,6 +2,7 @@
 name = Geo Search
 description = Search Solr with Bounding Box and Start End Dates
 dependencies[] = islandora_solr_search
+dependencies[] = jquery_ui
 version = 6.1dev
 core = 6.x
 package = ESDORA

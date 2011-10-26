@@ -58,7 +58,7 @@ function geo_solr_search_standalone() {
 }
 
 function geo_solr_search_map() {
-        $map = $_POST['box'];
+    $map = $_POST['box'];
     $map = trim($map);
     $_SESSION['mapCoor'] = $map;
     echo drupal_json($map);
@@ -81,6 +81,14 @@ function time_range_form() {
         '#prefix' => '<table><tr><td>',
         '#suffix' => '</td>',
     );
+    $form['map']['view'] = array(
+        '#type' => 'markup',
+        '#value' => '<div id="map"></div>',
+    );
+    $form['map']['status'] = array(
+        '#type' => 'markup',
+        '#value' => '<div><span style="float:right" id="coordinates"></span></div>',
+    );
     $form['dates'] = array(
         '#type' => 'markup',
         '#prefix' => '<td>',
@@ -100,19 +108,27 @@ function time_range_form() {
         '#default_value' => '',
         '#required' => FALSE,
     );
-    $form['map']['view'] = array(
-        '#type' => 'markup',
-        '#value' => '<div id="map"></div>',
-    );
-    $form['map']['status'] = array(
-        '#type' => 'markup',
-        '#value' => '<div><span style="float:right" id="coordinates"></span></div>',
-    );
+    
     $form['dates']['submit'] = array(
         '#type' => 'submit',
         '#value' => t('search'),
         '#weight' => 100,
     );
+
+//    $form['start'] = array(
+//        '#size' => '24%',
+//        '#type' => 'datepicker',
+//        '#title' => t('start'),
+//        '#default_value' => '',
+//        '#required' => FALSE,
+//    );
+//    $form['end'] = array(
+//        '#size' => '24%',
+//        '#type' => 'datepicker',
+//        '#title' => t('end'),
+//        '#default_value' => '',
+//        '#required' => FALSE,
+//    );
     return $form;
 }
 
@@ -221,7 +237,7 @@ function geo_solr_search_block($op='list', $delta=0, $edit=array()) {
     switch ($op) {
         case 'list' :
             $blocks[0]['info'] = t('Geo Search');
-            $blocks[0]['cache'] = BLOCK_NO_CACHE;
+            $blocks[0]['cache'] = BLOCK_CACHE_GLOBAL;
             return $blocks;
 
         case 'configure':
@@ -237,9 +253,9 @@ function geo_solr_search_block($op='list', $delta=0, $edit=array()) {
                 $block['content'] = drupal_get_form('time_range_form');
                 return $block;
             } else {
-                return null;
+                //return null;
             }
         default:
-            return null;
+            //return null;
     }
 }

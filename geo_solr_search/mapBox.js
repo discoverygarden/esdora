@@ -48,7 +48,7 @@ $(document).ready(function(){
  function init()
  {
      
-     $.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
+     //$.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
 
 	ajaxUrl=Drupal.settings.basePath;
 	ajaxUrl=ajaxUrl.concat("mapsearch/mapCoor");
