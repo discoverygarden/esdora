@@ -127,20 +127,20 @@ class Esdora {
   }
 
   function getMetadata() { //metadata tab
-    module_load_include('inc','fedora_repository','ObjectHelper');
+    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
     global $user, $base_url;
     $fdgcText;
     $fdgcAsHtml;
     $edit_metadata_urls = '';
-    if(user_access(ObjectHelper::$EDIT_FEDORA_METADATA)){
-      $edit_metadata_urls = l('Edit DC',$base_url.'/esdora/render/form/'.$this->pid.'/DC/DC/');
-      $edit_metadata_urls .= ' / '.l(' Edit FGDC', $base_url.'/esdora/render/form/'.$this->pid.'/FGDC.xml/fgdc/');
+    if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
+      $edit_metadata_urls = l('Edit DC', $base_url . base_path(). 'esdora/render/form/' . $this->pid . '/DC/DC/');
+      $edit_metadata_urls .= ' / ' . l(' Edit FGDC', $base_url . base_path(). 'esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
     }
 
     try {
       $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
       $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
-      return $fdgcAsHtml.$edit_metadata_urls;
+      return $fdgcAsHtml . $edit_metadata_urls;
     } catch (Exception $e) {
       $msg = 'caught exception: ' . $e->getMessage();
       $msg .= '; fgdc=' . $fdgcText . '; html=' . $fdgcAsHtml . '; pid=' . $this->item->pid;
@@ -156,8 +156,6 @@ class Esdora {
   }
 
   function getDescriptionWFB() { //description tab
-
-
     global $base_url;
     global $user;
     $content = '<table>';
@@ -283,8 +281,18 @@ class Esdora {
   }
 
   function getHistory() { //histroy tab
+    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
     $fieldSetcontent = "<div>";
     $pid = $this->pid;
+    if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
+      $fieldSetDF = array(
+        '#title' => t('Derivative Form'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#value' => drupal_get_form('esdora_islandora_derivative_form', $this->pid),
+      );
+      $fieldSetcontent .= theme('fieldset', $fieldSetDF);
+    }
     if (module_exists('graphviz_filter')) {
       $lineage = $this->getLineageAsGraph($pid);
     }
@@ -420,7 +428,7 @@ class Esdora {
     $html.='</div><br><div>';
     $count = 0;
     foreach ($processName as $desc) {
-      $link = $base_url . '/fedora/repository/' . $this->pid . '/PROCESS';
+      $link = $base_url . base_path().'fedora/repository/' . $this->pid . '/PROCESS';
       if (module_exists('fancybox')) {
         $html.='<a class="fb_dynamic" style="font-size:10;font-family:Helvetica-Outline;font-style:italic;" href="' . $link . '"> ' . $desc . '</a><br>';
       }
@@ -663,7 +671,7 @@ class Esdora {
               //don't do anything here as we don't want show external links here
             }
             else {
-              $html .= '<a href = "' . $base_url . '/fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
+              $html .= '<a href = "' . $base_url . base_path(). 'fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
             }
           }
         }
@@ -798,7 +806,7 @@ class Esdora {
    *
    * @param Fedora_Item $item
    */
-  static function add_oai_to_rels($item){
+  static function add_oai_to_rels($item) {
     $ds_list = $item->get_datastreams_list_as_array();
     $pid = $item->pid;
     if (empty($ds_list['RELS-EXT'])) {
@@ -818,14 +826,13 @@ class Esdora {
     $description = $description->item(0);
 
     // Create the new relationship node.
-    $newrel = $relsextxml->createElementNS("http://www.openarchives.org/OAI/2.0/",'itemID');
+    $newrel = $relsextxml->createElementNS("http://www.openarchives.org/OAI/2.0/", 'itemID');
 
     $newrel->nodeValue = $pid;
 
     $description->appendChild($newrel);
     $value = $relsextxml->saveXML();
     return $item->modify_datastream_by_value($relsextxml->saveXML(), 'RELS-EXT', "Fedora Object-to-Object Relationship Metadata", 'text/xml');
-
   }
 
   /**
