@@ -139,6 +139,55 @@ function esdora_islandora_edit_form_submit($form, &$form_state) {
   $xml_form->submit($form, $form_state);
 }
 
+/**
+ * adds isderivedfrom to the Rels ext, can take a comma seperated string as a list of pids
+ * currently no way to remove a pid from the list with this form (TODO:)
+ * @param array $form
+ * @param array $form_state
+ */
+function esdora_islandora_derivative_form_submit(&$form, &$form_state) {
+  global $base_url;
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  $pid_data = $form_state['values']['related_pid'];
+  $pid = $form_state['values']['pid'];
+  $item = new Fedora_Item($pid);
+  $pids = explode(',', $pid_data);
+  foreach ($pids as $derived_from_pid) {
+    if (valid_pid(trim($derived_from_pid))) {
+      $item->add_relationship('isDerivedFrom', $derived_from_pid);
+    }
+  }
+  $txt = $form_state['values']['txt'];
+  //this will overwrite the txt stream if it exists or create it if it doesn't
+  if (!empty($txt)) {
+    $ds_list = $item->get_datastreams_list_as_array();
+    if (empty($ds_list['processing.txt'])) {
+      $item->add_datastream_from_string($txt, 'processing.txt', 'processing text', $datastream_mimetype = 'text/plain', 'M');
+    }
+    else {
+      //TODO: add this to an api call called modify_datastream_by_txt or something similar
+      $dir = file_directory_temp();
+      $tmpfilename = tempnam($dir, 'fedoratmp');
+      $tmpfile = fopen($tmpfilename, 'w');
+      fwrite($tmpfile, $txt, strlen($txt));
+      fclose($tmpfile);
+      file_copy($tmpfilename, file_directory_path());
+      //$datastream_url = drupal_urlencode($tmpfilename);
+      $url = file_create_url($tmpfilename);
+      $item->modify_datastream_by_reference($url, 'processing.txt', 'processing text', 'text/plain', $force = FALSE, $logMessage = 'Modified by Islandora API');
+      unlink($tmpfilename);
+    }
+  }
+  drupal_goto($base_url.base_path().'fedora/repository/'.$pid);//would like to use a form redirect but since we are using a combination of ajax and drupal formapi does not see to redirect doesn't seem to work
+}
+
+/**
+ * creates a form on that we are currently calling from the history tab
+ * @param array $form_state
+ * @param string $pid
+ * @return string
+ */
 function esdora_islandora_derivative_form(&$form_state, $pid) {
   if (!isset($pid)) {
     drupal_set_message(t("Can't create derivative form no pid supplied"));
@@ -148,7 +197,7 @@ function esdora_islandora_derivative_form(&$form_state, $pid) {
   $item = new Fedora_Item($pid);
   $txt = $item->get_datastream_dissemination('processing.txt');
   $rels = $item->get_datastream_dissemination('RELS-EXT');
-  $derivatives_string = 'Currently Derived from: ';
+  $derivatives_string = '<b>Derived from:</b> ';
   $src = new DOMDocument('1.0', 'utf-8');
   $src->formatOutput = true;
   $src->preserveWhiteSpace = false;
@@ -156,11 +205,12 @@ function esdora_islandora_derivative_form(&$form_state, $pid) {
   //Loading extern file
   $src->loadXML($rels);
   $isDerivedFrom = $src->getElementsByTagName('isDerivedFrom');
-  foreach($isDerivedFrom as $derived){
-    $derivatives_string .=substr($derived->getAttribute('rdf:resource'),12);
+  foreach ($isDerivedFrom as $derived) {
+    $derivatives_string .= substr($derived->getAttribute('rdf:resource'), 12).', ';
   }
+  //$form['redirect'] = $base_url.'fedora/repository/'.$pid;
   $form = array();
-      $form['txt'] = array(
+  $form['txt'] = array(
     '#type' => 'textarea',
     '#title' => t('Text'),
     '#default_value' => $txt,
@@ -169,9 +219,17 @@ function esdora_islandora_derivative_form(&$form_state, $pid) {
   $form['related_pid'] = array(
     '#prefix' => $derivatives_string,
     '#type' => 'textfield',
-    '#title' => t('Derived From'),
+    '#title' => t('Add Derived From relationship'),
     '#maxlength' => 64,
     '#description' => t('comma seperated list of pids. If this object is already marked as being derived from an object then you don\'t need to mention the object here.  This is for new relationships.'),
+  );
+  $form['pid'] = array(
+    '#type' => 'hidden',
+    '#value' => $pid,
+  );
+  $form['tab'] = array(//the tabs are built using ajax and expect a post varible of tab we know we are on the History tab so add it here
+    '#type' => 'hidden',
+    '#value' => 'History',
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
   return $form;
@@ -257,7 +315,6 @@ function esdora_islandora_get_tabs($esdora_obj, $case) {
   }
   else
     $content.= 'oops';
-
   //$content = 'Hi calling ' . $case ;
   echo drupal_json($content);
 }
@@ -351,6 +408,12 @@ function esdora_file_upload_handler(&$form, &$form_state) {
   }
 }
 
+/**
+ * validates the form, if a viewer_url is present then it ignores uploaded files
+ * @param array $form
+ * @param array $form_state
+ * @return
+ */
 function esdora_rels_int_handler_validate(&$form, &$form_state) {
   if (empty($form_state['values']['viewer_url'])) {//if the viewer_url is populated we are adding a redirect stream only
     $files = $_FILES["files"]["name"];
