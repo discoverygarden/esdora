@@ -97,7 +97,7 @@ $(document).ready(function(){
         map.addLayer(layer);
         map.addControl(control);
         map.setCenter(new OpenLayers.LonLat(-85, 0), 2, false);
-       // map.zoomOut();
+        map.zoomOut();
         //map.zoomToMaxExtent();
     
 }
