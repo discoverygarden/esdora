@@ -78,38 +78,41 @@ function geo_solr_search_date() {
 function time_range_form() {
     $form['map'] = array(
         '#type' => 'markup',
-        '#prefix' => '<table><tr><td>',
+        '#prefix' => '<table id="geo-search"><tr><td>',
         '#suffix' => '</td>',
     );
     $form['map']['view'] = array(
         '#type' => 'markup',
         '#value' => '<div id="map"></div>',
     );
-    $form['map']['status'] = array(
-        '#type' => 'markup',
-        '#value' => '<div><span style="float:right" id="coordinates"></span></div>',
-    );
-    $form['dates'] = array(
+    $form['params'] = array(
         '#type' => 'markup',
         '#prefix' => '<td>',
         '#suffix' => '</td></tr></table>',
     );
-    $form['dates']['start'] = array(
+    $form['params']['bbox'] = array(
+        '#type' => 'textfield',
+        '#title' => 'Bounding box',
+        '#id'   => 'coordinates',
+        '#size' => '24',
+        '#value' => 'draw bounding box on map',
+    );
+    $form['params']['start'] = array(
         '#size' => '24%',
         '#type' => 'datepicker',
-        '#title' => t('start'),
+        '#title' => t('Start'),
         '#default_value' => '',
         '#required' => FALSE,
     );
-    $form['dates']['end'] = array(
+    $form['params']['end'] = array(
         '#size' => '24%',
         '#type' => 'datepicker',
-        '#title' => t('end'),
+        '#title' => t('End'),
         '#default_value' => '',
         '#required' => FALSE,
     );
     
-    $form['dates']['submit'] = array(
+    $form['params']['submit'] = array(
         '#type' => 'submit',
         '#value' => t('search'),
         '#weight' => 100,

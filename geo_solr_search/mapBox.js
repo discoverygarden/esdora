@@ -83,7 +83,8 @@ $(document).ready(function(){
 	                  	url:ajaxUrl,
 	                  	data: {"box": box},
 	                  	success: function(result){
-	                  		$('#coordinates').html(result);
+	                  		//$('#coordinates').html(result);
+                                        document.getElementById('coordinates').value=result;
                                },
 	                  	dataType:"json"
 	                  });
@@ -96,7 +97,7 @@ $(document).ready(function(){
         map.addLayer(layer);
         map.addControl(control);
         map.setCenter(new OpenLayers.LonLat(-85, 0), 2, false);
-        map.zoomOut();
+       // map.zoomOut();
         //map.zoomToMaxExtent();
     
 }
