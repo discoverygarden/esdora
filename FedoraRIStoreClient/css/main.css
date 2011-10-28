@@ -1,0 +1,39 @@
+/* 
+    Document   : main
+    Created on : Oct 13, 2011, 10:40:16 AM
+    Author     : localadmin
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+
+#submit_div
+{
+    padding-left: 300px;
+}
+#submit,#refresh, #home
+{
+    font: normal 12px Arial; 
+    line-height: 15px; 
+    height: 23px; 
+    padding-left:10px;
+    margin-left:3px;
+    background-color: #D7D6DB;
+}
+#check1,#check2{
+    font: normal 14px Arial;
+}
+#title
+{
+    font:Bold large Arial;
+    text-align: center;
+    background-color: #D7D6DB;
+}

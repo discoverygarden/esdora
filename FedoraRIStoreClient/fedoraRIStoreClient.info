@@ -1,0 +1,7 @@
+; $Id$
+name = Fedora RIStore Client
+dependencies[] = fedora_repository
+dependencies[] = graphviz_filter
+package = Fedora Repository
+version = 6.1dev
+core = 6.x
