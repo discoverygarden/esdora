@@ -21,8 +21,9 @@
 <xsl:template match="/">
  <xsl:if test="$count>0">
  
-<table cellpadding="2" cellspacing="1" border="0" width="70%" >
-  <tr style="border-bottom:1px solid #000; margin-bottom:4px;">
+ <p></p><p></p>
+<table cellpadding="2" margin="2" cellspacing="1" border="0" width="80%" style="border:0px;padding-top:8px; padding-bottom:8px;" >
+  <tr style="border-bottom:1px solid #000; margin-bottom:8px;">
   <th colspan="2">Name</th>
   <th colspan="2" align="right">Type</th>
   </tr>
@@ -33,7 +34,7 @@
 <xsl:template match="s:sparql/s:results">
    <xsl:for-each select="s:result">
    
-  <tr style="border:0px;">
+  <tr>
   <xsl:variable name='OBJECTURI' select="s:object/@uri"/>
   <xsl:variable name='CONTENTURI' select="s:content/@uri"/>
   <xsl:variable name='CONTENTMODEL' select="substring-after($CONTENTURI,'/')"/>

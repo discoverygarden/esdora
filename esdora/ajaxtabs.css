@@ -1,13 +1,17 @@
 @CHARSET "ISO-8859-1";
-#tabs {
-    border-bottom: 1px solid #BBBBBB;
-    border-collapse: collapse;
-    height: auto;
+
+#tabs button{
+    border-bottom: 2px solid #BBBBBB;
+    border-collapse:separate;
+    height: 30px;
+    width: 85px;
     line-height: normal;
     list-style: none outside none;
-    margin: 5px;
-    padding: 0 0 0 1em;
+    margin: 1px;
+    padding: 0;
     white-space: nowrap;
+    text-align: center;
+    font-size: 1.0em;
 }
 #tabs li {
     background-image: none;

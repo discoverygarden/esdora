@@ -11,7 +11,7 @@ class Esdora_Atomic extends Esdora {
 		$path_atomic=$path . '/ajaxtabs_atomic.js';
 		drupal_add_js($path_atomic);
 		$path_compound=$path . '/ajaxtabs.css';
-		drupal_add_js($path_compound);  
+		drupal_add_css($path_compound);  
 	}
 
 	/**
