@@ -123,10 +123,6 @@ class EsdoraCollection extends CollectionClass {
             return $esdora_collection_display;
         }
         //else we are putting a tabbed display with an overall manage tab
-        global $base_url;
-        global $user;
-
-        $_SESSION['esdora_collection']['selected_tab']='view';
         $objectHelper = new ObjectHelper();
         $item = new Fedora_Item($this->pid);
         $query = NULL;
@@ -185,12 +181,12 @@ class EsdoraCollection extends CollectionClass {
         );
         $esdora_tabs['manage_view'] = array(
             '#type' => 'tabpage',
-            '#title' => t('Manage'),
+            '#title' => t('Manage Collection'),
             '#content' => tabs_render($tabset),
         );
+        
         return tabs_render($esdora_tabs);
     }
-
 }
 
 ?>

@@ -240,16 +240,16 @@ class Esdora {
         module_load_include('inc', 'fedora_repository', 'ObjectHelper');
         $fieldSetcontent = "<div>";
         $pid = $this->pid;
-        if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
-            $fieldSetDF = array(
-                '#type' =>'fieldset',
-                '#title' => t('Derivative Form'),
-                '#collapsible' => TRUE,
-                '#collapsed' => FALSE,
-                '#value' => drupal_get_form('esdora_islandora_derivative_form', $this->pid),
-            );
-            $fieldSetcontent .= theme('fieldset', $fieldSetDF);
-        }
+//        if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
+//            $fieldSetDF = array(
+//                '#type' =>'fieldset',
+//                '#title' => t('Derivative Form'),
+//                '#collapsible' => TRUE,
+//                '#collapsed' => FALSE,
+//                '#value' => drupal_get_form('esdora_islandora_derivative_form', $this->pid),
+//            );
+//            $fieldSetcontent .= theme('fieldset', $fieldSetDF);
+//        }
 
         if (module_exists('graphviz_filter')) {
             $lineage = $this->getLineageAsGraph($pid);

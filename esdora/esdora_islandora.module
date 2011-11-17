@@ -147,6 +147,7 @@ function esdora_islandora_edit_form_submit($form, &$form_state) {
 }
 
 /**
+ * NOTE the form def is in esdora.inc
  * adds isderivedfrom to the Rels ext, can take a comma seperated string as a list of pids
  * currently no way to remove a pid from the list with this form (TODO:)
  * @param array $form
@@ -171,6 +172,9 @@ function esdora_islandora_derivative_form_submit(&$form, &$form_state) {
         $ds_list = $item->get_datastreams_list_as_array();
         if (empty($ds_list['processing.txt'])) {
             $item->add_datastream_from_string($txt, 'processing.txt', 'processing text', $datastream_mimetype = 'text/plain', 'M');
+            //mark it as metadata:
+            $esdora = new Esdora($pid);
+            $esdora->add_relationship_internal('isMetaDataFor', $pid, 'processing.txt', "http://esdora.ornl.gov/ontologies/relationships#");
         } else {
             //TODO: add this to an api call called modify_datastream_by_txt or something similar
             $dir = file_directory_temp();
@@ -269,6 +273,146 @@ function esdora_islandora_get_tabs($esdora_obj, $case) {
     echo drupal_json($content);
 }
 
+
+function addstream_form(&$form_state, $pid) {
+            
+    $form = array();
+
+    $options = array(
+        'data' => t('Data file'),
+        'metadata' => t('Metadata file'),
+    );
+    $form['addstream']['choices'] = array(
+      '#title' => t('Select a component type'), 
+      '#type' => 'radios', 
+      '#options' => $options,
+      '#default_value' =>'data',
+      );
+//    $form['#attributes']['enctype'] = 'multipart/form-data';
+    $form['#attributes'] = array('enctype' => 'multipart/form-data');
+    $form['addstream']['add-stream-file-location'] = array(
+        '#type' => 'file',
+        '#title' => t('Upload file'),
+        '#size' => 48,
+        '#description' => t('Choose a file to upload.'),
+        );
+    
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add Datastream'),
+     );
+    
+   $form['#redirect'] = "/fedora/repositroy/$pid";
+
+    $form['pid'] = array(
+      '#type' => 'hidden',
+      '#value' => "$pid"
+    );
+
+    return $form;
+}
+
+function addstream_form_submit($form, &$form_state) {
+   $validators = array();
+   global $base_url;
+  if (!empty($form_state['submit']) && $form_state['submit'] == 'OK') {
+    $form_state['rebuild'] = TRUE;
+    return;
+  }
+  module_load_include('inc', 'fedora_repository', 'MimeClass');
+  module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+
+  $pid = $form_state['values']['pid'];
+  $choices = $form_state['values']['choices'];
+  $metadata = ($choices=='metadata');
+  
+  
+// we dont use the following fields: file name is the dsid and label
+//     $dsid = $form_state['values']['stream_id'];
+//  $dsLabel = $form_state['values']['stream_label'] . substr($file, strrpos($file, '.')); // Add the file extention to the end of the label.;
+  $fileObj = file_save_upload('add-stream-file-location', $validators, 'path', FILE_EXISTS_REPLACE);
+  $file = $fileObj ->filepath;
+  if(!$file) {
+      throw new Exception("file not loaded correctly!");
+  }
+  $file_directory = dirname($file);
+  $file_basename = basename($file);  
+  $streamUrl = $base_url . '/' . $file_directory . '/' . drupal_urlencode($file_basename);
+  $mimetype = new MimeClass();
+  $dformat = $mimetype->getType($file);
+  $controlGroup = "M";
+  if ($dformat == 'text/xml') {
+    $controlGroup = 'X';
+  }
+  $file_basename = trim($file_basename);
+  $file_basename = str_replace(' ', '_', $file_basename);
+  $dsid=$file_basename;
+  $dsLabel=$file_basename;
+  try {
+    $item = new Fedora_Item($pid);
+    //@TODO Checksum not working...
+    $item->add_datastream_from_url($streamUrl, $dsid, $dsLabel, $dformat, $controlGroup, NULL, "MD5", '');
+    //add the relationship: isMetadataFor if its metadata
+    if($metadata) {
+       $esdora = new Esdora($pid);
+       $esdora->add_relationship_internal('isMetaDataFor', $pid, $dsid, "http://esdora.ornl.gov/ontologies/relationships#");
+    }
+    file_delete($file);
+  } catch (exception $e) {
+    drupal_set_message(t('@message', array('@message' => check_plain($e->getMessage()))), 'error');
+    return;
+  }
+  drupal_set_message("Data component $file_basename has been added to object $pid.");
+  $form_state['rebuild'] = TRUE;
+}
+
+function esdora_addviewer_form($form_state, $pid) {
+    $form['is_viewer'] = array();
+    $form['is_viewer']['viewer_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('The URL for the viewer'),
+    );
+    $form['is_viewer']['stream_id'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Enter an stream ID for the viewer'),
+        '#description' =>t("a unique identifer for this viewer."),
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Add Viewer'),
+     );
+    
+    $form['pid'] = array(
+      '#type' => 'hidden',
+      '#value' => "$pid"
+    );
+
+    return $form;
+ }
+ 
+ function esdora_addviewer_form_submit($form, &$form_state) {
+    module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+    $esdora = new Esdora($form_state['values']['pid']);
+    if (!empty($form_state['values']['viewer_url'])) {
+        $viewer_url = $form_state['values']['viewer_url'];
+        $filtered_url = $viewer_url; //filter_var($viewer_url, FILTER_VALIDATE_URL);
+        if (!isset($filtered_url)) {
+            drupal_set_message(t('You must enter a valid URL in the URL for Viewer textbox'));
+            return ' ';
+        }
+        //module_load_include('inc', 'fedora_repository', 'plugins/fedora_item');
+        $pid = $form_state['values']['pid'];
+        $dsid = $form_state['values']['stream_id'];
+        $dsLabel = $dsid;
+        $item = new Fedora_Item($pid);
+        $item->add_datastream_from_url($filtered_url, $dsid, $dsLabel, NULL, 'R');
+        $esdora->add_relationship_internal('isViewerFor', $pid, $dsid, "http://esdora.ornl.gov/ontologies/relationships#");
+        drupal_set_message(t('Successfully added viewer to @pid'),array('@pid'=>$pid));
+        return ' '; //we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
+    }
+ }
+
 /**
  *
  * @param <type> $form
@@ -279,7 +423,8 @@ function esdora_islandora_get_tabs($esdora_obj, $case) {
  */
 function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
     if ($form_id === "add_stream_form") {
-        $form['is_metadata'] = array(
+        //$form = esdora_add_stream_form();
+                $form['is_metadata'] = array(
             '#type' => 'checkbox',
             '#weight' => '-1',
             '#title' => t('is this metadata'),
@@ -296,7 +441,7 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
             '#weight' => '-2',
             '#title' => t('Is this a reference to a viewer.'),
             '#collapsible' => TRUE,
-            '#collapsed' => TRUE,
+            '#collapsed' => FALSE,
             '#description' => t('Enter a URL to an external viewer.  Marking this as Metadata or uploading a file will be ingnored as a Viewer cannot be Metadata and there will not be a file associated with this datastream.'));
 
         $form['is_viewer']['viewer_url'] = array(
@@ -322,6 +467,7 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
           ); */
         $form['#submit'][0] = 'esdora_rels_int_handler'; //add a new handler Actually replacing the orginal here but we call it from our function now, this should not affect other handlers as they would still be called after bit is a bit of a hack
         $form['#validate'][0] = 'esdora_rels_int_handler_validate'; //same for this function
+
     }
 
     if ($form_id == "fedora_repository_ingest_form") {
@@ -530,17 +676,110 @@ function esdora_repository_page($pid = NULL, $dsId = NULL, $collection = NULL, $
         
     }
     
-    if($esdora_collection_model !=NULL ) { //esdora collection object
+    if($esdora_collection_model !=NULL ) { //collection object
+        //esdora collection object
+        //because this code dirctly get the management features,
+        //we do not need IslandoraCollectionCmodel to be associated with collection object anymore ! yeah !
+        //and hence the freedom to choose a subset to display and the way we want to display
         $esdoraCollection = new EsdoraCollection($pid);
         return $esdoraCollection -> getContentForDisplay($esdora_collection_model, $hasManagePermission, $pid, $page_number);
     }
     else { //data object
         
         //TODO: need to find a place on GUI to put back management on object details
-        //NEW TAB "MANAGE DATASET"???
         //TODO: check permission
+        $data_display=$esdora_data_model -> displayExtraFieldset($pid, $page_number);
+        if(!$hasManagePermission) {
+            //this calls into Islandora content model so the model objects are still needed
+            return $data_display;
+        }
+        //has the permission, show a tabbed display with View and Manage tabs
         
-        return $esdora_data_model -> displayExtraFieldset($pid, $page_number);
+        $obj = new FedoraObjectDetailedContent($pid);
+        $object_details = $obj->showFieldSets();
+
+        $manage_view=array(
+            '#type' => 'tabset',
+        );
+
+        $add_component_content['component']=array(
+            '#type' => 'fieldset',
+            '#title' =>'Add Component',
+            '#collapsible' => TRUE,
+            '#collapsed'  => FALSE,
+            '#value' => drupal_get_form('addstream_form', $pid),
+            '#weight' =>-2,
+        );
+        $add_component_content['viewer']=array(
+            '#type' => 'fieldset',
+            '#title' =>'Add Viewer',
+            '#collapsible' => TRUE,
+            '#collapsed'  => TRUE,
+            '#value' => drupal_get_form('esdora_addviewer_form', $pid),
+            '#weight' =>-1,
+        );
+
+        $manage_view['Components'] = array(
+            '#type' =>'tabpage',
+            '#title'=>'Add',
+            '#selected' =>TRUE,
+            '#content'=> drupal_render($add_component_content),
+        );
+
+//        $edit_metadata_urls = l('Edit DC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/DC/DC/');
+//        $edit_metadata_urls .= ' / ' . l(' Edit FGDC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
+//        drupal_get_form('esdora_islandora_edit_form', $pid, $dsid, $form_name);
+        $edit_metadata['fgdc'] = array(
+            '#type' => 'fieldset',
+            '#title' =>t('Edit FGDC'),
+            '#collapsible' => TRUE,
+            '#collapsed'  => FALSE,
+            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'FGDC.xml', 'fgdc'),
+            '#weight' =>-2,
+        );
+        $edit_metadata['dc'] = array(
+            '#type' => 'fieldset',
+            '#title' =>t('Edit DC'),
+            '#collapsible' => TRUE,
+            '#collapsed'  => TRUE,
+            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'DC', 'DC'),
+            '#weight' =>-2,
+        );
+        $manage_view['Metadata'] = array(
+            '#type' =>'tabpage',
+            '#title'=>'Edit',
+            '#content'=>drupal_render($edit_metadata),
+        );
+        
+        $fieldSetDF = array(
+            '#type' =>'fieldset',
+            '#title' => t('Derivative Form'),
+            '#collapsible' => TRUE,
+            '#collapsed' => FALSE,
+            '#value' => drupal_get_form('esdora_islandora_derivative_form', $pid),
+        );
+        $fieldSetcontent = theme('fieldset', $fieldSetDF);
+
+        $manage_view['Lineage'] = array(
+            '#type' =>'tabpage',
+            '#title'=>'Lineage',
+            '#content'=>$fieldSetcontent,//$fieldSetcontent,
+        );
+        $manage_view = array_merge($manage_view, $object_details);
+        $esdora_tabs = array(
+            '#type' => 'tabset',
+        );
+        $esdora_tabs['data_view'] = array(
+            '#type' =>'tabpage',
+            '#title'=>'View',
+            '#content'=>$data_display,
+        );
+        $esdora_tabs['manage_view'] = array(
+            '#type' => 'tabpage',
+            '#title' => t('Manage Dataset'),
+            '#content' => tabs_render($manage_view),
+        );
+        return tabs_render($esdora_tabs);
     }
 }
 
