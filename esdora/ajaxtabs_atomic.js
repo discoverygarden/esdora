@@ -73,7 +73,7 @@ $(document).ready(function(){
 					       $(this).fancybox({  
 								'width':dWidth,  
 								'height':dHeight,  
-								'autoScale'         : false,   
+                                            			'autoScale'         : false,   
 								'type'          : 'iframe'  
 							}).trigger('click');
 					       

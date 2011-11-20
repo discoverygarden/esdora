@@ -97,8 +97,8 @@ class Esdora {
         $fdgcAsHtml;
         $edit_metadata_urls = '';
         if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
-            $edit_metadata_urls = l('Edit DC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/DC/DC/');
-            $edit_metadata_urls .= ' / ' . l(' Edit FGDC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
+            $edit_metadata_urls = l('Edit DC',  '/esdora/render/form/' . $this->pid . '/DC/DC/');
+            $edit_metadata_urls .= ' / ' . l(' Edit FGDC', '/esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
         }
 
         try {
@@ -458,7 +458,7 @@ class Esdora {
         $rows = explode("\n", $content);
         $lineage = null;
         if (count($rows) > 2) {
-            $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Children</th><th>Relation</th><th>Parent</th>';
+            $lineage = '<table border="2" cellpadding="5px" style="margin-bottom:15;"><th>Dataset</th><th>Relation</th><th>Origin</th>';
             $count = 0;
             foreach ($rows as $row) {
                 if ($count > 0 && $row != null) {
@@ -493,7 +493,7 @@ class Esdora {
         $content = do_Curl($url2);
         $rows = explode("\n", $content);
         if (count($rows) > 2) {
-            $lineage.= '<table border="2" cellpadding="5px" "style: float:left;"><th>Children</th><th>Relation</th><th>Parent</th>';
+            $lineage.= '<table border="2" cellpadding="5px" "style: float:left;"><th>Dataset</th><th>Relation</th><th>Origin</th>';
             $count = 0;
             foreach ($rows as $row) {
                 if ($count > 0 && $row != null) {

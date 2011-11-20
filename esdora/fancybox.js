@@ -1,4 +1,5 @@
 /*fancybox.js*/
+//WHY THIS FILE IS HERE? it is not used Nov 2011 Jerry
 $(document).ready(function(){  
 
 	$('a.fb_dynamic').each(function(){  
