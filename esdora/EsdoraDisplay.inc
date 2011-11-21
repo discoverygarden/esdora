@@ -148,54 +148,28 @@
                 '#weight' => -1,
             );
 
-            $manage_view['Components'] = array(
-                '#type' => 'tabpage',
-                '#title' => 'Add',
-                '#selected' => TRUE,
-                '#content' => drupal_render($add_component_content),
-                '#weight' =>-100,
-            );
-
-//        $edit_metadata_urls = l('Edit DC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/DC/DC/');
-//        $edit_metadata_urls .= ' / ' . l(' Edit FGDC', $base_url . base_path() . 'esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
-//        drupal_get_form('esdora_islandora_edit_form', $pid, $dsid, $form_name);
-            $edit_metadata['fgdc'] = array(
+            $manage_view_edit_fgdc = array(
                 '#type' => 'fieldset',
                 '#title' => t('Edit FGDC'),
                 '#collapsible' => TRUE,
                 '#collapsed' => FALSE,
                 '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'FGDC.xml', 'fgdc'),
-                '#weight' => -1,
             );
-            $edit_metadata['dc'] = array(
+            $manage_view_edit_dc = array(
                 '#type' => 'fieldset',
                 '#title' => t('Edit DC'),
                 '#collapsible' => TRUE,
                 '#collapsed' => TRUE,
                 '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'DC', 'DC'),
-                '#weight' => -2,
             );
-            $manage_view['Metadata'] = array(
-                '#type' => 'tabpage',
-                '#title' => 'Edit',
-                '#content' => drupal_render($edit_metadata),
-            );
-
-            $fieldSetDF = array(
+            $manage_view_lineage = array(
                 '#type' => 'fieldset',
                 '#title' => t('Derivative Form'),
                 '#collapsible' => TRUE,
                 '#collapsed' => FALSE,
                 '#value' => drupal_get_form('esdora_islandora_derivative_form', $pid),
             );
-            $fieldSetcontent = theme('fieldset', $fieldSetDF);
 
-            $manage_view['Lineage'] = array(
-                '#type' => 'tabpage',
-                '#title' => 'Lineage',
-                '#content' => $fieldSetcontent,
-            );
-            $manage_view = array_merge($manage_view, $object_details);
             $esdora_tabs = array(
                 '#type' => 'tabset',
             );
@@ -221,25 +195,46 @@ drupal_add_js (
     'inline');
 
 $url_add_component = "#dataset_add_component";
-$url_edit_fgdc = "#dataset_add_component";
-$url_edit_dc = "#dataset_add_component";
-$url_edit_lineage = "#dataset_add_component";
-$url_object_details = "#dataset_add_component";
+$url_edit_fgdc = "#dataset_edit_fgdc";
+$url_edit_dc = "#dataset_edit_dc";
+$url_edit_lineage = "#dataset_add_lineage";
+$url_object_details = "#dataset_object_details";
+
+$fancybox_width='800px;';
+$fancybox_height='650px;';
 
 $my_manage_view = '<div class="manage_dataset">';
 $my_manage_view .= '<fieldset><legend>Choose a management option</legend>';
 $my_manage_view .= '<ul>';
 $my_manage_view .= '<li><a href=' . $url_add_component . '>Add a component</a></li>';
 $my_manage_view .= '<li><a href=' . $url_edit_fgdc . '>Edit Metadata (FGDC)</a></li>';
-$my_manage_view .= '<li><a href=' . $url_edit_dc . '>Edit Metadta (DC) </a></li>';
+//TODO: DC assumes FGDC bug due to static storage instance, bug for Nigel to fix
+//$my_manage_view .= '<li><a href=' . $url_edit_dc . '>Edit Metadta (DC) </a></li>';
 $my_manage_view .= '<li><a href=' . $url_edit_lineage . '>Data Lineage</a></li>';
 $my_manage_view .= '<li><a href=' . $url_object_details . '>Object Details</a></li></ul></fieldset></div>';
 
 $my_manage_view .= '<div style="display: none;">                
-        <div id="dataset_add_component" style="width:800px; height:650px;overflow:auto;">'
+        
+        <div id="dataset_add_component" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
                 . drupal_render($manage_view_add_component) .   
         '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
-        </div> ';
+            
+        <div id="dataset_edit_fgdc" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($manage_view_edit_fgdc) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+
+        <div id="dataset_edit_dc" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($manage_view_edit_dc) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+
+        <div id="dataset_add_lineage" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($manage_view_lineage) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+
+        <div id="dataset_object_details" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($object_details) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+';
 
             $esdora_tabs['manage_view'] = array(
                 '#type' => 'tabpage',
