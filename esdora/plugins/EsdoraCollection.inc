@@ -107,6 +107,7 @@ class EsdoraCollection extends CollectionClass {
         return $xslContent;
     }
 
+ 
     function getContentForDisplay($esdora_collection_model, $hasManagePermission, $page_number) {
 //note: copied from CollectionClass->showFieldSets($page_number)
 //so ESDORA will no longer need the Islandora Conent Model and we can delete some tab views
@@ -118,29 +119,21 @@ class EsdoraCollection extends CollectionClass {
         module_load_include('inc', 'fedora_repository', 'CollectionManagement');
         module_load_include('inc', 'fedora_repository', 'BatchIngest');
 
-        $esdora_collection_display = $esdora_collection_model->displayExtraFieldset($this->pid, $page_number);
+        $esdora_collection_display = $esdora_collection_model->displayExtraFieldset($this->pid, $page_number);//calls showCollection
         if (!$hasManagePermission) {
             return $esdora_collection_display;
         }
         //else we are putting a tabbed display with an overall manage tab
-        $objectHelper = new ObjectHelper();
-        $item = new Fedora_Item($this->pid);
-        $query = NULL;
-        if ($item->exists() && array_key_exists('QUERY', $item->datastreams)) {
-            $query = $item->get_datastream_dissemination('QUERY');
-        }
-        $results = $this->getRelatedItems($this->pid, $query);
+        //Nov 20, changed to fancyox popups -jerry
 
-        // Check the form post to see if we are in the middle of an ingest operation.
-        $show_ingest_tab = (!empty($_POST['form_id']) && $_POST['form_id'] == 'fedora_repository_ingest_form');
         $add_to_collection = $this->getIngestInterface();
-
-        $show_batch_tab = TRUE;
+//        $show_batch_tab = TRUE;
         $policy = CollectionPolicy::loadFromCollection($this->pid, TRUE);
         $content_models = $policy->getContentModels();
-        if (count($content_models) == 1 && $content_models[0]->pid == "islandora:collectionCModel") {
-            $show_batch_tab = FALSE;
-        }
+//        if (count($content_models) == 1 && $content_models[0]->pid == "islandora:collectionCModel") {
+//            $show_batch_tab = FALSE;
+//        }
+/*        
         $tabset = array(
            '#type' => 'tabset',
             );
@@ -170,6 +163,66 @@ class EsdoraCollection extends CollectionClass {
                 '#content' => drupal_get_form('batch_creation_form', $this->pid, $content_models),
             );
         }
+  */      
+
+//experiment with lightbox
+//TODO: refactoring and extract functions
+$add_to_collection_view = array(
+    '#type' => 'fieldset',
+    '#title' => t('Ingest Dataset'),
+    '#value' => $add_to_collection,
+);
+
+$manage_collection_view = array(
+    '#type' => 'fieldset',
+    '#title' => t('Manage Collection'),
+    '#value' => drupal_get_form('collection_management_form', $this->pid, $content_models),
+    );
+
+$obj = new FedoraObjectDetailedContent($this->pid);
+$object_details = $obj->showFieldSets();
+        
+drupal_add_css("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.css"); 
+drupal_add_js("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.js");  
+drupal_add_js (        
+    '$(document).ready(function(){
+        $("div.manage_collection a").fancybox({
+            \'overlayShow\': true,
+            \'titlePosition\' : \'inside\',
+            \'transitionIn\' : \'none\',
+            \'transitionOut\' : \'none\',
+        });
+     }); ',
+    'inline');
+
+$url_add_dataset = "#collection_add_dataset";
+$url_manage_collection = "#collection_manage";
+$url_object_details = "#object_details";
+
+$fancybox_width='800px;';
+$fancybox_height='650px;';
+
+$my_manage_view = '<div class="manage_collection">';
+$my_manage_view .= '<fieldset><legend>Choose a management option</legend>';
+$my_manage_view .= '<ul>';
+$my_manage_view .= '<li><a href=' . $url_add_dataset . '>Add Dataset By Package</a></li>';
+$my_manage_view .= '<li><a href=' . $url_manage_collection . '>Manage This Collection</a></li>';
+$my_manage_view .= '<li><a href=' . $url_object_details . '>Object Details</a></li></ul></fieldset></div>';
+
+$my_manage_view .= '<div style="display: none;">                
+        
+        <div id="collection_add_dataset" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($add_to_collection_view) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+            
+        <div id="collection_manage" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($manage_collection_view) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+
+        <div id="object_details" style="width:' .$fancybox_width .' height:'.$fancybox_height .' overflow:auto;">' 
+                . drupal_render($object_details) .   
+        '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
+';
         
         $esdora_tabs = array(
             '#type' => 'tabset',
@@ -182,7 +235,7 @@ class EsdoraCollection extends CollectionClass {
         $esdora_tabs['manage_view'] = array(
             '#type' => 'tabpage',
             '#title' => t('Manage Collection'),
-            '#content' => tabs_render($tabset),
+            '#content' => $my_manage_view,
         );
         
         return tabs_render($esdora_tabs);

@@ -273,7 +273,7 @@ $my_manage_view .= '<div style="display: none;">
         '#value' => t('Add Datastream'),
      );
     
-   $form['#redirect'] = "/fedora/repositroy/$pid";
+   $form['#redirect'] = "/fedora/repository/$pid";
 
     $form['pid'] = array(
       '#type' => 'hidden',
@@ -322,8 +322,13 @@ function addstream_form_submit($form, &$form_state) {
   $dsLabel=$file_basename;
   try {
     $item = new Fedora_Item($pid);
-    //@TODO Checksum not working...
-    $item->add_datastream_from_url($streamUrl, $dsid, $dsLabel, $dformat, $controlGroup, NULL, "MD5", '');
+    $checksumType='DISABLED';
+    $checksum='none';
+    if(!$metadata) {
+        $checksumType="MD5";
+        $checksum = md5_file($file);
+    }
+    $item->add_datastream_from_url($streamUrl, $dsid, $dsLabel, $dformat, $controlGroup, NULL, $checksumType, $checksum);
     //add the relationship: isMetadataFor if its metadata
     if($metadata) {
        $esdora = new Esdora($pid);
@@ -334,8 +339,7 @@ function addstream_form_submit($form, &$form_state) {
     drupal_set_message(t('@message', array('@message' => check_plain($e->getMessage()))), 'error');
     return;
   }
-  drupal_set_message("Data component $file_basename has been added to object $pid.");
-  $form_state['rebuild'] = TRUE;
+  drupal_set_message(t("Data component $file_basename has been added to object $pid."));
 }
 
 function esdora_addviewer_form($form_state, $pid) {
@@ -386,7 +390,7 @@ function esdora_addviewer_form($form_state, $pid) {
         $item = new Fedora_Item($pid);
         $item->add_datastream_from_url($filtered_url, $dsid, $dsLabel, NULL, 'R');
         $esdora->add_relationship_internal('isViewerFor', $pid, $dsid, "http://esdora.ornl.gov/ontologies/relationships#");
-        drupal_set_message(t('Successfully added viewer to @pid'),array('@pid'=>$pid));
+        drupal_set_message(t("Successfully added viewer to $pid"));
         return ' '; //we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
     }
 }
