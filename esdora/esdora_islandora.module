@@ -378,7 +378,7 @@ function esdora_rels_int_handler_validate(&$form, &$form_state) {
             form_set_error('', t('No File uploaded. Please Choose a file.'));
             return FALSE;
         }
-        add_stream_form_validate(&$form, &$form_state);
+        add_stream_form_validate($form, $form_state);
     }
 }
 
@@ -410,7 +410,7 @@ function esdora_rels_int_handler(&$form, &$form_state) {
         return ' '; //we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
     }
     //call the orginal handler where this is where this gets brittle if the orginal form handler changes this may break (the add stream form is core so shouldn't change unless it is major refactor like going from 6 to 7 which would require changes
-    add_stream_form_submit(&$form, &$form_state);
+    add_stream_form_submit($form, $form_state);
     if ($form_state['values']['is_metadata'] === 1) {
         $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'], $form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
     }
