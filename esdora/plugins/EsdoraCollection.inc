@@ -15,7 +15,7 @@ class EsdoraCollection extends CollectionClass {
             $this->item = new Fedora_Item($pid);
         }
     }
-
+    
     function showCollection() {
         global $base_url;
         global $user;
@@ -106,18 +106,32 @@ class EsdoraCollection extends CollectionClass {
         }
         return $xslContent;
     }
-
+    
  
+    /**
+     * THE main entry for displaying ESDORA collection objects jerry nov. 2011
+     * 
+     * @param type $esdora_collection_model
+     * @param type $hasManagePermission
+     * @param type $page_number
+     * @return type 
+     * 
+     */
     function getContentForDisplay($esdora_collection_model, $hasManagePermission, $page_number) {
-//note: copied from CollectionClass->showFieldSets($page_number)
-//so ESDORA will no longer need the Islandora Conent Model and we can delete some tab views
-//this is for Collection Object only     
-//TODO: the tabs jumps and need to have a way to rem the position of the selected tab
+    //note: copied from CollectionClass->showFieldSets($page_number)
+    //so ESDORA will no longer need the Islandora Conent Model and we can delete some tab views
+    //this is for Collection Object only     
+    //
+    //TODO: the tabs jumps and need to have a way to rem the position of the selected tab
+        
         module_load_include('inc', 'fedora_repository', 'ContentModel');
         module_load_include('inc', 'fedora_repository', 'plugins/FedoraObjectDetailedContent');
         module_load_include('inc', 'fedora_repository', 'api/fedora_item');
         module_load_include('inc', 'fedora_repository', 'CollectionManagement');
+        module_load_include('inc', 'fedora_repository', 'CollectionPolicy');
         module_load_include('inc', 'fedora_repository', 'BatchIngest');
+        
+        module_load_include('inc', 'esdora_islandora', 'esdora_forms');
 
         $esdora_collection_display = $esdora_collection_model->displayExtraFieldset($this->pid, $page_number);//calls showCollection
         if (!$hasManagePermission) {
@@ -126,51 +140,17 @@ class EsdoraCollection extends CollectionClass {
         //else we are putting a tabbed display with an overall manage tab
         //Nov 20, changed to fancyox popups -jerry
 
-        $add_to_collection = $this->getIngestInterface();
-//        $show_batch_tab = TRUE;
         $policy = CollectionPolicy::loadFromCollection($this->pid, TRUE);
         $content_models = $policy->getContentModels();
-//        if (count($content_models) == 1 && $content_models[0]->pid == "islandora:collectionCModel") {
-//            $show_batch_tab = FALSE;
-//        }
-/*        
-        $tabset = array(
-           '#type' => 'tabset',
-            );
-        $tabset['add_tab'] = array(
-            '#type' => 'tabpage',
-            '#title' => t('Add Dataset'),
-            '#selected' => TRUE,
-            // This will be the content of the tab.
-            '#content' => $add_to_collection,
-        );
-        if (user_access('manage collections')) {
-            $tabset['add_collection_tab'] = array(
-                // #type and #title are the minimum requirements.
-                '#type' => 'tabpage',
-                '#title' => t('Manage Collection'),
-                // This will be the content of the tab.
-                '#content' => drupal_get_form('collection_management_form', $this->pid, $content_models),
-                '#selected' => FALSE,
-            );
-        }
-        if ($show_batch_tab && user_access('create batch process')) {
-            $tabset['batch_ingest_tab'] = array(
-                // #type and #title are the minimum requirements.
-                '#type' => 'tabpage',
-                '#title' => t('Batch Ingest'),
-                // This will be the content of the tab.
-                '#content' => drupal_get_form('batch_creation_form', $this->pid, $content_models),
-            );
-        }
-  */      
+
+        $add_dataset_to_collection = drupal_get_form('dataset_ingest_form', $content_models, $this->pid);
 
 //experiment with lightbox
 //TODO: refactoring and extract functions
 $add_to_collection_view = array(
     '#type' => 'fieldset',
     '#title' => t('Ingest Dataset'),
-    '#value' => $add_to_collection,
+    '#value' => $add_dataset_to_collection,
 );
 
 $manage_collection_view = array(

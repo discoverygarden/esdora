@@ -14,14 +14,6 @@ xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/
 <foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2008-12-14T00:12:52.636Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
 <foxml:xmlContent>
 <audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
-<audit:record ID="AUDREC1">
-<audit:process type="Fedora API-M"/>
-<audit:action>ingest</audit:action>
-<audit:componentID></audit:componentID>
-<audit:responsibility>fedoraAdmin</audit:responsibility>
-<audit:date>2011-03-01T14:56:58.331Z</audit:date>
-<audit:justification>Ingested from local file /Users/aoneill/dev/iiv/iiv/etc/fedora-objects/ilives_bookCModel.xml</audit:justification>
-</audit:record>
 <audit:record ID="AUDREC2">
 <audit:process type="Fedora API-M"/>
 <audit:action>modifyObject</audit:action>
@@ -102,6 +94,10 @@ xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/
     <datastream dsid="MODS"></datastream>
     <datastream dsid="DC"></datastream>
   </datastreams>
+  
+  <package_ingest_handler class="EsdoraIngest" file="plugins/EsdoraAtomisticIngest.inc" method="handleZipIngestForm" module="esdora_islandora">
+  </package_ingest_handler>    
+
   <ingest_form dsid="MODS" page="2">
     <form_builder_method class="IslandoraBook" file="book.inc" handler="handleIngestForm" method="buildDrupalForm" module="fedora_ilives"></form_builder_method>
     <form_elements></form_elements>

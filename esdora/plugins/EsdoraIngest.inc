@@ -88,13 +88,15 @@ class EsdoraIngest {
    *
    * @param <type> $form_values
    */
-  function handleZipIngestForm($form_values, $uploaded_file) {
+  function handleZipIngestForm($collection_pid, $uploaded_file) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');
     module_load_include('inc', 'fedora_repository', 'api/dublin_core');
-    $pid = $form_values['pid'];
-    $collection_pid = $form_values['collection_pid'];
-    //$fileName = $form_values['esdora_full_path'];
+    
+    
+    $pid = NULL; //create a new data object here
+    
+    
     $tmpDir = $this->unzip_file($uploaded_file);
 
     $files = scandir($tmpDir);

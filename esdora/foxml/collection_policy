@@ -2,7 +2,7 @@
   <content_models>
     
     <content_model dsid="ISLANDORACM" name="Default Data Model" namespace="es:data" pid="esdora:defaultDataCModel"></content_model>
-    
+    <content_model dsid="ISLANDORACM" name="Default Data Model" namespace="es:data" pid="esdora:atomicDataCModel"></content_model>
     <content_model dsid="ISLANDORACM" name="Default Collection Model" namespace="es:data" pid="esdora:defaultCollectionCModel"></content_model>
   </content_models>
   <search_terms>
