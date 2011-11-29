@@ -427,8 +427,13 @@ function esdora_rels_int_handler(&$form, &$form_state) {
  * @return type 
  */
 function esdora_repository_page($pid = NULL, $dsId = NULL, $collection = NULL, $page_number = NULL, $limit = NULL) {
-    module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
+    try {
+    module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');    
     return displayContent($pid, $dsId, $collection, $page_number, $limit);
+    }
+    catch (Exception $e) {
+        drupal_set_message("error trying to display $pid: error: ". $e->getMessage());
+    }
 }
 
 
