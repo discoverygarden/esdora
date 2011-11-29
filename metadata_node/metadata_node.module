@@ -108,6 +108,7 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
             $my_form['submit']['#weight'] = 200; //higher the number lower the position
             //unset($my_form['submit']);
             $form = array_merge($my_form, $form);
+            $form['redirect'] = FALSE;
             //$form['buttons']['submit']['#submit'][] = 'metadata_node_form_submit';
             break;
     }
@@ -140,9 +141,8 @@ function metadata_node_form_submit(array $form, array &$form_state) {
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
-        //$form_state['rebuild'] = true;
+        $form_state['rebuild'] = true;
     }
-    drupal_goto('/node/81');
 }
 
 /**
@@ -329,6 +329,10 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                 '#default_value' => variable_get(NUMBER_OF_RECORDS_BLOCK, 20),
             );
             return $form;
+        case 'save':
+            $number_of_record_per_block=$edit['num_records'];
+            variable_set(NUMBER_OF_RECORDS_BLOCK, (int)$number_of_record_per_block);
+            break;
         case 'view' :
             $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
             $result = array();

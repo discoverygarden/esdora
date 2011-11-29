@@ -331,7 +331,7 @@ class Esdora {
                     } else {
                         $name = 'process' . ($processCnt + 1);
                         $process[$processCnt] = $name;
-                        $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/process.txt';
+                        $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/processing.txt';
                         $processCnt = $processCnt + 1;
                     }
 
@@ -381,7 +381,7 @@ class Esdora {
                     } else {
                         $name = 'process' . ($processCnt + 1);
                         $process[$processCnt] = $name;
-                        $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/process.txt';
+                        $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/processing.txt';
                         $processCnt = $processCnt + 1;
                     }
 
