@@ -4,7 +4,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
+global $pid;
 
 function fedoraRIStoreClient_menu() {
     return array(
@@ -35,7 +35,6 @@ function fedoraRIStoreClient_menu() {
 
 function fedoraRIStoreClient_admin() {
     $form = array();
-   
     $form['fedoraRIStoreClient_wrapper1'] = array(
         '#prefix' => '<div id="fedoraRIStoreClient_wrapper">',
         '#suffix' => '</div>',
@@ -46,43 +45,27 @@ function fedoraRIStoreClient_admin() {
         '#suffix' => '</div>',
         '#type' => 'fieldset',
     );
-    $form['fedoraRIStoreClient_wrapper3'] = array(
-        '#prefix' => '<div id="fedoraRIStoreClient_wrapper">',
-        '#suffix' => '</div>',
-        '#type' => 'fieldset',
-    );
-    $form['fedoraRIStoreClient_wrapper1']['local_top'] = array(
-        '#type' => 'textfield',
-        '#title' => t('The top level Collection'),
-        '#default_value' => variable_get('local_top', 'es:top') //false by default
-    );
-    $form['fedoraRIStoreClient_wrapper1']['local_namespace'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Local Namespace'),
-        '#default_value' => variable_get('local_namespace', 'esLocal'), //false by default
-        '#description' => t('Comma seperated values')
-    );
 
-    $form['fedoraRIStoreClient_wrapper2']['fedoraRIStoreClient_server1'] = array(
+    $form['fedoraRIStoreClient_wrapper1']['fedoraRIStoreClient_server1'] = array(
         '#type' => 'textfield',
         '#title' => t('First external fedora server to query'),
-        '#default_value' => variable_get('fedoraRIStoreClient_server1', 'https://esdora.ornl.gov/fedora/risearch') //false by default
+        '#default_value' => variable_get('_field_name_value', 'https://esdora.ornl.gov/fedora/risearch') //false by default
     );
-    $form['fedoraRIStoreClient_wrapper2']['fedoraRIStoreClient_namespace1'] = array(
+    $form['fedoraRIStoreClient_wrapper1']['fedoraRIStoreClient_namespace1'] = array(
         '#type' => 'textfield',
         '#title' => t('Corresponding namespaces'),
-        '#default_value' => variable_get('fedoraRIStoreClient_namespace1', 'es'), //false by default
+        '#default_value' => variable_get('_field_name_value', 'es'), //false by default
         '#description' => t('Comma seperated values')
     );
-    $form['fedoraRIStoreClient_wrapper3']['fedoraRIStoreClient_server2'] = array(
+    $form['fedoraRIStoreClient_wrapper2']['fedoraRIStoreClient_server2'] = array(
         '#type' => 'textfield',
         '#title' => t('Second external fedora server to query'),
-        '#default_value' => variable_get('fedoraRIStoreClient_server2', 'https://esdora2.ornl.gov/fedora/risearch') //false by default
+        '#default_value' => variable_get('_field_name_value', 'https://esdora2.ornl.gov/fedora/risearch') //false by default
     );
-    $form['fedoraRIStoreClient_wrapper3']['fedoraRIStoreClient_namespace2'] = array(
+    $form['fedoraRIStoreClient_wrapper2']['fedoraRIStoreClient_namespace2'] = array(
         '#type' => 'textfield',
         '#title' => t('Corresponding namespaces'),
-        '#default_value' => variable_get('fedoraRIStoreClient_namespace2', 'es2'), //false by default
+        '#default_value' => variable_get('_field_name_value', 'es2'), //false by default
         '#description' => t('Comma seperated values')
     );
     return system_settings_form($form);
@@ -93,16 +76,7 @@ function fedoraRIStoreClient_admin_validate($form, &$form_state) {
     if ($form_state['clicked_button']['#id'] == 'edit-submit') {
         $namespace1 = explode(',', $form_state['values']['fedoraRIStoreClient_namespace1']);
         $namespace2 = explode(',', $form_state['values']['fedoraRIStoreClient_namespace2']);
-        $localnamespace = explode(',', $form_state['values']['local_namespace']);;
         if (array_intersect($namespace1, $namespace2)) {
-            form_set_error('fedoraRIStoreClient_wrapper2', t('namespaces must be different for different servers'));
-        }
-        if(array_intersect($namespace1,$localnamespace))
-        {
-            form_set_error('fedoraRIStoreClient_wrapper2', t('namespaces must be different for different servers'));
-        }
-        if(array_intersect($namespace2,$localnamespace))
-        {
             form_set_error('fedoraRIStoreClient_wrapper2', t('namespaces must be different for different servers'));
         }
     }
@@ -111,16 +85,11 @@ function fedoraRIStoreClient_admin_validate($form, &$form_state) {
 function fedoraRIStoreClient_page() {
     $pid = arg(1);
     if (empty($pid))
-        $pid = variable_get('local_top', 'es:top');;
+        $pid = 'es:top';
     global $base_url;
     $url = $base_url . '/fedoraRIStoreClient/';
     $html = '';
     $objecttype = "Collection Object";
-    module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
-    if (!fedora_available()) {
-        drupal_set_message('The Fedora repository server is currently unavailable. Please contact the site administrator.', 'warning', FALSE);
-        return '';
-    }
     module_load_include('inc', 'fedoraRIStoreClient', 'plugins/RIStoreClientUtils');
     $client = new RIStoreClientUtils();
     $pids = $client->get_child_pids_collection($pid);
@@ -208,8 +177,15 @@ function doSparqlQuery($pid, $url,$first,$second) {
     $query_string .= $encodedPID;
     $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
 
-    $Queryurl=$url. "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
-    $Queryurl.= $query_string;
+    $query_string = "select  \$subject'DerivedFrom'\$object
+                     from <#ri>
+                     where walk(
+                    <info:fedora/es:TestC> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object 
+                    and \$subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object )";
+    $myquery=htmlentities(urlencode($query_string));
+    
+    $Queryurl="$externalurl1?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=$myquery";
+//    $Queryurl.= $query_string;
     $content = do_Curl($Queryurl);
 
     $rows = explode("\n", $content);
@@ -240,10 +216,10 @@ function doSparqlQuery($pid, $url,$first,$second) {
                 $temp = explode( ':',$object);
                 $resultNamespace[$cnt] = $temp[0];
                 $pids[$cnt] = $object;
-                /*$subjects = explode(".", $subject);
+                $subjects = explode(".", $subject);
                 $subject = $subjects[count($subjects) - 1];
                 $objects = explode(".", $object);
-                $object = $objects[count($objects) - 1];*/
+                $object = $objects[count($objects) - 1];
 
                 if (in_array($subject, $subjectArray)) {
                     $temp = array_search($subject, $subjectArray);
@@ -265,25 +241,12 @@ function doSparqlQuery($pid, $url,$first,$second) {
     $graph = 'strict digraph G{ rankdir=LR; ';
     $cnt = 0;
     $linksHTMl = '<div id="links"><i>LINKS</i><br>';
-    module_load_include('inc', 'fedoraRIStoreClient', 'plugins/RIStoreClientUtils');
-   
     while ($cnt < count($subjectArray)) {
-        if (in_array($resultNamespace[$cnt],$externalnamespace1)) {
-            $parseExURL = parse_url($externalurl1);
-            $temp = getTitle($objectArray[$cnt]).'  ('.$parseExURL["host"].')';
-        }
-        elseif (in_array($resultNamespace[$cnt],$externalnamespace2)) {
-           $parseExURL = parse_url($externalurl2);
-            $temp = getTitle($objectArray[$cnt]).'('.$parseExURL["host"].')';
-        }
-        else
-            $temp=getTitle($objectArray[$cnt]);
-        $graph.='"' . $temp . '"->' . $process[$cnt] . ';';
-        $graph.=$process[$cnt] . '->"' .getTitle($subjectArray[$cnt]). '";';
-        $graph.='"' . $temp . '" ' . '[shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.='"' . getTitle($subjectArray[$cnt]). '" ' . '[ shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.=$process[$cnt] . '[shape=none, fontsize=8]';
-        
+        $graph.='"' . $objectArray[$cnt] . '"->' . $process[$cnt] . ';';
+        $graph.=$process[$cnt] . '->"' . $subjectArray[$cnt] . '";';
+        $graph.='"' . $objectArray[$cnt] . '" ' . '[shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.='"' . $subjectArray[$cnt] . '" ' . '[ shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.=$process[$cnt] . '[shape=none';
         if (strpos($linksHTMl, $process[$cnt]) == false)
             $linksHTMl.='<a href="' . $processLink[$cnt] . '">' . $process[$cnt] . '</a><br>';
         $cnt = $cnt + 1;
@@ -314,25 +277,27 @@ function doSparqlQuery($pid, $url,$first,$second) {
 }
 
 function doExSparqlQueryFirst($pid, $url,$second) {
-    $pid=trim($pid);
-    $externalurl = variable_get('fedoraRIStoreClient_server2', 'https://esdora2.ornl.gov/fedora/risearch');
+    
+    $externalurl = variable_get('fedoraRIStoreClient_server2', 'https://esdora2.ornl.gov/fedora/risearch'); //'http://esdora2.ornl.gov:8080/fedora/risearch';
     $externalnamespace = explode(',', variable_get('fedoraRIStoreClient_namespace2', 'es2'));
     $parseURL = parse_url($url);
     $processURL = $parseURL["scheme"] . '://' . $parseURL["host"] . '/fedora/repository';
     $urlpieces = explode('.', $parseURL["host"]);
     $server = $urlpieces[0];
-    //$encodedPID = str_replace(':','%3A',$pid);
+    $encodedPID = str_replace(':','%3A',$pid);
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
-    $query_string = "select  \$subject'DerivedFrom'\$object
-                    from <#ri>
-                    where walk(
-                   <info:fedora/$pid> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object 
-                   and \$subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object )";
-
-    $myquery=htmlentities(urlencode($query_string));   
-    $Queryurl="$url?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=$myquery";
+    $query_string = 'select  $subject \'DerivedFrom\' $object
+       from <#ri>
+        where walk(
+        <info:fedora/'.$pid.'> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object 
+        and $subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object)';
+   /* $query_string = "select%20%20%24subject'DerivedFrom'%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk(%0A%20%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+    $query_string= $query_string.$encodedPID;
+    $query_string=$query_string."%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20)";
+        */
+    $query_string =  htmlspecialchars(drupal_urlencode($query_string));
+    $Queryurl=$url. "?type=tuples&format=csv&lang=itql&stream=on&query=".$query_string;
     $content = do_Curl($Queryurl);
-
     
 
     $rows = explode("\n", $content);
@@ -363,6 +328,11 @@ function doExSparqlQueryFirst($pid, $url,$second) {
                 $temp = explode( ':',$object);
                 $resultNamespace[$cnt] = $temp[0];
                 $pids[$cnt] = $object;
+                $subjects = explode(".", $subject);
+                $subject = $subjects[count($subjects) - 1];
+                $objects = explode(".", $object);
+                $object = $objects[count($objects) - 1];
+
                 if (in_array($subject, $subjectArray)) {
                     $temp = array_search($subject, $subjectArray);
                     $process[$cnt] = $server . '_process' . ($temp + 1);
@@ -384,17 +354,11 @@ function doExSparqlQueryFirst($pid, $url,$second) {
     $cnt = 0;
     $linksHTMl = '<div id="links"><i>LINKS</i><br>';
     while ($cnt < count($subjectArray)) {
-        if (in_array($resultNamespace[$cnt],$externalnamespace)) {
-           $parseExURL = parse_url($externalurl);
-            $temp = getTitle($objectArray[$cnt]).'  ('.$parseExURL["host"].')';
-        }
-        else
-            $temp=getTitle($objectArray[$cnt]);
-        $graph.='"' . $temp . '"->' . $process[$cnt] . ';';
-        $graph.=$process[$cnt] . '->"' . getTitle($subjectArray[$cnt]). '";';
-        $graph.='"' . $temp . '" ' . '[shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.='"' . getTitle($subjectArray[$cnt]). '" ' . '[ shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.=$process[$cnt] . '[shape=none, fontsize=8]';
+        $graph.='"' . $objectArray[$cnt] . '"->' . $process[$cnt] . ';';
+        $graph.=$process[$cnt] . '->"' . $subjectArray[$cnt] . '";';
+        $graph.='"' . $objectArray[$cnt] . '" ' . '[shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.='"' . $subjectArray[$cnt] . '" ' . '[ shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.=$process[$cnt] . '[shape=none';
         if (strpos($linksHTMl, $process[$cnt]) == false)
             $linksHTMl.='<a href="' . $processLink[$cnt] . '">' . $process[$cnt] . '</a><br>';
         $cnt = $cnt + 1;
@@ -418,11 +382,10 @@ function doExSparqlQueryFirst($pid, $url,$second) {
         $count= $count+1;
     }
     //return '<div><p>'.$url1.'</p><p>'.$url2.'</p></div>';
-    return $html;
+    return $Queryurl;
 }
 
 function doExSparqlQuerySecond($pid, $url,$first) {
-    $pid=trim($pid);
     $externalurl = variable_get('fedoraRIStoreClient_server1', 'https://esdora.ornl.gov/fedora/risearch'); //'http://esdora2.ornl.gov:8080/fedora/risearch';
     $externalnamespace = explode(',', variable_get('fedoraRIStoreClient_namespace1', 'es'));
     $parseURL = parse_url($url);
@@ -431,15 +394,12 @@ function doExSparqlQuerySecond($pid, $url,$first) {
     $server = $urlpieces[0];
     $encodedPID = htmlentities(urlencode($pid));
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
-    $query_string = "select  \$subject'DerivedFrom'\$object
-                    from <#ri>
-                    where walk(
-                   <info:fedora/$pid> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object 
-                   and \$subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> \$object )";
+    $query_string = "select%20%20%24subject%27DerivedFrom%27%20%24object%0Afrom%20%3C%23ri%3E%0Awhere%20walk%28%0A%20%20%20%20%20%20%20%3Cinfo%3Afedora%2F";
+    $query_string .= $encodedPID;
+    $query_string .="%3E%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%0A%20%20%20%20%20%20%20and%20%24subject%20%3Cinfo%3Afedora%2Ffedora-system%3Adef%2Frelations-external%23isDerivedFrom%3E%20%24object%20%29";
 
-    $myquery=htmlentities(urlencode($query_string));   
-    $Queryurl="$url?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=$myquery";
-    $content = do_Curl($Queryurl);
+    $Queryurl.=$url. "?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=";
+    $Queryurl.= $query_string;
    
 
     $rows = explode("\n", $content);
@@ -470,10 +430,10 @@ function doExSparqlQuerySecond($pid, $url,$first) {
                 $temp = explode( ':',$object);
                 $resultNamespace[$cnt] = $temp[0];
                 $pids[$cnt] = $object;
-                /*$subjects = explode(".", $subject);
+                $subjects = explode(".", $subject);
                 $subject = $subjects[count($subjects) - 1];
                 $objects = explode(".", $object);
-                $object = $objects[count($objects) - 1];*/
+                $object = $objects[count($objects) - 1];
 
                 if (in_array($subject, $subjectArray)) {
                     $temp = array_search($subject, $subjectArray);
@@ -496,17 +456,11 @@ function doExSparqlQuerySecond($pid, $url,$first) {
     $cnt = 0;
     $linksHTMl = '<div id="links"><i>LINKS</i><br>';
     while ($cnt < count($subjectArray)) {
-        if (in_array($resultNamespace[$cnt],$externalnamespace)) {
-           $parseExURL = parse_url($externalurl);
-            $temp = getTitle($objectArray[$cnt]).'  ('.$parseExURL["host"].')';
-        }
-        else
-            $temp=getTitle($objectArray[$cnt]);
-        $graph.='"' . $temp . '"->' . $process[$cnt] . ';';
-        $graph.=$process[$cnt] . '->"' . getTitle($subjectArray[$cnt]) . '";';
-        $graph.='"' . $temp . '" ' . '[shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.='"' . getTitle($subjectArray[$cnt]) . '" ' . '[ shape=ellipse,fontsize=8,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
-        $graph.=$process[$cnt] . '[shape=none,fontsize=8]';
+        $graph.='"' . $objectArray[$cnt] . '"->' . $process[$cnt] . ';';
+        $graph.=$process[$cnt] . '->"' . $subjectArray[$cnt] . '";';
+        $graph.='"' . $objectArray[$cnt] . '" ' . '[shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.='"' . $subjectArray[$cnt] . '" ' . '[ shape=ellipse,fontsize=10,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline"];';
+        $graph.=$process[$cnt] . '[shape=none';
         if (strpos($linksHTMl, $process[$cnt]) == false)
             $linksHTMl.='<a href="' . $processLink[$cnt] . '">' . $process[$cnt] . '</a><br>';
         $cnt = $cnt + 1;
@@ -533,3 +487,14 @@ function doExSparqlQuerySecond($pid, $url,$first) {
     return $html;
 }
 
+function getTitle($str){
+ $strings = explode(":",$str);
+ if( strstr($strings[1],'.'))
+ {
+     $substrings= explode('.',$strings[1]);
+     $count = count($substrings)-1;
+     return $substrings[$count];
+ }
+ else
+    return $strings[1];
+}
