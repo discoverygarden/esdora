@@ -1,16 +1,17 @@
 <?php
 
-// $Id$
-
-/*
- * Created on 18-Feb-08
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
+/**
+ * @file
+ * 
+ * Collection Class Class
  */
-// module_load_include('nc', 'CollectionClass', '');
-// This CLASS caches the streams so once you call a getstream once it will always return the same stream as long as you are using the
-// instance of this class.  Cached to prevent mutiple hits to fedora.  maybe a bit confusing though if this class is used in a different context.
+
+/**
+ * This CLASS caches the streams so once you call a getstream once it will always return
+ * the same stream as long as you are using the instance of this class. Cached to
+ * prevent mutiple hits to fedora.  maybe a bit confusing though if this class is used in 
+ * a different context.
+ */
 class CollectionClass {
 
   public static $COLLECTION_CLASS_COLLECTION_POLICY_STREAM = 'COLLECTION_POLICY';
@@ -34,10 +35,15 @@ class CollectionClass {
     }
   }
 
-  /* gets objects related to this object.  must include offset and limit
+  /**
+   * gets objects related to this object.  must include offset and limit
    * calls getRelatedItems but enforces limit and offset
+   * @param type $pid
+   * @param type $limit
+   * @param type $offset
+   * @param type $itqlquery
+   * @return type 
    */
-
   function getRelatedObjects($pid, $limit, $offset, $itqlquery=NULL) {
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
     $objectHelper = new ObjectHelper();
@@ -51,6 +57,12 @@ class CollectionClass {
   /**
    * Gets objects related to this item.  It will query the object for a Query stream and use that as a itql query
    * or if there is no query stream it will use the default.  If you pass a query to this method it will use the passed in query no matter what
+   * @global type $user
+   * @param type $pid
+   * @param type $itqlquery
+   * @param int $limit
+   * @param int $offset
+   * @return type 
    */
   function getRelatedItems($pid, $itqlquery = NULL, $limit = NULL, $offset = NULL) {
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
@@ -92,10 +104,15 @@ class CollectionClass {
     $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
     $url .= "?type=tuples&flush=TRUE&format=Sparql&limit=$limit&offset=$offset&lang=itql&stream=on&query=" . $query_string;
     $content .= do_curl($url);
-    
+
     return $content;
   }
 
+  /**
+   * get Collection Policy Stream ?
+   * @param type $collection_pid
+   * @return type 
+   */
   function getCollectionPolicyStream($collection_pid) {
     if ($this->collectionPolicyStream != NULL) {
       return $this->collectionPolicyStream;
@@ -104,35 +121,58 @@ class CollectionClass {
     return $this->collectionPolicyStream;
   }
 
+  /**
+   * get Relationship element ?
+   * @param type $collection_pid
+   * @return type 
+   */
   function getRelationshipElement($collection_pid) {
     $stream = $this->getCollectionPolicyStream($collection_pid);
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error getting relationship element from policy stream !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting relationship element from policy stream @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return;
     }
     $relationship = $xml->relationship[0];
     return $relationship;
   }
 
+  /**
+   * get Collection View Stream ?
+   * @param type $collection_pid
+   * @return type 
+   */
   function getCollectionViewStream($collection_pid) {
     $this->collectionViewStream = $this->getStream($collection_pid, CollectionClass :: $COLLECTION_CLASS_COLLECTION_VIEW_STREAM, 0);
     return $this->collectionViewStream;
   }
 
+  /**
+   * get Stream ?
+   * @param type $pid
+   * @param type $dsid
+   * @param type $showError
+   * @return type 
+   */
   function getStream($pid, $dsid, $showError = 1) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $item = new fedora_item($pid);
     return isset($item->datastreams[$dsid]) ? $item->get_datastream_dissemination($dsid) : NULL;
   }
 
+  /**
+   * get Pid name space ?
+   * @param type $pid
+   * @param type $dsid
+   * @return type 
+   */
   function getPidNameSpace($pid, $dsid) {
     $stream = $this->getCollectionPolicyStream($pid);
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error getting PID namespace !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting PID namespace @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return;
     }
     foreach ($xml->contentmodels->contentmodel as $contentModel) {
@@ -148,6 +188,9 @@ class CollectionClass {
 
   /**
    * gets a list of content models from a collection policy
+   * @param type $collection_pid
+   * @param type $showError
+   * @return ContentModel 
    */
   function getContentModels($collection_pid, $showError = TRUE) {
     module_load_include('inc', 'Fedora_Repository', 'ContentModel');
@@ -156,7 +199,7 @@ class CollectionClass {
       $xml = new SimpleXMLElement($collection_stream);
     } catch (Exception $e) {
       if ($showError) {
-        drupal_set_message(t("!e", array('!e' => $e->getMessage())), 'error');
+        drupal_set_message(t('@e', array('@e' => check_plain($e->getMessage()))), 'error');
       }
       return NULL;
     }
@@ -196,7 +239,7 @@ class CollectionClass {
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error Getting FormHandler: !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error Getting FormHandler: @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return NULL;
     }
     $formHandler = $xml->ingest_form;
@@ -218,12 +261,18 @@ class CollectionClass {
     return NULL;
   }
 
+  /**
+   * get Allowed Mime Types
+   * @param type $contentModelPid
+   * @param type $contentModel_dsid
+   * @return type 
+   */
   function getAllowedMimeTypes($contentModelPid, $contentModel_dsid) {
     $stream = $this->getContentModelStream($contentModelPid, $contentModel_dsid);
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error getting content model stream for mime types !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting content model stream for mime types @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return;
     }
     foreach ($xml->mimetypes->type as $type) {
@@ -235,6 +284,12 @@ class CollectionClass {
   /**
    * Grabs the rules from the content model stream
    * file the file that has been uploaded
+   *
+   * @param type $file
+   * @param type $mimetype
+   * @param type $pid
+   * @param type $dsid
+   * @return type 
    */
   function getAndDoRules($file, $mimetype, $pid, $dsid) {
     if (!user_access('ingest new fedora objects')) {
@@ -247,7 +302,7 @@ class CollectionClass {
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error getting content model stream !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting content model stream @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return FALSE;
     }
     foreach ($xml->ingest_rules->rule as $rule) {
@@ -262,6 +317,10 @@ class CollectionClass {
 
   /**
    * calls the methods defined in the content model rules .xml file stored in a Fedora object
+   *
+   * @param type $file
+   * @param type $methods
+   * @return type 
    */
   function callMethods($file, $methods) {
     foreach ($methods as $method) {
@@ -294,13 +353,19 @@ class CollectionClass {
   /**
    * grabs a xml form definition from a content model and builds
    * the form using drupals forms api
+   *
+   * @param type $form
+   * @param type $form_state
+   * @param type $contentModelPid
+   * @param type $contentModelDsid
+   * @return type 
    */
   function build_ingest_form(&$form, &$form_state, $contentModelPid, $contentModelDsid) {
     $stream = $this->getContentModelStream($contentModelPid, $contentModelDsid);
     try {
       $xml = new SimpleXMLElement($stream);
     } catch (Exception $e) {
-      drupal_set_message(t('Error getting ingest form stream !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting ingest form stream @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return FALSE;
     }
     $docRoot = $_SERVER['DOCUMENT_ROOT'];
@@ -357,8 +422,13 @@ class CollectionClass {
     return $thisClass->$phpMethod($form, $ingest_form, $form_state['values'], $form_state);
   }
 
-  //this will also create a personal collection for an existing user if they don't have one
-  //not using this function currently
+  /**
+   * this will also create a personal collection for an existing user if they don't have one
+   * not using this function currently
+   * 
+   * @param type $user
+   * @return type 
+   */
   function createUserCollection(& $user) {
     if (isset($user->fedora_personal_pid)) {
       return;
@@ -381,7 +451,7 @@ class CollectionClass {
             $params
           ));
     } catch (exception $e) {
-      drupal_set_message(t('Error getting Next PID: !e', array('!e' => $e->getMessage())), 'error');
+      drupal_set_message(t('Error getting Next PID: @e', array('@e' => check_plain($e->getMessage()))), 'error');
       return FALSE;
     }
     $pid = implode(get_object_vars($object));
@@ -403,6 +473,11 @@ class CollectionClass {
   /**
    * Queries a collection object for an xslt to format how the
    * collection of objects is displayed.
+   *
+   * @param type $pid
+   * @param type $path
+   * @param type $canUseDefault
+   * @return type 
    */
   function getXslContent($pid, $path, $canUseDefault = TRUE) {
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
@@ -414,12 +489,19 @@ class CollectionClass {
     return $xslContent;
   }
 
+  /**
+   * show field sets ?
+   * @global type $base_url
+   * @global type $user
+   * @param type $page_number
+   * @return string 
+   */
   function showFieldSets($page_number) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    module_load_include('inc', 'fedora_repository', 'CollectionManagement');
+    module_load_include('inc', 'fedora_repository', 'BatchIngest');
     global $base_url;
-
     $tabset = array();
-
     global $user;
     $objectHelper = new ObjectHelper();
     $item = new Fedora_Item($this->pid);
@@ -427,32 +509,74 @@ class CollectionClass {
     if ($item->exists() && array_key_exists('QUERY', $item->datastreams)) {
       $query = $item->get_datastream_dissemination('QUERY');
     }
-    
     $results = $this->getRelatedItems($this->pid, $query);
-    
+
     $collection_items = $this->renderCollection($results, $this->pid, NULL, NULL, $page_number);
     $collection_item = new Fedora_Item($this->pid);
     // Check the form post to see if we are in the middle of an ingest operation.
     $show_ingest_tab = (!empty($_POST['form_id']) && $_POST['form_id'] == 'fedora_repository_ingest_form');
     $add_to_collection = $this->getIngestInterface();
 
+    $show_batch_tab = TRUE;
+    $policy = CollectionPolicy::loadFromCollection($this->pid, TRUE);
+    $content_models = $policy->getContentModels();
+    if (count($content_models) == 1 && $content_models[0]->pid == "islandora:collectionCModel") {
+      $show_batch_tab = FALSE;
+    }
+    if (!$show_ingest_tab) {
+      $view_selected = TRUE;
+    }
+    if(!$collection_items){
+      $view_selected = FALSE;
+      $add_selected = TRUE;
+    }
+    $view_selected = !$show_ingest_tab;
+
+
+    /** jerry pan hack to get rid of View tab for this instance
     $tabset['view_tab'] = array(
       '#type' => 'tabpage',
       '#title' => 'View',
-      '#content' => $collection_items
+      '#selected' => $view_selected,
+      '#content' => $collection_items,
+     
     );
-    
+    jerry*/
+
     $tabset['add_tab'] = array(
-      // #type and #title are the minimum requirements.
       '#type' => 'tabpage',
       '#title' => t('Add'),
-      '#selected' => $show_ingest_tab,
+      '#selected' => $add_selected,
       // This will be the content of the tab.
       '#content' => $add_to_collection,
     );
+    if (user_access('manage collections')) {
+      $tabset['add_collection_tab'] = array(
+        // #type and #title are the minimum requirements.
+        '#type' => 'tabpage',
+        '#title' => t('Manage This Collection'),
+        // This will be the content of the tab.
+        '#content' => drupal_get_form('collection_management_form', $this->pid, $content_models),
+        '#selected' => FALSE,
+      );
+    }
+    if ($show_batch_tab && user_access('create batch process')) {
+      $tabset['batch_ingest_tab'] = array(
+        // #type and #title are the minimum requirements.
+        '#type' => 'tabpage',
+        '#title' => t('Batch Ingest'),
+        // This will be the content of the tab.
+        '#content' => drupal_get_form('batch_creation_form', $this->pid, $content_models),
+      );
+    }
     return $tabset;
   }
 
+  /**
+   * get Ingest Interface ??
+   * @global type $base_url
+   * @return string 
+   */
   function getIngestInterface() {
     global $base_url;
     $objectHelper = new ObjectHelper();
@@ -476,6 +600,16 @@ class CollectionClass {
     return $ingestObject;
   }
 
+  /**
+   * render collection
+   * @global type $base_url
+   * @param type $content
+   * @param type $pid
+   * @param type $dsId
+   * @param type $collection
+   * @param int $pageNumber
+   * @return type 
+   */
   function renderCollection($content, $pid, $dsId, $collection, $pageNumber = NULL) {
     $path = drupal_get_path('module', 'fedora_repository');
     global $base_url;
@@ -492,6 +626,7 @@ class CollectionClass {
 
 
     $collectionName = $collection;
+ 
     if (!$pageNumber) {
       $pageNumber = 1;
     }
@@ -531,7 +666,7 @@ class CollectionClass {
             throw new Exception("Invalid XML.");
           }
         } catch (Exception $e) {
-          drupal_set_message(t('!e', array('!e' => $e->getMessage())), 'error');
+          drupal_set_message(t('@e', array('@e' => check_plain($e->getMessage()))), 'error');
           return '';
         }
       }

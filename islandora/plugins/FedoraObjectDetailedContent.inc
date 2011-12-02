@@ -1,7 +1,24 @@
 <?php
 
-class FedoraObject {
-  function  __construct($pid = '') {
+
+
+/**
+ * @file
+ * FedoraObjectDetailedContent class
+ */
+
+/**
+ * Fedora Object. This class is a plugin called from content models to display a detailed list of 
+ * content of the Fedora Item. This is hard coded into Islandora core, and it can also be called
+ * from the IslandoraCM stream.
+ */
+class FedoraObjectDetailedContent {
+
+  /**
+   * Constructor
+   * @param type $pid 
+   */
+  function __construct($pid = '') {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     if (!empty($pid)) {
 
@@ -9,7 +26,12 @@ class FedoraObject {
       $this->item = new Fedora_Item($pid);
     }
   }
-  
+
+  /**
+   * Show Field Sets
+   * @global type $user
+   * @return type 
+   */
   public function showFieldSets() {
     global $user;
     $objectHelper = new ObjectHelper();
@@ -27,16 +49,16 @@ class FedoraObject {
       '#type' => 'tabset',
     );
     $dc_html = $objectHelper->getFormattedDC($this->item);
-    
+
     $ds_list = $objectHelper->get_formatted_datastream_list($this->pid, NULL, $this->item);
-    
+
 
     $tabset['fedora_object_details']['tabset']['view'] = array(
       '#type' => 'tabpage',
       '#title' => t('View'),
       '#content' => $dc_html . $ds_list . $purge_form,
     );
-    
+
     if (fedora_repository_access(OBJECTHELPER :: $EDIT_FEDORA_METADATA, $this->pid, $user)) {
       $editform = drupal_get_form('fedora_repository_edit_qdc_form', $this->pid, 'DC');
       $tabset['fedora_object_details']['tabset']['edit'] = array(
@@ -46,7 +68,8 @@ class FedoraObject {
         '#content' => $editform,
       );
     }
-    
+
     return $tabset;
   }
+
 }
