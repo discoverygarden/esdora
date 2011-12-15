@@ -18,7 +18,6 @@ function metadata_node_node_info() {
         )
     );
 }
-
 /**
  * Implementation of hook_view() 
  * 
@@ -87,7 +86,7 @@ function metadata_node_form(&$node, $form_state) {
  * remove some of the default node entries 
  */
 function metadata_node_form_alter(&$form, &$form_state, $form_id) {
-    //drupal_set_message("Form id: $form_id");
+//    drupal_set_message("Form id: $form_id");
     switch ($form_id) {
         case 'metadata_node_node_form':
             unset($form['author']);
@@ -108,11 +107,23 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
             $my_form['submit']['#weight'] = 200; //higher the number lower the position
             //unset($my_form['submit']);
             $form = array_merge($my_form, $form);
+//            $form['callback']  = 'load_node_form_function'; //to work with ahah - ajax call
             $form['redirect'] = FALSE;
             //$form['buttons']['submit']['#submit'][] = 'metadata_node_form_submit';
             break;
     }
 }
+
+
+//function load_node_form_function() {
+//    dvm('here');
+//    module_load_include('inc', 'node', 'node.pages');
+//    $args = func_get_args();
+//    shift($args);
+//    $form = call_user_func_array('node_form', $args); 
+//    dvm($form);
+//    return $form;
+//}
 
 /**
  * handler for submit button

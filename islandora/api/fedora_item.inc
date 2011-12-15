@@ -74,7 +74,14 @@ class Fedora_Item {
    * @param type $logMessage
    * @return type 
    */
-  function add_datastream_from_file($datastream_file, $datastream_id, $datastream_label = NULL, $datastream_mimetype = '', $controlGroup = 'M', $logMessage = NULL) {
+  function add_datastream_from_file($datastream_file, 
+          $datastream_id, 
+          $datastream_label = NULL, 
+          $datastream_mimetype = '', 
+          $controlGroup = 'M', 
+          $logMessage = NULL,
+          $checksumType='DISABLED',
+          $checksum='none') {
     module_load_include('inc', 'fedora_repository', 'MimeClass');
     if (!is_file($datastream_file)) {
       drupal_set_message("$datastream_file not found<br />", 'warning');
@@ -91,7 +98,14 @@ class Fedora_Item {
     $datastream_url = drupal_urlencode($datastream_file);
     $url = file_create_url($datastream_url);
 
-    $return_value = $this->add_datastream_from_url($url, $datastream_id, $datastream_label, $datastream_mimetype, $controlGroup, $logMessage);
+    $return_value = $this->add_datastream_from_url($url, 
+            $datastream_id, 
+            $datastream_label, 
+            $datastream_mimetype, 
+            $controlGroup, 
+            $logMessage,
+            $checksumType,
+            $checksum);
 
     if ($original_path != $datastream_file) {
       file_delete($datastream_file);
@@ -109,7 +123,16 @@ class Fedora_Item {
    * @param type $logMessage
    * @return type 
    */
-  function add_datastream_from_url($datastream_url, $datastream_id, $datastream_label = NULL, $datastream_mimetype = '', $controlGroup = 'M', $logMessage = NULL) {
+  function add_datastream_from_url(
+          $datastream_url, 
+          $datastream_id, 
+          $datastream_label = NULL, 
+          $datastream_mimetype = '', 
+          $controlGroup = 'M', 
+          $logMessage = NULL,
+          $checksumType='DISABLED',
+          $checksum='none') {
+      
     if (empty($datastream_label)) {
       $datastream_label = $datastream_id;
     }
@@ -125,11 +148,10 @@ class Fedora_Item {
       'dsLocation' => $datastream_url,
       'controlGroup' => $controlGroup,
       'dsState' => 'A',
-      'checksumType' => 'DISABLED',
-      'checksum' => 'none',
+      'checksumType' => $checksumType,
+      'checksum' =>$checksum,
       'logMessage' => ($logMessage != NULL) ? $logMessage : 'Ingested object ' . $datastream_id
     );
-
 
     return $this->soap_call('addDataStream', $params);
   }

@@ -12,20 +12,27 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         }
     }
     $form = array();
-    $form['#attributes'] = array('enctype' => 'multipart/form-data');
     $form['model'] = array(
         '#type' => 'select',
         '#title' => 'Choose a content model',
         '#options' => $model_options,
     );
+    $form['#attributes'] = array('enctype' => 'multipart/form-data');
     $form['file_upload'] = array(
         '#type' => 'file',
         '#title' => t('Upload a zipped package file'),
         '#size' => 48,
-//        '#required' => TRUE,
+        //'#required' => TRUE, //TODO: why not???
         '#description' => t('Please create a zipped ingestion package with "Data" and "Metadata" subfolders. 
             Place FGDC.xml and other descriptive files in the "Metadata" subfolder; and place
             data files in the "Data" subfolder.'),
+    );
+    $form['dataset_name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Dataset name'),
+        '#size'  => 48,
+        '#description' => t('Please enter a name for this dataset (unique under the current collection'),
+        '#required' => TRUE,
     );
     $form['submit'] = array(
         '#type' => 'submit',
@@ -40,10 +47,17 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
 }
 
 function dataset_ingest_form_validate(&$form, &$form_state) {
-    if($form_state['values']['file_upload']==NULL) {
+    if (!($file = file_save_upload('file_upload', null, file_directory_path()))) {
+        form_set_error('File entry is required, please sellect a pre-prepared zip file to upload');
         drupal_set_message('File entry is required, please sellect a pre-prepared zip file to upload');
-        return false;
+        return FALSE;
     }
+//    $dataset_name=$form_state['values']['dataset_name'];
+//    if(!isset($dataset_name) || empty ($dataset_name)) {
+//        form_set_error('Dataset name is required, please enter a dataset name');
+//        return FALSE;        
+//    }
+    $form_state['rebuild'] = FALSE;
 }
 
 function dataset_ingest_form_submit(&$form, &$form_state) {
@@ -51,48 +65,24 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
     //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
     //$files_dir = "$tmp_directory/$form_build_id";
     if ($file = file_save_upload('file_upload', null, file_directory_path())) {
-        module_load_include('inc', 'fedora_repository', 'ContentModel');
-        $collection_pid = $form_state['values']['collection_pid'];
-        $cmodel_pid = $form_state['values']['model'];
-        assert(isset($cmodel_pid));
-        assert(isset($collection_pid));
-        
-        //handle ingest from model generically
-        $cmodel = ContentModel::loadFromModel($cmodel_pid);
-        $handlers=$cmodel->xml->getElementsbyTagName("package_ingest_handler");
-        if(!isset ($handlers)) {
-            throw new Exception("Content model $cmodel_pid does not define a 'package_ingest_handler', which is required for this action");
+       try {    
+            $collection_pid = $form_state['values']['collection_pid'];
+            $cmodel_pid = $form_state['values']['model'];
+            $dataset_name=$form_state['values']['dataset_name'];
+
+            //handle ingest from model generically
+            module_load_include('inc', 'esdora_islandora', 'EsdoraDataContentModel');
+            $cmodel = EsdoraDataContentModel::loadFromModel($cmodel_pid);
+            $cmodel -> ingestZippedPackage($collection_pid, $file, $dataset_name);
+        }  
+        catch (Exception $e)   {
+                //set message here
+                drupal_set_message("Ingesting of zipped package encountered a problem, $e->getMessage()");
         }
-        $handler = $handlers->item(0); //Q - multiple handlers is possible here, but not needed for now
-        //the following will call into EsdoraIngest.inc method handleZipIngestForm(), 
-        //or something similar as defined by the model object
-        $module = $handler->getAttribute('module');
-        $class = $handler->getAttribute('class');
-        $methodName = $handler->getAttribute('method');
-        $moduleFile = $handler->getAttribute('file');
-        $path = drupal_get_path('module', !empty($module) ? $module : 'esdora_islandora') . '/' . $method->getAttribute('file');
-        if (!file_exists($path)) {
-            drupal_set_message('Ingest handler file \'' . $path . '\' does not exist.', 'error');
-            return;
-        }
-        @require_once($path);
-        $className = $method->getAttribute('class');
-        $methodName = ($method->getAttribute('method'));
-        if (!class_exists($className)) {
-            drupal_set_message('Ingest handler: class \'' . $className . ' does not exist.', 'error');
-            return;
-        }
-        try {
-            $class = new $className;
-            $class->$methodName($collection_pid, $file);
-        //example call:
-        //    $esdora_ingest = new EsdoraIngest();
-        //    $esdora_ingest->handleZipIngestForm($collection_pid, $file);                
-        }
-        catch (Exception $e) {
-            Drupal_set_message('Error calling Ingest handler method \'' . $className . '->' . $methodName . $e->getMessage());
-            throw $e;
-       }
-   }
+        unlink($file->file_delete($file->filepath));
+    }
+    else {
+        //file did not upload correct, set msg
+        drupal_set_message("No file is uploaded. If the problem persists, please notify the administer of this problem");
+    }
 }
-?>
