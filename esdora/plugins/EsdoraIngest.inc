@@ -65,7 +65,6 @@ class EsdoraIngest {
     $object->add_relationship('isMemberOfCollection', $collection_pid);
     $object->add_relationship('hasModel', $content_model, FEDORA_MODEL_URI);
     Esdora::add_oai_to_rels($object);
-    drupal_set_message(t("Successfully added @pid to collection @collection_pid",array('@pid'=>$pid,'@collection_pid'=>$collection_pid)));
     return array($label, $object);
   }
 
@@ -109,7 +108,7 @@ class EsdoraIngest {
     $pid = $this->getNextPID($collection_pid, $dataset_name);
     $label=$dataset_name;
     //create a new data object here, if the following call pass, pid will be a real pid
-    $this->create_skeleton_object($label, $pid, $collection_pid, $content_model);
+    $this->create_skeleton_object($label, $pid, $collection_pid, $content_model_pid);
     $object = new Fedora_Item($pid);
 
     $tmpDir = $this->unzip_file($uploaded_file);
@@ -173,11 +172,16 @@ class EsdoraIngest {
         Esdora::add_oai_to_rels($object);
 //    $object->modify_object($top_folder_name);//add the label property ??
     $this->add_viewer_streams("$tmpDir/$top_folder_name/viewers.txt", $object);
-    $text = file("$tmpDir/$new_object_label/DOI.txt");
-    //$this->add_doi_to_dc($object, $text[0]); //
-    $this->update_dc($object,$text[0],$new_object_label);
+    $doi_file="$tmpDir/$top_folder_name/DOI.txt";
+    if(is_file($doi_file)) {
+        $text = file($doi_file);
+        $this->update_dc($object,$text[0],$new_object_label);
+    }
+        
+    //cleanup now
     $this->deleteDirectory($tmpDir);
     unlink($uploaded_file->filepath);
+    return $pid;
   }
 
   function deleteDirectory($dir) {

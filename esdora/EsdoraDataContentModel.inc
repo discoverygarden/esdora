@@ -93,12 +93,14 @@ class EsdoraDataContentModel extends ContentModel {
         @require_once($path);
         try {
             $class = new $className;
-            $class->$methodName($collection_pid, $file, $this->pid, $dataset_name);
+            $pid=$class->$methodName($collection_pid, $file, $this->pid, $dataset_name); //$this->pid is the cmodel pid, function returns newly created pid
+            return $pid;
             //example call:
             //    $esdora_ingest = new EsdoraIngest();
             //    $esdora_ingest->handleZipIngestForm($collection_pid, $file);                
         } catch (Exception $e) {
             Drupal_set_message('Error calling Ingest handler method \'' . $className . '->' . $methodName . $e->getMessage());
+            return NULL;
         }
     }
 }

@@ -100,7 +100,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
     $esdora_collection_model = NULL;
     $esdora_data_model = NULL;
     foreach ($content_models as $content_model) {
-        //is there a betterway to get the nature of the object (collection or data)?
+        //is there a better way to get the nature of the object (collection or data)?
         if ($content_model->pid == ESDORA_COLLECTION_PID) {
             $esdora_collection_model = $content_model;
         }
@@ -116,7 +116,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
         //and hence the freedom to choose a subset to display and the way we want to display
         $esdoraCollection = new EsdoraCollection($pid);
         return $esdoraCollection->getContentForDisplay($esdora_collection_model, $hasManagePermission, $pid, $page_number);
-    } else { //data object
+    } else if ($esdora_data_model !=NULL){ //data object
         //TODO: need to find a place on GUI to put back management on object details
         //TODO: check permission
         $data_display = $esdora_data_model->displayExtraFieldset($pid, $page_number);
@@ -240,7 +240,11 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
             '#content' => $my_manage_view,
         );
         return tabs_render($esdora_tabs);
-    }
+    } //if data object
+    else {//error condition, no model associated with the object, must have a model 
+        drupal_set_message("The object has no content model associated with it, please check the object details on Fedora Admin application.");
+        return '';
+    }   
 }
 
 function addstream_form(&$form_state, $pid) {

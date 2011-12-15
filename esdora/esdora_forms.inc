@@ -38,7 +38,7 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         '#type' => 'submit',
         '#value' => t('Add Dataset'),
     );
-    $form['#redirect'] = "/fedora/repository/$collection_pid";
+    //$form['#redirect'] = "/fedora/repository/$collection_pid";
     $form['collection_pid'] = array(
         '#type' => 'hidden',
         '#value' => "$collection_pid"
@@ -73,11 +73,14 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
             //handle ingest from model generically
             module_load_include('inc', 'esdora_islandora', 'EsdoraDataContentModel');
             $cmodel = EsdoraDataContentModel::loadFromModel($cmodel_pid);
-            $cmodel -> ingestZippedPackage($collection_pid, $file, $dataset_name);
+            $new_pid=$cmodel -> ingestZippedPackage($collection_pid, $file, $dataset_name);
+            drupal_set_message(t("Successfully added @pid to collection @collection_pid",array('@pid'=>$new_pid,'@collection_pid'=>$collection_pid)));
+            drupal_goto('/fedora/repository/' . $new_pid);
         }  
         catch (Exception $e)   {
                 //set message here
                 drupal_set_message("Ingesting of zipped package encountered a problem, $e->getMessage()");
+                return FALSE;
         }
         unlink($file->file_delete($file->filepath));
     }
