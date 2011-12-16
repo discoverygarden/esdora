@@ -88,6 +88,12 @@ function esdora_islandora_menu() {
             'page callback' => 'esdora_islandora_render_form',
             'type' => MENU_CALLBACK,
         ),
+       'esdora/addtoworkflow' => array(
+            'access callback' => 'user_access',
+            'access arguments' => array(OBJECTHELPER::$EDIT_FEDORA_METADATA),
+            'page callback' => 'esdora_islandora_add_to_workflow',
+            'type' => MENU_CALLBACK,
+        ),
     );
 }
 
@@ -102,6 +108,20 @@ function esdora_islandora_help($path, $arg) {
             return t('Use this page to grab a list of items from a Fedora collection.');
     }
 }
+
+function esdora_islandora_add_to_workflow ($pid) {
+    
+  module_load_include('inc','islandora_workflow','islandora_workflow');
+  $result = islandora_workflow_init_workflow($pid);
+  if($result){
+    drupal_set_message(t('successfully added object to workflow'));
+
+  } else {
+    drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$pid)));
+  }
+ return 'attempted to update object';
+}
+
 
 /**
  * returns a form using the xml_form builder

@@ -17,7 +17,22 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         '#title' => 'Choose a content model',
         '#options' => $model_options,
     );
+    $form['dataset_name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Dataset name'),
+        '#size'  => 48,
+        '#description' => t('Please enter a unique name for this dataset.'),
+        '#required' => TRUE,
+    );
+    
+    $form['add_to_workflow'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Add to workflow'),
+        '#description' => t('If checked, the dataset will not be publised until approval.'),
+    );
+    
     $form['#attributes'] = array('enctype' => 'multipart/form-data');
+
     $form['file_upload'] = array(
         '#type' => 'file',
         '#title' => t('Upload a zipped package file'),
@@ -26,13 +41,6 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         '#description' => t('Please create a zipped ingestion package with "Data" and "Metadata" subfolders. 
             Place FGDC.xml and other descriptive files in the "Metadata" subfolder; and place
             data files in the "Data" subfolder.'),
-    );
-    $form['dataset_name'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Dataset name'),
-        '#size'  => 48,
-        '#description' => t('Please enter a name for this dataset (unique under the current collection'),
-        '#required' => TRUE,
     );
     $form['submit'] = array(
         '#type' => 'submit',
@@ -69,23 +77,39 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
             $collection_pid = $form_state['values']['collection_pid'];
             $cmodel_pid = $form_state['values']['model'];
             $dataset_name=$form_state['values']['dataset_name'];
-
             //handle ingest from model generically
             module_load_include('inc', 'esdora_islandora', 'EsdoraDataContentModel');
             $cmodel = EsdoraDataContentModel::loadFromModel($cmodel_pid);
             $new_pid=$cmodel -> ingestZippedPackage($collection_pid, $file, $dataset_name);
-            drupal_set_message(t("Successfully added @pid to collection @collection_pid",array('@pid'=>$new_pid,'@collection_pid'=>$collection_pid)));
-            drupal_goto('/fedora/repository/' . $new_pid);
+            //todo add to workflow if checked.
+            $add_to_work_flow=$form_state['values']['add_to_workflow'];
+            if($add_to_work_flow) {
+                  module_load_include('inc','islandora_workflow','islandora_workflow');
+                  $result = islandora_workflow_init_workflow($new_pid);
+                  if($result){
+                    drupal_set_message(t("Successfully added @pid to collection @collection_pid, and the object is ready for workflow",
+                            array('@pid'=>$new_pid,'@collection_pid'=>$collection_pid)));
+                    drupal_goto('/islandora_workflow'); //TODO correct tab?? landing to the pid?
+                  } else {
+                    drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$new_pid)));
+                  }                      
+            }
+            else {
+                drupal_set_message(t("Successfully added @pid to collection @collection_pid, and the object is published",
+                        array('@pid'=>$new_pid,'@collection_pid'=>$collection_pid)));
+                drupal_goto('/fedora/repository/' . $new_pid);
+            }
         }  
         catch (Exception $e)   {
-                //set message here
-                drupal_set_message("Ingesting of zipped package encountered a problem, $e->getMessage()");
-                return FALSE;
+            //set message here
+            drupal_set_message("Ingesting of zipped package encountered a problem, $e->getMessage()");
+            return FALSE;
         }
         unlink($file->file_delete($file->filepath));
     }
     else {
         //file did not upload correct, set msg
+        //or even better, use a template to add one anyways? @TODO
         drupal_set_message("No file is uploaded. If the problem persists, please notify the administer of this problem");
     }
 }

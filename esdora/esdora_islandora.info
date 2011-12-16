@@ -1,6 +1,7 @@
 ; $Id$
 name = esdora islandora cmodel
 dependencies[] = fedora_repository
+dependencies[] = islandora_workflow
 dependencies[] = tabs
 description = esdora content models.
 package = ESDORA
