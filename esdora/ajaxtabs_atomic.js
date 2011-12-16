@@ -24,7 +24,7 @@ $(document).ready(function(){
 					 $('.Viewers').css('background-color','#F4F4F4');
 					 Drupal.attachBehaviors('#div1');
 				},
-				dataType:"json",
+				dataType:"json"
 			});
 			
 		});
@@ -46,7 +46,7 @@ $(document).ready(function(){
 						 $('.Viewers').css('background-color','#F4F4F4');
 						 Drupal.attachBehaviors('#div1');
 					},
-					dataType:"json",
+					dataType:"json"
 				});
 				
 			});
@@ -80,7 +80,7 @@ $(document).ready(function(){
 						}); 
 					
 				},
-				dataType:"json",
+				dataType:"json"
 			});
 			
 		});
@@ -116,7 +116,7 @@ $(document).ready(function(){
 						}); 
 						
 					},
-					dataType:"json",
+					dataType:"json"
 				});
 				
 			});
@@ -145,12 +145,12 @@ $(document).ready(function(){
 									'autoScale'         : false,
 									'transitionIn' : 'none',
 									'transitionOut' : 'none',
-									'type'          : 'iframe',  
+									'type'          : 'iframe'  
 								});
 						       
 							}); 
 						},
-					dataType:"json",
+					dataType:"json"
 				});
 							
 		});	

@@ -25,7 +25,7 @@ $(document).ready(function(){
 					 Drupal.attachBehaviors('#div1');
 					 return false;
 				},
-				dataType:"json",
+				dataType:"json"
 			});
 			return false;
 			
@@ -50,7 +50,7 @@ $(document).ready(function(){
 						 Drupal.attachBehaviors('#div1');
 					
 					},
-					dataType:"json",
+					dataType:"json"
 				});
 				
 				
@@ -87,7 +87,7 @@ $(document).ready(function(){
 						}); 
 					
 				},
-				dataType:"json",
+				dataType:"json"
 			});
 			
 		});
@@ -124,7 +124,7 @@ $(document).ready(function(){
 							}); 
 						
 					},
-					dataType:"json",
+					dataType:"json"
 				});
 				
 			});
@@ -155,13 +155,13 @@ $(document).ready(function(){
 									'autoScale'         : false, 
 									'transitionIn'       :   'elastic',
 									'transitionOut'  :   'elastic',
-									'type'          : 'iframe',  
+									'type'          : 'iframe'  
 								});
 						       return false;
 						       
 							}); 
 						},
-					dataType:"json",
+					dataType:"json"
 				});
 							
 		});	
