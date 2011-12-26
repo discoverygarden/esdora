@@ -293,9 +293,14 @@ function get_content_models_as_option_array() {
       $parts = explode(',', $item);
       $item = new fedora_item($parts[0]);
       $nameparts = explode(':', $parts[0]);
-      if (!$restricted || in_array($nameparts[0], $allowed))
+      if (!$restricted || in_array($nameparts[0], $allowed)) {
         $datastreams = array_keys($item->get_datastreams_list_as_array());
-      if (in_array('ISLANDORACM', $datastreams)) {
+      }
+      else {
+          //dvm($nameparts);
+      }
+      //-Jerry: when the $datastreams is null, error is seen on next call, so better check for it      
+      if ($datastreams != NULL && in_array('ISLANDORACM', $datastreams)) {
         $options[$parts[0]] = $parts[1] . ' ~ ' . $parts[0];
       }
     }
