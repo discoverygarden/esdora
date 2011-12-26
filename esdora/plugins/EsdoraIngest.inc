@@ -96,10 +96,6 @@ class EsdoraIngest {
     $dc->save();
   }
 
-  /**
-   *
-   * @param <type> $form_values
-   */
   function handleZipIngestForm($collection_pid, $uploaded_file, $content_model_pid, $dataset_name) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');

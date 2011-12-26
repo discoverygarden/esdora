@@ -90,7 +90,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
     // 
     //check the permission first, simplify to one permission only
     $hasManagePermission = false;
-    if (user_access($objectHelper->MANAGE_COLLECTIONS)) {
+    if (user_access(ObjectHelper::$MANAGE_COLLECTIONS)) {
         $hasManagePermission = true;
     }
 
