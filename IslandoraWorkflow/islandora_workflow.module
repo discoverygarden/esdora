@@ -1,0 +1,1553 @@
+<?php
+
+define('APPROVED', 'In Review');
+/**
+ * @file
+ *   This module is intended to implement a generic Islandora workflow around the creation and publication of objects.
+ *
+ * @author
+ *   William Panting
+ *
+ * @todo
+ *   Alow for the sorting of columns: requires signifigent refactoring. Likely dump all data to JS? scaleable?
+ *
+ * @todo
+ *   Alow collapsable columns.
+ *
+ * @todo
+ *   Explore using icons for the workflow state.
+ *
+ * @todo
+ *   Make the permissions page display collection labels if there is one rather than pid
+ *
+ * @todo
+ *   Fix bug with pager/tabs not working on first page change: the tab is not being remembered,
+ *   this may requre a refactor from doing this server side.
+ *
+ * @todo
+ *   Would it be good to create a workflow fedora object that derives the islandora fedora api object? This COULD impact performance.
+ *   A way to transfer this to the pre-processor func should be found so the ir queries are not being repeated.
+ *   The schema will be changing so that the last modified date and current note subject will be in the rels-int, large refactor here.
+ *
+ *  @todo
+ *    Address being able to add not-in-workflow objects and broken workflow objects to a workflow state.
+ *    The distinction between the two states.
+ *    I think this should be an integration piece: that the 'reject to workflow' should go in an object management UI.
+ *
+ * Two different techniqes are being used for generating similar tables in tabs here:
+ *
+ * 1. The work tabs use the same function but pass a parameter to change the content of the form because the only
+ * difference is some missing elements in the workflow tab vs the overview tab.
+ *
+ * 2. The permission tabs use seperate functions because the have enough differences (especialy in the submit funciton) to make this easier to follow.
+ *
+ * This module treates the object owner as the creator for its purposes.
+ */
+
+/**
+ * This generates the main workflow page
+ * @return $page
+ *   The html of the page to return
+ */
+function islandora_workflow_work() {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  $page_tabs=array(
+    '#type' => 'tabset',
+  );
+  //make the last page-changed tab selected
+  if (isset($_SESSION['workflow_page']['pager_page_array']) && isset($_GET['page'])) {
+    $page=$_GET['page'];
+    $current_pages=explode(',', $page);
+    $last_pages=$_SESSION['workflow_page']['pager_page_array'];
+    if ($current_pages[0] != $last_pages[0]) {//workflow page change
+      $page_tabs['Workflow'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Workflow'),
+        '#content' => drupal_get_form('islandora_workflow_workflow_form'),
+        '#selected' => TRUE,
+        '#weight' => '1',
+      );
+      $page_tabs['Overview'] = array(
+            '#type' => 'tabpage',
+            '#title' => t('Overview'),
+            '#content' => drupal_get_form('islandora_workflow_overview_form'),
+            '#weight' => '2',
+          );
+      return tabs_render($page_tabs);
+    }
+    elseif ($current_pages[1] != $last_pages[1]) {//overview tab page change
+      $page_tabs['Workflow'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Workflow'),
+        '#content' => drupal_get_form('islandora_workflow_workflow_form'),
+        '#weight' => '1',
+      );
+      $page_tabs['Overview'] = array(
+            '#type' => 'tabpage',
+            '#title' => t('Overview'),
+            '#content' => drupal_get_form('islandora_workflow_overview_form'),
+            '#selected' => TRUE,
+            '#weight' => '2',
+          );
+      return tabs_render($page_tabs);
+    }
+  }
+  //no previous pages or changes to pages
+  $page_tabs['Workflow'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Workflow'),
+        '#content' => drupal_get_form('islandora_workflow_workflow_form'),
+        '#weight' => '1',
+      );
+  $page_tabs['Overview'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Overview'),
+        '#content' => drupal_get_form('islandora_workflow_overview_form'),
+        '#weight' => '0', //-Jerry
+      );
+  return tabs_render($page_tabs);
+}
+
+/**
+ * This function builds the forms for the islandora_workflow_work page
+ * In pagination globals the index 0 is for workflow tab and 1 is for overview
+ * @param string $tab
+ *   which tab is calling the form, iether 'overview' or 'workflow'
+ * @return array $form
+ *   the array containing the aporpriate form
+ */
+function islandora_workflow_work_form(&$form_state, $tab) {
+  //init
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow'); //for getting workflow info
+  $users_manager_collections = islandora_workflow_get_current_users_collections();
+  $users_editor_collections = islandora_workflow_get_current_users_collections('islandora_workflow_Editor');
+  $users_submitter_collections = islandora_workflow_get_current_users_collections('islandora_workflow_Submitter');
+  $users_collections = islandora_workflow_get_current_users_collections('all');
+  //pager init stuff
+  global $pager_page_array, $pager_total;
+  //which pager applies to this tab
+  if ($tab == 'workflow') {
+    $pager_index = 0;
+  }
+  if ($tab=='overview') {
+    $pager_index = 1;
+  }
+  //set the current page
+  $page=isset($_GET['page']) ? $_GET['page'] : '';
+  $pager_page_array=explode(',', $page);
+  //control the objects displayed on each page
+  $objects_per_page = 10;
+  $object_count = 0;
+  $object_lower_bound = $pager_page_array[$pager_index]*$objects_per_page;
+  $object_upper_bound = $object_lower_bound+$objects_per_page;
+  //record the current $pager_page_array for comparison with the next time the page loads [to pick the tab to display]
+  //@todo: fix we should be re setting this session variable when the user changes tabs
+  $_SESSION['workflow_page']['pager_page_array'] = $pager_page_array;
+  //populate an array of all users in relevent collections, to be used in the assign-to-user drop down
+  $users_collections_members = islandora_workflow_get_all_users_with_collection_permissions(array_keys($users_collections));
+
+  //submit_function declaration
+  $workflow_tabs_form['#submit'] = array('islandora_workflow_work_form_submit');
+
+  //tab forms
+  $workflow_tabs_form['objects_form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Workflow'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE,
+    '#description' => t('Perform work on objects you have access to.'),
+  );
+  $workflow_tabs_form['objects_form']['objects_form_elems'] = array('#theme' => 'workflow_table');
+
+  //submit button
+  $workflow_tabs_form['Submit'] = array(
+    '#type' => 'submit',
+    '#weight' => '1',
+//    '#value' => t('Submit') //-Jerry
+    '#value' => t('Enter Workflow'),
+    '#name' => 'Submit',        
+  );
+    //approve button
+  if (user_access('islandora_workflow_Administrator') || $users_manager_collections || $users_editor_collections || user_access('administer')) {
+    $workflow_tabs_form['Approve'] = array(
+      '#type' => 'submit',
+      '#weight' => '2',
+      '#value' => t('Submit for Review'), //-Jerry
+      '#name' =>'Approve',  
+    );
+ }
+    //publish button
+  if (user_access('islandora_workflow_Administrator') || $users_manager_collections || user_access('administer')) {
+    $workflow_tabs_form['Publish'] = array(
+      '#type' => 'submit',
+      '#weight' => '3',
+      '#value' => t('Submit for Publish'), //-Jerry
+      '#name'  => 'Publish',
+    );
+  }
+  //reject button
+  if (user_access('islandora_workflow_Administrator') || $users_manager_collections || $users_editor_collections || user_access('administer')) {
+    $workflow_tabs_form['Reject'] = array(
+      '#type' => 'submit',
+      '#weight' => '4',
+      '#value' => t('Set Rejected'), //-Jerry
+      '#name'  => 'Reject',
+    );
+  }
+  
+  //-Jerry Group the following
+  //TODO, how to theme this correctly?
+  $workflow_tabs_form['Filler'] = array(
+    '#type' => 'markup',
+    '#weight' => '5',
+    '#value' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+    '#name'  => 'Filler',  
+  );
+  $workflow_tabs_form['Claim'] = array(
+    '#type' => 'submit',
+    '#weight' => '6',
+    '#value' => t('Claim'),
+    '#name'  => 'Claim',  
+  );
+  //assign button
+  $workflow_tabs_form['Assign'] = array(
+    '#type' => 'submit',
+    '#weight' => '6',
+    '#value' => t('Assign'),
+    '#name'  => 'Assign',
+  );
+  //delete button
+  $workflow_tabs_form['Delete'] = array(
+    '#type' => 'submit',
+    '#weight' => '7',
+    '#value' => t('Delete'),
+    '#name' => 'Delete',
+  );
+
+
+  //populate tab for viewing objects
+
+  //get all members of the collections the user has manager/admin access to
+  /*setting the name as $member for edit and manage buttons is against the forms api
+  * but neccessary to get around a drupalism that has submit buttons with the same name
+  * reporting an incorrect parent
+  */
+  if ($users_manager_collections) {
+    foreach ($users_manager_collections as $collection_id => $collection_name) {
+      //get all objects in collection
+      $collection_members = islandora_workflow_get_all_members_of_collection($collection_id);
+      if ($collection_members) {
+        //filter collection items if in workflow tab
+        if ($tab == 'workflow') {
+          foreach ($collection_members as $member => $member_attibutes) {
+            //show things in approved state
+            if ($member_attibutes['state'] != APPROVED) {
+              unset($collection_members[$member]);
+            }
+          }
+        }
+        //filter collection items if in overview tab
+        if ($tab == 'overview') {
+          foreach ($collection_members as $member => $member_attibutes) {
+            //filter collection items if the user has manager level access to the collection
+            $workflow_state = $member_attibutes['state'];
+            //remove everything not in a workflow state
+            if (!$workflow_state) {
+              unset($collection_members[$member]);
+            }
+            //filter collection items if the user is not an admin
+            if (!user_access('islandora_workflow_Administrator') && !user_access('administer')) {
+              //show things not in published state
+              if ($workflow_state == 'published') {
+                unset($collection_members[$member]);
+              }
+            }
+          }
+        }
+        foreach ($collection_members as $member => $member_attibutes) {
+          $object_count++;//keeping track of objects to show
+          if ($object_count > $object_lower_bound && $object_count <= $object_upper_bound) {
+            $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Selecter'] = array(
+              '#type' => 'checkbox',
+              '#title' => t(''),
+            );
+            $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Assign'] = array(
+              '#type' => 'select',
+              '#default_value' => array_search($member_attibutes['assignee'], $users_collections_members[$collection_id]),
+              '#options' => $users_collections_members[$collection_id],
+            );
+          }
+        }
+      }
+    }
+  }
+  //get all members of the collections the user has editor level for, excluding those that the user has
+  if ($users_editor_collections) {
+    foreach ($users_editor_collections as $collection_id => $collection_name) {
+      if (!isset($users_manager_collections[$collection_id])) {//exclude higher level permissions in the same collection
+        //get all objects in collection
+        $collection_members = islandora_workflow_get_all_members_of_collection($collection_id);
+
+        if ($collection_members) {
+          //filter collection items if in workflow tab
+          if ($tab == 'workflow') {
+            foreach ($collection_members as $member => $member_attibutes) {
+              //show things in approved state
+              if ($member_attibutes['state'] != 'submitted') {
+                unset($collection_members[$member]);
+              }
+            }
+          }
+          //filter collection items if in overview tab
+          if ($tab == 'overview') {
+            foreach ($collection_members as $member => $member_attibutes) {
+              //filter collection items if the user is not an admin
+              if (!user_access('islandora_workflow_Administrator') && !user_access('administer')) {
+                //show things not in published state
+                $workflow_state = $member_attibutes['state'];
+                if ($workflow_state=='published' || $workflow_state==APPROVED) {
+                  unset($collection_members[$member]);
+                }
+              }
+            }
+          }
+
+          foreach ($collection_members as $member => $member_attibutes) {
+            $object_count++;//keeping track of objects to show
+            if ($object_count > $object_lower_bound && $object_count <=$object_upper_bound) {
+              $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Selecter']=array(
+                '#type' => 'checkbox',
+                '#title' => t(''),
+              );
+              $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Assign'] = array(
+                '#type' => 'select',
+                '#default_value' => array_search($member_attibutes['assignee'], $users_collections_members[$collection_id]),
+                '#options' => $users_collections_members[$collection_id],
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+  //get all members of the collections the user has submitter level for, excluding those that the user has manager/editor level
+  if ($users_submitter_collections) {
+    foreach ($users_submitter_collections as $collection_id => $collection_name) {
+      if ((!isset($users_manager_collections[$collection_id])) && (!isset($users_editor_collections[$collection_id]))) {//exclude higher level permissions in the same collection
+        // get all objects in those collections that they are submitters (only) in collection
+        $collection_members = islandora_workflow_get_all_members_of_collection($collection_id);
+
+        if ($collection_members) {
+          //filter collection items if in workflow tab
+          if ($tab=='workflow') {
+            foreach ($collection_members as $member => $member_attibutes) {
+              //show things in approved state
+              global $user;
+              if ($member_attibutes['state'] != 'created' || $member_attibutes['owner'] != $user->name) {
+                unset($collection_members[$member]);
+              }
+            }
+          }
+          //filter collection items if in overview tab
+          if ($tab=='overview') {
+            foreach ($collection_members as $member => $member_attibutes) {
+              //filter collection items if the user is not an admin
+              if (!user_access('islandora_workflow_Administrator') && !user_access('administer')) {
+                //show things not in published state
+                global $user;
+                if ($member_attibutes['owner'] != $user->name) {
+                  unset($collection_members[$member]);
+                }
+              }
+            }
+          }
+          foreach ($collection_members as $member => $member_attibutes) {
+            $object_count++;//keeping track of objects to show
+            if ($object_count > $object_lower_bound && $object_count <= $object_upper_bound) {
+              $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Selecter'] = array(
+                '#type' => 'checkbox',
+                '#title' => t(''),
+              );
+              $workflow_tabs_form['objects_form']['objects_form_elems'][$collection_id][$member]['Assign'] = array(
+                '#type' => 'select',
+                '#default_value' => array_search($member_attibutes['assignee'], $users_collections_members[$collection_id]),
+                '#options' => $users_collections_members[$collection_id],
+              );
+            }
+          }
+        }
+      }
+    }
+  }
+  //include the tab in the form array so that the preprocessor/theme can be aware of the tab it is
+  //drupal hack to pass a variable to my preprocessor function
+  $workflow_tabs_form['objects_form']['objects_form_elems']['tab']=array(
+    '#type' => 'textfield',
+    '#default_value' => $pager_index,
+    '#access' => FALSE
+  );
+
+  //set pager total now that we know how many objects there are
+  $pager_total[$pager_index] = ceil($object_count/$objects_per_page);
+
+  return $workflow_tabs_form;
+}
+
+/**
+ *This function is used to let me have multiple 'islandora_workflow_work_form's on
+ *the same page without collision
+ *@param string $form_id
+ *  the string identifying the form
+ *@param array $args
+ *  an array containign the arguments provided to drupal_get_form()
+ *@return array $form_info
+ *  an associative array containing the form_id callback and arguments
+ */
+function islandora_workflow_forms($form_id, $args) {
+
+  $form_info['islandora_workflow_workflow_form']= array('callback' => 'islandora_workflow_work_form', 'callback arguments' => array('workflow'));
+  $form_info['islandora_workflow_overview_form']= array('callback' => 'islandora_workflow_work_form', 'callback arguments' => array('overview'));
+
+  return $form_info;
+}
+
+/**
+ * The menu entries for this module.
+ * @return $menu_entries
+ *   An arrray of the items to be added to the drupal menu
+ */
+function islandora_workflow_menu() {
+  $menu_entries= array();
+  //settings associated with islandora_workflow
+  $menu_entries['admin/settings/islandora_workflow_opts']=array(
+    'title' => 'Islandora workflow settings',
+    'description' => 'Here you can change various settings for the islandora_workflow module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_workflow_admin'),
+    'access arguments' => array('islandora_workflow_Administrator'),
+    'type' => MENU_NORMAL_ITEM
+  );
+    //settings associated with islandora_workflow and collection permissions
+  $menu_entries['admin/settings/islandora_workflow_perms']=array(
+    'title' => 'Islandora workflow permissions',
+    'description' => 'Here you can assign permissions to roles on a collection by collection level.',
+    'page callback' => 'islandora_workflow_collection_permissions',
+    'access callback' => 'islandora_workflow_check_permissions',
+    'access arguments' => array(array('islandora_workflow_Administrator', 'islandora_workflow_Manager')),
+    'type' => MENU_NORMAL_ITEM
+  );
+  //main working page for islandora_workflow
+  $menu_entries['islandora_workflow']=array(
+    'title' => 'My Islandora work',
+    'description' => 'This is the main access point to islandora_workflow',
+    'page callback' => 'islandora_workflow_work',
+    'access callback' => 'islandora_workflow_check_permissions',
+    'access arguments' => array(array('islandora_workflow_Administrator', 'islandora_workflow_Editor', 'islandora_workflow_Manager', 'islandora_workflow_Submitter')),
+    'type' => MENU_NORMAL_ITEM
+   );
+  //main working page for islandora_workflow
+  $menu_entries['islandora_workflow_edit_note']=array(
+    'title' => 'Edit Note',
+    'description' => 'You may edit the note on this object',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_workflow_edit_note_form'),
+    'access callback' => 'islandora_workflow_check_permissions',
+    'access arguments' => array(array('islandora_workflow_Administrator', 'islandora_workflow_Editor', 'islandora_workflow_Manager', 'islandora_workflow_Submitter')),
+    'type' => MENU_CALLBACK
+   );
+ return $menu_entries;
+}
+
+/**
+ * This function is the hook_form for the islandora_workflow_edit_note callback for editing the note on an object
+ * @return array $edit_note_form
+ *   The drupal form array for editing a note.
+ */
+function islandora_workflow_edit_note_form() {
+
+  if (isset($_GET['object'])) {
+    //init
+    module_load_include('inc', 'islandora_workflow', 'islandora_workflow'); //for getting the current note state
+    $object_id=$_GET['object'];
+    $subject=islandora_workflow_get_object_note_subject($object_id);
+    $body=islandora_workflow_get_object_note_body($object_id);
+    $edit_note_form['#redirect']=array('islandora_workflow');
+    $edit_note_form['note_form']=array(
+      '#type' => 'fieldset',
+      '#title' => t('Note'),
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
+      '#tree' => TRUE,
+      '#description' => t('Change the note attached to this object.'),
+    );
+
+    //submit button
+    $edit_note_form['note_form']['Subject']= array(
+      '#type' => 'textfield',
+      '#weight' => '1',
+      '#default_value' => $subject
+    );
+
+    //submit button
+    $edit_note_form['note_form']['Body']= array(
+      '#type' => 'textarea',
+      '#weight' => '2',
+      '#default_value' => $body
+    );
+
+    //submit button
+    $edit_note_form['note_form']['Submit']= array(
+      '#type' => 'submit',
+      '#weight' => '3',
+      '#value' => t('Submit')
+    );
+    //drupal made me do it
+    $edit_note_form['note_form']['object']=array(
+      '#type' => 'textfield',
+      '#default_value' => $object_id,
+      '#access' => FALSE
+    );
+  }
+  else {
+    $edit_note_form=array();
+  }
+
+  return $edit_note_form;
+}
+
+/**
+ * This function is the access callback used for access to the workflow/perm section of this module
+ * @param $permission_array
+ *   those user roles to allow access
+ * @return boolean
+ *   wheather or not to permit access
+ */
+function islandora_workflow_check_permissions($permission_array) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  //let the user into any page if they are a workflow admin
+  if (in_array('islandora_workflow_Administrator', $permission_array) && user_access('islandora_workflow_Administrator')) {
+    return TRUE;
+  }
+  //loop through permissions allowed
+  foreach ($permission_array as $permission) {
+    //return true if the user has an allowed permission
+    if ($permission != 'islandora_workflow_Administrator' && user_access($permission) && islandora_workflow_get_current_users_collections($permission)!=FALSE) {
+      return TRUE;
+    }
+  }
+  //if no permission matched then return false
+  return FALSE;
+}
+
+/**
+ * This function returns the form that will let an administrator modify the module's settings
+ * @return $adminForm
+ *   the form for edditing islandora_workflow settings.
+ */
+function islandora_workflow_admin(&$form_state) {
+  $admin_form=array();
+
+  // check if the xacml api is enabled
+  $disabled = !module_exists('islandora_xacml_api');
+
+  if ($disabled) {
+    $admin_form['info'] = array(
+      '#value' => 'The Islandora Xacml API module must be enabled to use this feature.',
+    );
+  }
+
+  // give warning about roles if they do not have the administrator role or are not UID = 1
+  global $user;
+  if(!($user->uid == 1 || in_array('administrator',$user->roles)) && !$disabled) {
+    $admin_form['warning'] = array(
+      '#value' => 'WARNING: It is recommended that you be "User 1" or have the role "administrator" when enabling or '
+      . 'disabling XACML security. You need to have access to EVERY object in the repository because they all '
+      . 'need to be updated.',
+    );
+  }
+
+  $admin_form['islandora_workflow_enforce_security']= array(
+    '#type' => 'checkbox',
+    '#disabled' => $disabled,
+    '#title' => t('Enforce Security'),
+    '#default_value' => variable_get('islandora_workflow_enforce_security', 0),
+    '#description' => t("Use XACML to enforce workflow security. Even if disabled the workflow module still enforces security at the drupal level."),
+  );
+
+  $admin_form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
+  );
+
+  return $admin_form;
+}
+
+function islandora_workflow_admin_submit($form, &$form_state) {
+  module_load_include('inc', 'islandora_workflow');
+  drupal_set_message('Your settings have been updated.');
+
+  // if the setting changed
+  if($form_state['values']['islandora_workflow_enforce_security'] != variable_get('islandora_workflow_enforce_security', 0)) {
+
+    // update the drupal variable
+    variable_set('islandora_workflow_enforce_security', $form_state['values']['islandora_workflow_enforce_security']);
+
+    // get the list of collections with members that need to be updated
+    $collection_list = islandora_workflow_get_all_collections();
+    foreach($collection_list as $collection_pid => $collection_name) {
+      $members = islandora_workflow_get_all_members_of_collection($collection_pid);
+      if($members) {
+        $collection_list[$collection_pid] = $members;
+        // delete everything in a published state
+        foreach($members as $pid => $data) {
+          if($data['state'] == 'published') {
+            unset($members[$pid]);
+          }
+        }
+      }
+
+      if($members) {
+        $collection_list[$collection_pid] = $members;
+      }
+      else {
+        unset($collection_list[$collection_pid]);
+      }
+    }
+
+    if($collection_list) {
+      $operations = array();
+      $delete = !variable_get('islandora_workflow_enforce_security', 0);
+
+      foreach($collection_list as $collection_pid => $members) {
+        $operations[] = array('islandora_workflow_batch_function', array($collection_pid, $members, $delete));
+      }
+
+      // arrrr... tis batch time billy
+      $batch = array(
+        'title' => t('Updating XACML Policies'),
+        'operations' => $operations,
+        'finished' => 'islandora_workflow_batch_finished',
+      );
+      batch_set($batch);
+    }
+  }
+}
+
+/**
+ * drupal permission hook
+ * The list of avaialble permissions for this module.
+ * @return array
+ *   The list of permissions.
+ */
+function islandora_workflow_perm() {
+  return array('islandora_workflow_Administrator', 'islandora_workflow_Editor', 'islandora_workflow_Manager', 'islandora_workflow_Submitter');
+}
+
+/**
+ * drupal hook to show help
+ * @param $path
+ *   The path that the help is being accessed from.
+ * @return $help
+ *   The help string that will be returned to the user.
+ */
+function islandora_workflow_help($path, $arg) {
+  $help='';//default
+
+  switch ($path) {
+    case 'admin/modules#description' :
+    $help= t('A generic workflow module for Fedora objects.');
+    case 'admin/settings/islandora_workflow_opts' :
+    $help= t('If the repository is full of objects this operation could take awhile. Every object needs to be updated. Use this with care.');
+  }
+
+  return $help;
+}
+
+/**
+ * This function registers themeing functions with Drupal.
+ * @return array $themes
+ *   the array of available themes
+ */
+function islandora_workflow_theme() {
+   $themes=array();
+   $themes['permissions_role_table']=array(
+   'arguments' => array('list' => NULL, 'form' => NULL),
+   'template' => 'permissions_role_table'
+    );
+   $themes['permissions_user_table']=array(
+   'arguments' => array('list' => NULL, 'form' => NULL),
+   'template' => 'permissions_user_table'
+    );
+   $themes['workflow_table']=array(//both workflow and overview tabs should be able to use this template
+   'arguments' => array('list' => NULL, 'form' => NULL),
+   'template' => 'workflow_table'
+    );
+   return $themes;
+ }
+
+ /**
+  * This function handles making variables available to the theme template for
+  * the islandora_workflow_collection_permissions page (user tab)
+  * @param array ref $vars
+  *   the list of variables (including the form) to send to the template
+  * @return array $vars
+  *   the modified list of variables to send to the template
+  */
+function islandora_workflow_preprocess_permissions_user_table(&$vars) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+
+  $vars['users']=islandora_workflow_get_users_with_module_permissions();
+  $vars['list']['collection_selector']=drupal_render($vars['list']['collection_selector']);
+  $vars['list']['collection_submit']=drupal_render($vars['list']['collection_submit']);
+  //render each form element
+  foreach ($vars['users'] as $user_id => $user_name) {
+    $vars['list'][$user_id][$_SESSION['workflow_permissions_page']['active_collection']]=drupal_render($vars['list'][$user_id][$_SESSION['workflow_permissions_page']['active_collection']]);
+  }
+}
+
+/**
+  * This function handles making variables available to the theme template for
+  * the islandora_workflow_collection_permissions page (role tab)
+  * @param array ref $vars
+  *   the list of variables (including the form) to send to the template
+  * @return array $vars
+  *   the modified list of variables to send to the template
+  */
+function islandora_workflow_preprocess_permissions_role_table(&$vars) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+
+  //$vars['collections']=islandora_workflow_get_current_users_collections();
+  $vars['roles']=islandora_workflow_get_roles_with_module_permissions();
+  $vars['list']['collection_selector']=drupal_render($vars['list']['collection_selector']);
+  $vars['list']['collection_submit']=drupal_render($vars['list']['collection_submit']);
+  //render each form element
+  foreach ($vars['roles'] as $role_id => $role_name) {
+    $vars['list'][$role_id][$_SESSION['workflow_permissions_page']['active_collection']]=drupal_render($vars['list'][$role_id][$_SESSION['workflow_permissions_page']['active_collection']]);
+  }
+}
+
+/**
+  * This function handles making variables available to the theme template for
+  * the workflow tabs of the 'work' page
+  * @param array ref $vars
+  *   the list of variables (including the form) to send to the template
+  * @return array $vars
+  *   the modified list of variables to send to the template
+  */
+function islandora_workflow_preprocess_workflow_table(&$vars) {
+  $vars['pager_index']=$vars['list']['tab']['#value'];//drupal made me do it
+
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_collection'); //for getting members of collections etc.
+
+  $vars['collections'] = islandora_workflow_get_current_users_collections('all');
+  foreach ($vars['collections'] as $collection_id => $collection_name) {
+    $collection_members = islandora_workflow_get_all_members_of_collection($collection_id);
+    if ($collection_members) {
+      $vars['collections'][$collection_id] = array($collection_name => $collection_members);//makes it useful for theme as a list off all the members of all the collections
+
+      foreach ($collection_members as $member => $member_attibutes) {
+        if (isset($vars['list'][$collection_id][$member])) { //The isset is here so that only populated items are rendered into HTML for display
+
+          $member_workflow_state = $member_attibutes['state'];
+
+          if ($member_workflow_state) { //make sure workflow data is present too
+
+            $vars['list'][$collection_id][$member]['state'] = $member_workflow_state;//current workflow state
+
+            //render each object element
+            $vars['list'][$collection_id][$member]['Selecter'] = drupal_render($vars['list'][$collection_id][$member]['Selecter']);
+            $vars['list'][$collection_id][$member]['Assign'] = drupal_render($vars['list'][$collection_id][$member]['Assign']);
+
+            //get the dates and provide them
+            $times = islandora_workflow_get_object_state_time_stamp($member);
+//            $vars['list'][$collection_id][$member]['when_created'] = format_date($member_attibutes['created_date'], $type = 'small');
+// -Jerry the above format is wrong, the format_date call is on a unix timestamp, but the argument is already a string//
+            $creatationTime = $member_attibutes['created_date'];
+            $offsetOfT = strpos($creatationTime, 'T');
+            $creatationTimeDisplay=substr($creatationTime, 0, $offsetOfT);
+            $vars['list'][$collection_id][$member]['when_created'] = $creatationTimeDisplay;
+            $vars['list'][$collection_id][$member]['last_workflow_progression'] = $times['islandora_workflow_modified'];
+
+            //if there is a note
+            $member_note_subject = islandora_workflow_get_object_note_subject($member);
+            if ($member_note_subject) {
+              $vars['list'][$collection_id][$member]['note_subject']=
+                l($member_note_subject,
+                  'islandora_workflow_edit_note',  array('query' => 'object=' . $member));
+            }
+            else {//if there is no note
+              $vars['list'][$collection_id][$member]['note_subject']=
+                l('Create Note',
+                  'islandora_workflow_edit_note',  array('query' => 'object=' . $member));
+            }
+
+            $member_label = $member_attibutes['label'];
+            if ($member_label) {//if there is a label
+              $vars['list'][$collection_id][$member]['object']=
+                l($member_label,//use the label
+                  'fedora/repository/'. $member);
+            }
+            else {//no label
+              $vars['list'][$collection_id][$member]['object']=
+                l($member,//use the pid
+                  'fedora/repository/'. $member);
+            }
+          }
+        }
+      }
+    }
+    else {//remove the collection in it has no members
+     unset($vars['collections'][$collection_id]);
+    }
+  }
+}
+
+/**
+ * This generates the page for editing collection level permissions
+ * @return $collection_role_permissions_form
+ *   The form for changing collection permissions granted to roles
+ */
+function islandora_workflow_collection_permissions() {
+  $page_tabs=array(
+    '#type' => 'tabset',
+  );
+  $page_tabs['Users'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Users'),
+        '#content' => drupal_get_form('islandora_workflow_user_permissions_form'),
+        '#weight' => '1',
+      );
+ $page_tabs['Roles'] = array(
+        '#type' => 'tabpage',
+        '#title' => t('Roles'),
+        '#content' => drupal_get_form('islandora_workflow_role_permissions_form'),
+        '#weight' => '2',
+      );
+
+  return tabs_render($page_tabs);
+}
+
+/**
+ * This function builds the form that allows users to modify role based permissions for individual collections
+ * @return array $collection_role_permissions_form
+ *   the array containing the form.
+ */
+function islandora_workflow_role_permissions_form() {
+//init
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  $collection_role_permissions_form=array();
+  $current_module_permissions=array();
+
+  //collect current state data
+  $my_collections=islandora_workflow_get_current_users_collections();//used to get list of collections to display
+
+  $current_module_permissions=islandora_workflow_get_roles_with_module_permissions();//used to get what roles to display and avaialbe options for selects
+  $current_collection_permissions=islandora_workflow_get_all_role_permissions();//used to find the default options for slects
+  //setup the form
+  $collection_role_permissions_form['islandora_workflow_collection_permissions_table'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Collecion Permissions'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, //See http://drupal.org/node/751826
+    '#description' => t('Assign collection level permissions to roles.'),
+  );
+  //theme
+  $collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']=array(
+  '#theme' => 'permissions_role_table'
+  );
+
+  //collection selector and submit button
+  $my_collections_ids=array();
+  foreach ($my_collections as $collection_id => $collection_name) {
+    if (!isset($_SESSION['workflow_permissions_page']['active_collection'])) {
+      $_SESSION['workflow_permissions_page']['active_collection']=$collection_id;
+    }
+    $my_collections_ids[]=$collection_id;
+  }
+  $collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']=array(
+    '#type' => 'select',
+    '#options' => $my_collections_ids,
+    '#default_value' => array_search($_SESSION['workflow_permissions_page']['active_collection'], $my_collections_ids)
+  );
+  $collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_submit']=array(
+    '#type' => 'submit',
+    '#value' => t('Select Collection'),
+  );
+
+  //submit button
+  $collection_role_permissions_form['update']= array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#name'  =>'Update',
+    '#weight' => '1');
+  //restore button
+  $collection_role_permissions_form['restore']= array(
+    '#type' => 'submit',
+    '#value' => t('Restore'),
+    '#name'  =>'Restore',
+    '#weight' => '2');
+
+  //populate the form
+  foreach ($current_module_permissions as $role_id => $role_name) {//roles
+      //add none to the possible options
+      $current_module_permissions[$role_id][key($role_name)][]='';
+      //remove the islandora_workflow_Administrator permission
+      if (in_array('islandora_workflow_Administrator', $current_module_permissions[$role_id][key($role_name)])) {
+        unset($current_module_permissions[$role_id][key($role_name)][array_search('islandora_workflow_Administrator', $current_module_permissions[$role_id][key($role_name)])]);
+      }
+      //change the left over permission strings to be more user friendly
+      if (in_array('islandora_workflow_Manager', $current_module_permissions[$role_id][key($role_name)])) {
+        $current_module_permissions[$role_id][key($role_name)][array_search('islandora_workflow_Manager', $current_module_permissions[$role_id][key($role_name)])]='Manager';
+      }
+      if (in_array('islandora_workflow_Editor', $current_module_permissions[$role_id][key($role_name)])) {
+        $current_module_permissions[$role_id][key($role_name)][array_search('islandora_workflow_Editor', $current_module_permissions[$role_id][key($role_name)])]='Editor';
+      }
+      if (in_array('islandora_workflow_Submitter', $current_module_permissions[$role_id][key($role_name)])) {
+        $current_module_permissions[$role_id][key($role_name)][array_search('islandora_workflow_Submitter', $current_module_permissions[$role_id][key($role_name)])]='Submitter';
+      }
+        $collection_id=$_SESSION['workflow_permissions_page']['active_collection'];
+        //change the default permission string to be inline with the user friendly strings
+        if ($current_collection_permissions[$role_id][$collection_id]=='islandora_workflow_Manager') {
+          $current_collection_permissions[$role_id][$collection_id]='Manager';
+        }
+        if ($current_collection_permissions[$role_id][$collection_id]=='islandora_workflow_Editor') {
+          $current_collection_permissions[$role_id][$collection_id]='Editor';
+        }
+        if ($current_collection_permissions[$role_id][$collection_id]=='islandora_workflow_Submitter') {
+          $current_collection_permissions[$role_id][$collection_id]='Submitter';
+        }
+        //drupal made me do it...
+        $collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table'][$role_id][$collection_id] = array(
+        '#type' => 'select',
+        //default value works, but if you hit refresh on the page the values do not go back to the default... navigating away does reset the value
+        '#default_value' => array_search($current_collection_permissions[$role_id][$collection_id], $current_module_permissions[$role_id][key($role_name)]),//make this into whatever the current setting is for that collection/role
+        '#options' => $current_module_permissions[$role_id][key($role_name)],//what are available to the current role
+        );
+  }
+  return $collection_role_permissions_form;
+}
+
+/**
+  * This function processes the form submitted from the collection permission page
+  * @param $collection_role_permissions_form
+  *   Holds all the data on the state  of the form submitted
+  * @param $collection_role_permissions_form_state
+  *   An easier to use version of $collection_role_permissions_form
+  */
+function islandora_workflow_role_permissions_form_submit($collection_role_permissions_form, &$collection_role_permissions_form_state) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+
+  $clicked_button = $collection_role_permissions_form_state['clicked_button']['#name']; //-Jerry changed from value to name
+  if ($clicked_button=='Update') {//handle updating the page
+    //init
+    $current_permissions=islandora_workflow_get_all_role_permissions();
+    //these arrays all follow array[$role_id][$collection_id]str
+    $changed_permissions=array();
+    $new_permissions=array();
+    $removed_permissions=array();
+
+    //get the values returned by the form
+    $possible_permission=$collection_role_permissions_form_state['values']['islandora_workflow_collection_permissions_table']['permissions_table'];
+    foreach ($possible_permission as $role_id => $collection) {
+      if (is_array($collection)) {
+        foreach ($collection as $collection_id => $select_element) {
+
+          $select_element_index=$possible_permission[$role_id][$collection_id];
+          $select_element_value=$collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table'][$role_id][$collection_id]['#options'][$select_element_index];
+          //remap user friendly element option values to permission names
+          if ($select_element_value=='Manager') {
+            $select_element_value='islandora_workflow_Manager';
+          }
+          elseif ($select_element_value=='Editor') {
+            $select_element_value='islandora_workflow_Editor';
+          }
+          elseif ($select_element_value=='Submitter') {
+            $select_element_value='islandora_workflow_Submitter';
+          }
+
+          //compare the form values against the database and record the changes necessary
+          if (isset($current_permissions[$role_id][$collection_id])) {//if there is currently a DB rule
+            if ($current_permissions[$role_id][$collection_id]!=$select_element_value) {//if the DB and FORM disagree
+              if ($select_element_value=='') {// if the form element is empty
+                //add the form rule to the DB queue for deleting the rule
+                $removed_permissions[$role_id][$collection_id] = $current_permissions[$role_id][$collection_id];
+              }
+              else {//if the form element is populated
+                //add the form rule to the DB queue for rewriting the rule
+                $changed_permissions[$role_id][$collection_id] = $select_element_value;
+              }
+            }
+          }
+          else {//if there is NOT a DB rule
+            if ($select_element_value!='') {//if the form's rule is NOT empty
+              //add the form rule to the DB queue for adding a permission
+              $new_permissions[$role_id][$collection_id]=$select_element_value;
+            }//if it is empty do nothing
+          }
+        }
+      }
+    }
+    //send changes to DB
+    foreach ($changed_permissions as $role_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $query='UPDATE {islandora_workflow_role_permissions}';
+        $query=$query . ' SET role=' . $role_id . ', collection="' . $collection_id . '", permission="' . $permission . '"';
+        $query= $query .' WHERE role=' . $role_id . ' AND collection="' . $collection_id . '"';
+        db_query($query);
+      }
+    }
+    //send new permissions to DB
+    foreach ($new_permissions as $role_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $record=array(
+          'role' => $role_id,
+          'collection' => $collection_id,
+          'permission' => $permission
+        );
+        drupal_write_record('islandora_workflow_role_permissions', $record);
+      }
+    }
+    //delete now unnecessary entries in DB
+    foreach ($removed_permissions as $role_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $query='DELETE FROM {islandora_workflow_role_permissions}';
+        $query= $query .' WHERE role=' . $role_id . ' AND collection="' . $collection_id . '"';
+        db_query($query);
+      }
+    }
+
+    $collection_pid = $_SESSION['workflow_permissions_page']['active_collection'];
+
+    // check if the collection is empty
+    if(variable_get('islandora_workflow_enforce_security', 0) && module_exists('islandora_xacml_api')) {
+      module_load_include('inc', 'islandora_workflow');
+      $members = islandora_workflow_get_all_members_of_collection($collection_pid);
+    }
+
+    if($members) {
+      // remove any published collection members
+      foreach($members as $pid => $member) {
+        if ($member['state'] == 'published') {
+          unset($members[$pid]);
+        }
+      }
+    }
+
+    // If Xacml is used, then we need to update every single member of a collection in a batch
+    if(variable_get('islandora_workflow_enforce_security', 0) && module_exists('islandora_xacml_api') && $members) {
+      // arrrr... tis batch time billy
+      $batch = array(
+        'title' => t('Updating XACML Policies'),
+        'progress_message' => t('Please wait if many objects are being updated this could take a few minutes.'),
+        'operations' => array(
+          array('islandora_workflow_batch_function', array($collection_pid, $members, FALSE)),
+        ),
+        'finished' => 'islandora_workflow_batch_finished',
+      );
+      batch_set($batch);
+    }
+
+    //print out to user
+    drupal_set_message(t('Changes to role based permissions were processed.'));
+
+  }
+  elseif ($clicked_button=='Restore') {//handle reset
+    drupal_set_message(t('Permissions have not been changed.'));
+  }
+  elseif ($clicked_button=='Select Collection') {//collection to display
+    $_SESSION['workflow_permissions_page']['active_collection']=$collection_role_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']['#options'][$collection_role_permissions_form_state['values']['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']];
+  }
+}
+
+/**
+ * This function builds the form that allows users to modify user based permissions for individual collections
+ * @return array $collection_user_permissions_form
+ *   the array containing the form.
+ */
+function islandora_workflow_user_permissions_form() {
+//init
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+  $collection_user_permissions_form=array();
+  $current_module_permissions=array();
+
+  //collect current state data
+  $my_collections=islandora_workflow_get_current_users_collections();//used to get list of collections to display
+
+  $current_module_permissions=islandora_workflow_get_users_with_module_permissions();//used to get what users to display and avaialbe options for selects
+  $current_collection_permissions=islandora_workflow_get_all_user_permissions();//used to find the default options for slects
+  //setup the form
+  $collection_user_permissions_form['islandora_workflow_collection_permissions_table'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Collecion Permissions'),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, //See http://drupal.org/node/751826
+    '#description' => t('Assign collection level permissions to users.'),
+  );
+  //theme
+  $collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']=array(
+  '#theme' => 'permissions_user_table'
+  );
+
+  //collection selector and submit button
+  $my_collections_ids=array();
+  foreach ($my_collections as $collection_id => $collection_name) {
+    if (!isset($_SESSION['workflow_permissions_page']['active_collection'])) {
+      $_SESSION['workflow_permissions_page']['active_collection']=$collection_id;
+    }
+    $my_collections_ids[]=$collection_id;
+  }
+  $collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']=array(
+    '#type' => 'select',
+    '#options' => $my_collections_ids,
+    '#default_value' => array_search($_SESSION['workflow_permissions_page']['active_collection'], $my_collections_ids)
+  );
+  $collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_submit']=array(
+    '#type' => 'submit',
+    '#value' => t('Select Collection'),
+  );
+
+  //submit button
+  $collection_user_permissions_form['update']= array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#name'  =>'Update',  
+    '#weight' => '1');
+  //restore button
+  $collection_user_permissions_form['restore']= array(
+    '#type' => 'submit',
+    '#value' => t('Restore'),
+    '#name'  =>'Restore',
+    '#weight' => '2');
+
+  //populate the form
+  foreach ($current_module_permissions as $user_id => $user_name) {//users
+    //add none to the possible options
+    $current_module_permissions[$user_id][key($user_name)][]='';
+    //remove the islandora_workflow_Administrator permission
+    if (in_array('islandora_workflow_Administrator', $current_module_permissions[$user_id][key($user_name)])) {
+      unset($current_module_permissions[$user_id][key($user_name)][array_search('islandora_workflow_Administrator', $current_module_permissions[$user_id][key($user_name)])]);
+    }
+    //change the left over permission strings to be more user friendly
+    if (in_array('islandora_workflow_Manager', $current_module_permissions[$user_id][key($user_name)])) {
+      $current_module_permissions[$user_id][key($user_name)][array_search('islandora_workflow_Manager', $current_module_permissions[$user_id][key($user_name)])]='Manager';
+    }
+    if (in_array('islandora_workflow_Editor', $current_module_permissions[$user_id][key($user_name)])) {
+      $current_module_permissions[$user_id][key($user_name)][array_search('islandora_workflow_Editor', $current_module_permissions[$user_id][key($user_name)])]='Editor';
+    }
+    if (in_array('islandora_workflow_Submitter', $current_module_permissions[$user_id][key($user_name)])) {
+      $current_module_permissions[$user_id][key($user_name)][array_search('islandora_workflow_Submitter', $current_module_permissions[$user_id][key($user_name)])]='Submitter';
+    }
+    $collection_id=$_SESSION['workflow_permissions_page']['active_collection'];
+    //change the default permission string to be inline with the user friendly strings
+    if ($current_collection_permissions[$user_id][$collection_id]=='islandora_workflow_Manager') {
+      $current_collection_permissions[$user_id][$collection_id]='Manager';
+    }
+    if ($current_collection_permissions[$user_id][$collection_id]=='islandora_workflow_Editor') {
+      $current_collection_permissions[$user_id][$collection_id]='Editor';
+    }
+    if ($current_collection_permissions[$user_id][$collection_id]=='islandora_workflow_Submitter') {
+      $current_collection_permissions[$user_id][$collection_id]='Submitter';
+    }
+    //drupal made me do it...
+    $collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table'][$user_id][$collection_id] = array(
+    '#type' => 'select',
+    //default value works, but if you hit refresh on the page the values do not go back to the default... navigating away does reset the value
+    '#default_value' => array_search($current_collection_permissions[$user_id][$collection_id], $current_module_permissions[$user_id][key($user_name)]),//make this into whatever the current setting is for that collection/user
+    '#options' => $current_module_permissions[$user_id][key($user_name)],//what are available to the current user
+    );
+  }
+  return $collection_user_permissions_form;
+}
+
+/**
+  * This function processes the form submitted from the collection permission page
+  * @param $collection_user_permissions_form
+  *   Holds all the data on the state  of the form submitted
+  * @param $collection_user_permissions_form_state
+  *   An easier to use version of $collection_user_permissions_form
+  */
+function islandora_workflow_user_permissions_form_submit($collection_user_permissions_form, &$collection_user_permissions_form_state) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow.permissions');
+  $clicked_button = $collection_user_permissions_form_state['clicked_button']['#name']; //-Jerry changed
+  if ($clicked_button=='Update') {//handle updating the page
+    //init
+    $current_permissions=islandora_workflow_get_all_user_permissions();
+    //these arrays all follow array[$user_id][$collection_id]str
+    $changed_permissions=array();
+    $new_permissions=array();
+    $removed_permissions=array();
+
+    //get the values returned by the form
+    $possible_permission=$collection_user_permissions_form_state['values']['islandora_workflow_collection_permissions_table']['permissions_table'];
+
+    foreach ($possible_permission as $user_id => $collection) {
+      if (is_array($collection)) {
+        foreach ($collection as $collection_id => $select_element) {
+
+          $select_element_index=$possible_permission[$user_id][$collection_id];
+          $select_element_value=$collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table'][$user_id][$collection_id]['#options'][$select_element_index];
+          //remap user friendly element option values to permission names
+          if ($select_element_value=='Manager') {
+            $select_element_value='islandora_workflow_Manager';
+          }
+          elseif ($select_element_value=='Editor') {
+            $select_element_value='islandora_workflow_Editor';
+          }
+          elseif ($select_element_value=='Submitter') {
+            $select_element_value='islandora_workflow_Submitter';
+          }
+
+          //compare the form values against the database and record the changes necessary
+          if (isset($current_permissions[$user_id][$collection_id])) {//if there is currently a DB rule
+            if ($current_permissions[$user_id][$collection_id]!=$select_element_value) {//if the DB and FORM disagree
+              if ($select_element_value=='') {// if the form element is empty
+                //add the form rule to the DB queue for deleting the rule
+                $removed_permissions[$user_id][$collection_id] = $current_permissions[$user_id][$collection_id];
+              }
+              else {//if the form element is populated
+                //add the form rule to the DB queue for rewriting the rule
+                $changed_permissions[$user_id][$collection_id] = $select_element_value;
+              }
+            }
+          }
+          else {//if there is NOT a DB rule
+            if ($select_element_value!='') {//if the form's rule is NOT empty
+              //add the form rule to the DB queue for adding a permission
+              $new_permissions[$user_id][$collection_id]=$select_element_value;
+            }//if it is empty do nothing
+          }
+        }
+      }
+    }
+    //send changes to DB
+    foreach ($changed_permissions as $user_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $query='UPDATE {islandora_workflow_user_permissions}';
+        $query=$query . ' SET user=' . $user_id . ', collection="' . $collection_id . '", permission="' . $permission . '"';
+        $query= $query .' WHERE user=' . $user_id . ' AND collection="' . $collection_id . '"';
+        db_query($query);
+      }
+    }
+    //send new permissions to DB
+    foreach ($new_permissions as $user_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $record=array(
+          'user' => $user_id,
+          'collection' => $collection_id,
+          'permission' => $permission
+        );
+        drupal_write_record('islandora_workflow_user_permissions', $record);
+      }
+    }
+    //delete now unnecessary entries in DB
+    foreach ($removed_permissions as $user_id => $collection) {
+      foreach ($collection as $collection_id => $permission) {
+        $query='DELETE FROM {islandora_workflow_user_permissions}';
+        $query= $query .' WHERE user=' . $user_id . ' AND collection="' . $collection_id . '"';
+        db_query($query);
+      }
+    }
+
+    $collection_pid = $_SESSION['workflow_permissions_page']['active_collection'];
+
+    // check if the collection is empty
+    if(variable_get('islandora_workflow_enforce_security', 0) && module_exists('islandora_xacml_api')) {
+      module_load_include('inc', 'islandora_workflow');
+      $members = islandora_workflow_get_all_members_of_collection($collection_pid);
+    }
+
+    if($members) {
+      // remove any published collection members
+      foreach($members as $pid => $member) {
+        if ($member['state'] == 'published') {
+          unset($members[$pid]);
+        }
+      }
+    }
+
+    // If Xacml is used, then we need to update every single member of a collection in a batch
+    if(variable_get('islandora_workflow_enforce_security', 0) && module_exists('islandora_xacml_api') && $members) {
+      // arrrr... tis batch time billy
+      $batch = array(
+        'title' => t('Updating XACML Policies'),
+        'progress_message' => t('Please wait if many objects are being updated this could take a few minutes.'),
+        'operations' => array(
+          array('islandora_workflow_batch_function', array($collection_pid, $members, FALSE)),
+        ),
+        'finished' => 'islandora_workflow_batch_finished',
+      );
+      batch_set($batch);
+    }
+
+    drupal_set_message(t('Changes to user based permissions were processed.'));
+
+  }
+  elseif ($clicked_button=='Restore') {//handle reset
+    drupal_set_message(t('Permissions have not been changed.'));
+  }
+  elseif ($clicked_button=='Select Collection') {//collection to display
+    $_SESSION['workflow_permissions_page']['active_collection']=$collection_user_permissions_form['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']['#options'][$collection_user_permissions_form_state['values']['islandora_workflow_collection_permissions_table']['permissions_table']['collection_selector']];
+  }
+}
+
+/**
+ * This is a function that is supposed to be called by drupal_batch. It will update all the members in a
+ * collection to either include a XACML policy appropriate for their state, or the child security policy of their
+ * parent collection. This function assumes that every pid in the $members array needs to be updated.
+ *
+ * @param $collection_pid
+ *   PID of the parent collection.
+ * @param $members
+ *   Array of members of the collection. It is assumed to have the structure of the output of
+ *   islandora_workflow_get_all_members_of_collection
+ * @param $delete
+ *   Boolean. If this is TRUE all the POLICY streams will be deleted and the parents CHILD_SECURITY stream will be
+ *   added if it exists. If it is FALSE then an appropriate POLICY stream for workflow state will be added.
+ * @param $context
+ *   This is defined by drupal_batch.
+ */
+function islandora_workflow_batch_function($collection_pid, $members, $delete, &$context) {
+  module_load_include('inc', 'islandora_xacml_api', 'Xacml');
+  module_load_include('permissions.inc', 'islandora_workflow');
+  module_load_include('object.inc', 'islandora_fedora_api');
+  module_load_include('exception.inc', 'islandora_fedora_api');
+  module_load_include('inc', 'islandora_workflow');
+
+  if (empty($context['sandbox'])) {
+    $context['sandbox'] = array();
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['members'] = $members;
+    $context['sandbox']['items'] = count($members);
+    if(!isset($context['results']['success'])) {
+      $context['results']['success'] = array();
+    }
+    if(!isset($context['results']['fail'])) {
+      $context['results']['fail'] = array();
+    }
+  }
+
+  $data = reset($context['sandbox']['members']);
+  $pid = key($context['sandbox']['members']);
+  unset($context['sandbox']['members'][$pid]);
+  $context['sandbox']['progress']++;
+
+  try {
+    $object = new FedoraObject($pid);
+    $datastreams = $object->get_datastreams();
+
+    if(!$delete) {
+      $xacml = new Xacml();
+      //get users and roles
+      $creator = islandora_workflow_get_object_creator($pid);
+      $perms = islandora_workflow_get_permission_state($collection_pid, $data['state']);
+      $perms['users'][] = $creator;
+
+      $xacml->managementRule->addRole($perms['roles']);
+      $xacml->viewingRule->addRole($perms['roles']);
+      $xacml->managementRule->addUser($perms['users']);
+      $xacml->viewingRule->addUser($perms['users']);
+
+      if(isset($datastreams['POLICY'])) {
+        $datastreams['POLICY']->content = $xacml->getXmlString();
+      }
+      else {
+        $object->addDatastream('POLICY', NULL, $xacml->getXmlString(), array('mimeType' => 'text/xml', 'controlGroup' => 'X'));
+      }
+    }
+    else {
+      // xacml is disabled. delete the xacml datastream if it exists before it starts causing problems.
+      if(isset($datastreams['POLICY'])) {
+          $datastreams['POLICY']->purge();
+      }
+      $collectionObject = new FedoraObject($collection_pid);
+      $collectionDS = $collectionObject->get_datastreams();
+
+      if(isset($collectionDS['CHILD_SECURITY'])) {
+        $object->addDatastream('POLICY', NULL, $collectionDS['CHILD_SECURITY']->content, array('dsLabel' => 'security policy', 'mimeType' => 'text/xml', 'controlGroup' => 'X', 'logMessage' => 'Adding policy datastream.'));
+      }
+    }
+    $context['results']['success'][] = $pid;
+  }
+  catch (FedoraAPIRestException $e) {
+    $context['results']['fail'][] = $pid;
+  }
+
+  $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['items'];
+}
+
+/**
+ * This function is called by the drupal batch function when it it completed
+ * islandora_workflow_batch_function. This function just prints some info
+ * to the screen.
+ *
+ * @param boolean $success
+ *   If the operation was successfull
+ * @param $results
+ *   An array containing the results of the batch function. (Created in islandora_workflow_batch_function).
+ * @param $operations
+ */
+function islandora_workflow_batch_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(format_plural(count($results['success']), 'One policy updated.', '@count policies updated.'));
+  }
+  else {
+    $message = t('Finished with an error.');
+  }
+
+  if($results['fail']) {
+    foreach($results['fail'] as $fail) {
+      drupal_set_message("Failed to update: $fail", 'error');
+    }
+  }
+}
+
+/**
+  * This function handles all of the possible submits from the workflow work form (overview and workflow)
+  * @param $work_form
+  *   Holds all the data on the state  of the form submitted
+  * @param $work_form_state
+  *   An easier to use version of $work_form_form
+  */
+function islandora_workflow_work_form_submit($work_form, &$work_form_state) {
+  //init
+  $clicked_button = $work_form_state['clicked_button']['#name']; //-Jerry change to name
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow');
+  $collections=islandora_workflow_get_all_collections();
+  $selected_object_ids=array();
+  $assignees=array();
+  $assignee_indexes=array();
+  //get selected objects
+  foreach ($work_form_state['values']['objects_form']['objects_form_elems'] as $collection) {
+    if (is_array($collection)) {//prevent a warning
+      foreach ($collection as $object_id => $object_form_elements) {
+        if ($object_form_elements['Selecter']==1) {
+          $selected_object_ids[]=$object_id;
+          $assignee_indexes[$object_id]=$object_form_elements['Assign'];
+        }
+      }
+    }
+  }
+  //get selected assignees
+  foreach ($work_form['objects_form']['objects_form_elems'] as $collection) {
+    if (isset($collection['#post']) && is_array($collection)) {//makes sure we only operate on the object elements
+      foreach ($collection as $object_id => $object) {
+        if (isset($object['#post']) && is_array($object)) {
+          $assignees[$object_id]=$object['Assign']['#options'][$assignee_indexes[$object_id]];
+        }
+      }
+    }
+  }
+  //handle buttons
+  if ($clicked_button=='Submit') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_submit_object($object_id);
+    }
+  }
+  elseif ($clicked_button=='Delete') {//this sets fedora state to D
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_delete_object($object_id);
+    }
+  }
+  elseif ($clicked_button=='Reject') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_reject_object($object_id);
+    }
+  }
+  elseif ($clicked_button=='Approve') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_approve_object($object_id);
+    }
+  }
+  elseif ($clicked_button=='Publish') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_publish_object($object_id);
+      //this is a hack to get things into the workflow for testing
+      //islandora_workflow_init_workflow($object_id);//remove
+    }
+  }
+  elseif ($clicked_button=='Claim') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_claim_object($object_id);
+    }
+  }
+  elseif ($clicked_button=='Assign') {
+    foreach ($selected_object_ids as $object_id) {
+      islandora_workflow_assign_object($object_id, $assignees[$object_id]);
+    }
+  }
+}
+
+/**
+ * This function handles the submission of the note edit form
+ * @param $edit_note_form
+ *   Holds all the data on the state  of the form submitted
+ * @param $edit_note_form_state
+ *   the form's state array
+ */
+function islandora_workflow_edit_note_form_submit($edit_note_form, &$edit_note_form_state) {
+  module_load_include('inc', 'islandora_workflow', 'islandora_workflow'); //for setting the note value
+
+  $object_id=$edit_note_form_state['values']['note_form']['object'];
+  $subject=$edit_note_form_state['values']['note_form']['Subject'];
+  $body=$edit_note_form_state['values']['note_form']['Body'];
+
+  islandora_workflow_set_object_note($object_id, $subject, $body);
+}
+
+/**
+ * This function is used to handle the outgoing mail for islandora_workflow
+ *
+ * @param string $key
+ *   Thes message template to use
+ * @param array $message
+ *   The message to augment with the template
+ * @param array $params
+ *   containst 'object_id' which is the object for which this email regards.
+ */
+function islandora_workflow_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'assign':
+      //init
+      $body=islandora_workflow_get_object_note_body($params['object_id']);
+      $subject=islandora_workflow_get_object_note_subject($params['object_id']);
+      //setup email
+      $message['subject']=$params['object_id'] .' Assigned: ' . $subject;
+      $message['body'][]= 'Object '. $params['object_id'] .' has been assigned to you.';
+      $message['body'][]= $body;
+    break;
+    case 'reject':
+      //init
+      $body=islandora_workflow_get_object_note_body($params['object_id']);
+      $subject=islandora_workflow_get_object_note_subject($params['object_id']);
+      //setup email
+      $message['subject']=$params['object_id'] .' Rejected: ' . $subject;
+      $message['body'][]= 'Object '. $params['object_id'] .' has been rejected to you.';
+      $message['body'][]= $body;
+    break;
+    case 'submit':
+      //init
+      $body=islandora_workflow_get_object_note_body($params['object_id']);
+      $subject=islandora_workflow_get_object_note_subject($params['object_id']);
+      //setup email
+      $message['subject']=$params['object_id'] .' Submited: ' . $subject;
+      $message['body'][]= 'Object '. $params['object_id'] .' has been submited for appoval.';
+      $message['body'][]= $body;
+    break;
+    case 'approve':
+      //init
+      $body=islandora_workflow_get_object_note_body($params['object_id']);
+      $subject=islandora_workflow_get_object_note_subject($params['object_id']);
+      //setup email
+      $message['subject']=$params['object_id'] .' Aproved: ' . $subject;
+      $message['body'][]= 'Object '. $params['object_id'] .' has been aproved and is awaiting publication.';
+      $message['body'][]= $body;
+    break;
+  }
+}
