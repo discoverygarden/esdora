@@ -287,7 +287,13 @@ function collection_management_form_submit($form, &$form_state) {
     }
     $item = fedora_item::ingest_new_item($new_collection_pid, 'A', $new_collection_label, $user->name);
     $item->add_relationship('isMemberOfCollection', $collection_pid, RELS_EXT_URI);
+    
     $item->add_relationship('hasModel', 'islandora:collectionCModel', FEDORA_MODEL_URI);
+    
+    //--Jerry hack to make it work in esdora, may need to do form alter and add a new submission function handler
+    $item->add_relationship('hasModel', 'esdora:defaultCollectionCModel', FEDORA_MODEL_URI);
+    
+    
     $item->add_datastream_from_string($collection_policy_xml->saveXML(), 'COLLECTION_POLICY');
     $item->add_datastream_from_file($thumbnail, 'TN');
     drupal_goto("/fedora/repository/$new_collection_pid");
