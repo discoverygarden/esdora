@@ -8,6 +8,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraCollection');
+    module_load_include('inc', 'esdora_islandora', 'esdora_forms');
     module_load_include('inc', 'fedora_repository', 'ContentModel');
     module_load_include('inc', 'fedora_repository', 'plugins/FedoraObjectDetailedContent');
 
@@ -168,6 +169,13 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
             '#collapsed' => FALSE,
             '#value' => drupal_get_form('esdora_islandora_derivative_form', $pid),
         );
+        
+        $add_to_workflow = array(
+            '#type' => 'fieldset',
+            '#title' => t('Add To Workflow'),
+            '#collapsible' => FALSE,
+            '#value' => drupal_get_form('esdora_add_to_workflow_form', $pid),            
+        );
 
         $esdora_tabs = array(
             '#type' => 'tabset',
@@ -197,6 +205,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
         $url_edit_dc = "#dataset_edit_dc";
         $url_edit_lineage = "#dataset_add_lineage";
         $url_object_details = "#dataset_object_details";
+        $url_add_to_workflow = "#add_to_workflow";
 
         $fancybox_width = '800px;';
         $fancybox_height = '650px;';
@@ -209,7 +218,8 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
 //TODO: DC assumes FGDC bug due to static storage instance, bug for Nigel to fix
 //$my_manage_view .= '<li><a href=' . $url_edit_dc . '>Edit Metadta (DC) </a></li>';
         $my_manage_view .= '<li><a href=' . $url_edit_lineage . '>Data Lineage</a></li>';
-        $my_manage_view .= '<li><a href=' . $url_object_details . '>Object Details</a></li></ul></fieldset></div>';
+        $my_manage_view .= '<li><a href=' . $url_object_details . '>Object Details</a></li>';
+        $my_manage_view .= '<li><a href=' . $url_add_to_workflow . '>Add To Workflow</a></li></ul></fieldset></div>';
 
         $my_manage_view .= '<div style="display: none;">                
         
@@ -232,7 +242,11 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
         <div id="dataset_object_details" style="width:' . $fancybox_width . ' height:' . $fancybox_height . ' overflow:auto;">'
                 . drupal_render($object_details) .
                 '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
-';
+                
+        <div id="add_to_workflow" style="width:' . $fancybox_width . ' height:' . $fancybox_height . ' overflow:auto;">'
+                . drupal_render($add_to_workflow) .
+                '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>'
+                ;
 
         $esdora_tabs['manage_view'] = array(
             '#type' => 'tabpage',

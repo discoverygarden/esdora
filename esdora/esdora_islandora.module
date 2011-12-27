@@ -231,7 +231,8 @@ function get_child_count($collection_pid) {
 			where $object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $collection_pid . '>)
 			from <#ri>
 			where
-			$s $p $o';
+			$s $p $o
+                        and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>';
 
     $query_string = htmlentities(urlencode($query));
     $content = '';
@@ -242,7 +243,7 @@ function get_child_count($collection_pid) {
         $tokens = explode('"', trim($content));
         $value = $tokens[1];
         if ($value == 0) {
-            return "Data Object";
+            return "Data Object"; //TODO this is wrong when create a new empty collection
         } else {
             return 'Collection Object (total items: ' . $value . ')';
         }

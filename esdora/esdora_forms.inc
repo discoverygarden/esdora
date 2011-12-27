@@ -113,3 +113,106 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
         drupal_set_message("No file is uploaded. If the problem persists, please notify the administer of this problem");
     }
 }
+
+/**
+ * creates a form on that we are currently calling from the history tab
+ * @param array $form_state
+ * @param string $pid
+ * @return string
+ */
+function esdora_islandora_derivative_form(&$form_state, $pid) {
+    if (!isset($pid)) {
+        drupal_set_message(t("Can't create derivative form no pid supplied"));
+        return;
+    }
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $item = new Fedora_Item($pid);
+    $txt = $item->get_datastream_dissemination('processing.txt');
+    $rels = $item->get_datastream_dissemination('RELS-EXT');
+    $derivatives_string = '<b>Derived from:</b> ';
+    $src = new DOMDocument('1.0', 'utf-8');
+    $src->formatOutput = true;
+    $src->preserveWhiteSpace = false;
+
+    //Loading extern file
+    $src->loadXML($rels);
+    $isDerivedFrom = $src->getElementsByTagName('isDerivedFrom');
+    foreach ($isDerivedFrom as $derived) {
+        $derivatives_string .= substr($derived->getAttribute('rdf:resource'), 12) . ', ';
+    }
+    //$form['redirect'] = $base_url.'fedora/repository/'.$pid;
+    $form = array();
+    $form['txt'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Text'),
+        '#default_value' => $txt,
+        '#description' => t('Text contained in the processing stream'),
+    );
+    $form['related_pid'] = array(
+        '#prefix' => $derivatives_string,
+        '#type' => 'textfield',
+        '#title' => t('Add Derived From relationship'),
+        '#maxlength' => 64,
+        '#description' => t('comma seperated list of pids. If this object is already marked as being derived from an object then you don\'t need to mention the object here.  This is for new relationships.'),
+    );
+    $form['pid'] = array(
+        '#type' => 'hidden',
+        '#value' => $pid,
+    );
+    $form['tab'] = array(//the tabs are built using ajax and expect a post varible of tab we know we are on the History tab so add it here
+        '#type' => 'hidden',
+        '#value' => 'History',
+    );
+    $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+    return $form;
+}
+
+
+function esdora_add_to_workflow_form(&$form_state, $pid) {
+    $form['confirm']['are you sure'] = array(
+    '#type'  =>  'markup',
+    '#value' => t('<strong>Are you sure?</strong> <br/> '),
+    '#description' => t('Click OK will set the object as inactive untill the workflow is complete.'),
+    );
+    $form['confirm']['desc'] = array(
+    '#type'  =>  'markup',
+    '#value' => t('Click OK will set the object as inactive untill the workflow is complete. <br/>'),
+    );
+    $form['confirm']['pid'] = array(
+        '#type' => 'hidden',
+        '#value' => $pid,
+    );
+
+    $form['confirm']['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('OK'),
+    );
+    $form['confirm']['cancel'] = array(
+      '#type' => 'button',
+      '#value' => t('Cancel'),  
+      '#attributes' => array(
+          'onclick' => '$.fancybox.close();',
+          'onsubmit' => 'return false',
+          ),
+    );
+    
+    return $form;
+
+}
+
+function esdora_add_to_workflow_form_submit(&$form, &$form_state) {
+    //add the pid to workflow....
+    $pid =$form_state['values']['pid'];
+    if(isset ($pid)) {
+        module_load_include('inc','islandora_workflow','islandora_workflow');
+        $result = islandora_workflow_init_workflow($pid);
+        if($result){
+            drupal_set_message(t("Successfully added @pid to workflow",
+                            array('@pid'=>$pid) ));
+            drupal_goto('/islandora_workflow'); //TODO correct tab?? landing to the pid?
+        } else {
+            drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$pid)));
+        }                      
+    }
+    
+}
