@@ -84,6 +84,7 @@ class Esdora {
         $non_data_streams[] = array('DC', 'text/xml', 'X');
         $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
         $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
+        $non_data_streams[] = array('islandora_workflow', 'text/xml', 'X');
         //drupal_set_message('<pre>'. print_r($non_data_streams, TRUE) .'</pre>');
         $streams = $this->getListOfStreams('*', $non_data_streams);
 
@@ -646,7 +647,8 @@ class Esdora {
                         $html .= '<tr><td>';
                         if ($ds_info->datastream->controlGroup == 'E' || $ds_info->datastream->controlGroup == 'R') {//link to external viewer
                             //$txtValue = $this->item->get_datastream_dissemination($ds->ID);
-                            //$html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
+                            $txtValue = $ds_info->datastream->location;
+                            $html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
                             //don't do anything here as we don't want show external links here
                         } else {
                             $html .= '<a href = "' . $base_url . base_path() . 'fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
