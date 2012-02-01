@@ -1,15 +1,14 @@
 <?php
+
 /**
  * Provides Spatial and Temporal Search on the following Solr fields
  *  'Bound.North', 'Bound.South', 'Bound.East', 'Bound.West'
  * AND 'Start.Date', 'End.Date'
  * 
- * question make these name fields configurable?
+ * make these name fields are configurable from search.terms.txt
  * 
  * Module by Biva, Jerry
  */
-
-
 
 /**
  * Implementation of hook_menu().
@@ -52,7 +51,7 @@ function geo_solr_search_standalone() {
                         <input type="text" id="from" name="from"/>
                         <label for="to">to</label>
                         <input type="text" id="to" name="to"/>';
-        $output.='<p id="date"></p>';
+    $output.='<p id="date"></p>';
 
     return $output;
 }
@@ -67,6 +66,7 @@ function geo_solr_search_map() {
 /*
  * not used
  */
+
 function geo_solr_search_date() {
     $datefrom = $_POST[datefrom];
     $dateto = $_POST[dateto];
@@ -90,11 +90,20 @@ function time_range_form() {
         '#prefix' => '<td>',
         '#suffix' => '</td></tr></table>',
     );
+    //add keywords
+    $form['params']['keyword'] = array(
+        '#type' => 'textfield',
+        '#title' => 'Keywords',
+        '#id' => 'keywords',
+        '#size' => '24',
+        '#required' => TRUE,
+    );
+
     $form['params']['bbox'] = array(
         '#type' => 'textfield',
         '#title' => 'Bounding box',
-        '#id'   => 'coordinates',
-        '#size' => '24',
+        '#id' => 'coordinates',
+        '#size' => '32',
         '#value' => 'draw bounding box on map',
     );
     $form['params']['start'] = array(
@@ -111,125 +120,143 @@ function time_range_form() {
         '#default_value' => '',
         '#required' => FALSE,
     );
-    
+
     $form['params']['submit'] = array(
         '#type' => 'submit',
         '#value' => t('search'),
         '#weight' => 100,
     );
 
-//    $form['start'] = array(
-//        '#size' => '24%',
-//        '#type' => 'datepicker',
-//        '#title' => t('start'),
-//        '#default_value' => '',
-//        '#required' => FALSE,
-//    );
-//    $form['end'] = array(
-//        '#size' => '24%',
-//        '#type' => 'datepicker',
-//        '#title' => t('end'),
-//        '#default_value' => '',
-//        '#required' => FALSE,
-//    );
     return $form;
 }
 
 /*
  * validation function to the form
  */
+
 function time_range_form_validate($form, &$form_state) {
-    if( (!isset($_SESSION['mapCoor']) || empty($_SESSION['mapCoor'])) && empty($form_state['values']['start']) && empty($form_state['values']['end'])) {
+    if ((!isset($_SESSION['mapCoor']) || empty($_SESSION['mapCoor'])) && empty($form_state['values']['start']) && empty($form_state['values']['end'])) {
         form_set_error('Please enter start date, or end date, or select bounding box to search.');
         Drupal_set_message('Please enter start date, or end date, or select bounding box to search.', 'status', FALSE);
-    }    
+    }
     $start = $form_state['values']['start'];
     $end = $form_state['value']['end'];
-    if(!empty($start)) {
-        if(!is_numeric(substr($start, 0, 4))) {
-        form_set_error('Please config the date entry to conform to ISO 8601 format.');
-        Drupal_set_message('Please config the date entry to conform to ISO 8601 format.', 'status', FALSE);
+    if (!empty($start)) {
+        if (!is_numeric(substr($start, 0, 4))) {
+            form_set_error('Please config the date entry to conform to ISO 8601 format.');
+            Drupal_set_message('Please config the date entry to conform to ISO 8601 format.', 'status', FALSE);
         }
     }
-    if(!empty($end)) {
-        if(!is_numeric(substr($start, 0, 4))) {
-        form_set_error('Please config the date entry to conform to ISO 8601 format.');
-        Drupal_set_message('Please config the date entry to conform to ISO 8601 format.', 'status', FALSE);
+    if (!empty($end)) {
+        if (!is_numeric(substr($start, 0, 4))) {
+            form_set_error('Please config the date entry to conform to ISO 8601 format.');
+            Drupal_set_message('Please config the date entry to conform to ISO 8601 format.', 'status', FALSE);
         }
     }
     //TODO above refactor in function
 }
+
+function setSearchTermVariables() {
+    //todo best way to read in php config file?
+    $term_file_name = drupal_get_path('module', 'geo_solr_search') . '/seartch.terms.txt';
+    $file_handle = fopen($term_file_name, "r");
+    $term_string = fread($file_handle, filesize($term_file_name));
+    fclose($file_handle);
+    $tokens = split("\r\n", $term_string); //?
+    foreach ($tokens as $s) {
+        $terms = split("=", $tokens);
+        variable_set("box.north", $terms[1]);
+    }
+    fclose($file_handle);
+}
+
 /*
  * Form handler
  */
+
 function time_range_form_submit($form, &$form_state) {
-    //drupal_set_message(t('My form has been submitted.'));
+//cache - optimize this term setting section. variable table?
+    //read in the itql query for getting collections
+    if (variable_get("box.north") == NULL) {
+        setSearchTermVariables();
+    }
+
+    $box_north = variable_get("box.north");
+    $box_east = variable_get("box.east");
+    $box_south = variable_get("box.south");
+    $box_west = variable_get("box.west");
+
+    $start_date = varibale_get("start.date");
+    $end_date = variable_get("end.date");
+
+    $keyword = $form_state['values']['keyword'];
     $start = $form_state['values']['start'];
     $end = $form_state['values']['end'];
-    $bbox=$_SESSION['mapCoor'];
-    $bboxFilterQ='';
-    if(!empty($bbox)) {
+    $bbox = $_SESSION['mapCoor'];
+    $bboxFilterQ = '';
+    if (!empty($bbox)) {
         //this works: Bound.West:[-126.5 TO 180] OR Bound.South:[15.0 TO 90] OR Bound.East:[-180 TO -54.1] OR Bound.North[-90 TO 52.98]
-        $bboxeach = split(', ',$bbox);
-        $west=$bboxeach[0];
-        $south=$bboxeach[1];
+        $bboxeach = split(', ', $bbox);
+        $west = $bboxeach[0];
+        $south = $bboxeach[1];
         $east = $bboxeach[2];
         $north = $bboxeach[3];
-        $bboxFilterQ ="Bound.West:[$west TO 180]";
-        $bboxFilterQ.=" OR Bound.East:[-180 TO $east]";
-        $bboxFilterQ.=" OR Bound.North:[-90 TO $north]";
-        $bboxFilterQ.=" OR Bound.South:[$south TO 90]";
+//        $bboxFilterQ ="Bound.West:[$west TO 180]";
+        $bboxFilterQ = "$box_west:[$west TO 180]";
+//        $bboxFilterQ.=" OR Bound.East:[-180 TO $east]";
+        $bboxFilterQ.=" OR $box_east:[-180 TO $east]";
+//        $bboxFilterQ.=" OR Bound.North:[-90 TO $north]";
+        $bboxFilterQ.=" OR $box_north:[-90 TO $north]";
+//        $bboxFilterQ.=" OR Bound.South:[$south TO 90]";
+        $bboxFilterQ.=" OR $box_south:[$south TO 90]";
     }
-    
+
     $timeFilterQ = '';
-    if(!empty($start)) {
-       // fix up time up to ISO 8601 strict - should have been setup by datepicker on client side, but this will fix
-       // the case client pass in 1988/02/11, (ideal is 1988-02-11)
+    if (!empty($start)) {
+        // fix up time up to ISO 8601 strict - should have been setup by datepicker on client side, but this will fix
+        // the case client pass in 1988/02/11, (ideal is 1988-02-11)
         //Start.Date:[10/03/2011 TO *] AND End.Date:[* TO 10/03/2011])
         //needs to be 1976-03-06T23:59:59.999Z
         //note: this query works: Start.Date:[1900-01-01T00:00:00Z TO NOW] AND End.Date:[* TO 2001-01-01T00:00:00Z]
-       $start_date = str_replace('/', '-', $start);
-       $start_date .='T23:59:59.999Z';
-       $timeFilterQ="Start.Date:[$start_date TO NOW]";
+        $start_date = str_replace('/', '-', $start);
+        $start_date .='T23:59:59.999Z';
+        $timeFilterQ = "Start.Date:[$start_date TO NOW]";
     }
-    if(!empty($end)) {
-       $end_date = str_replace('/', '-', $end);
-       $end_date .='T23:59:59.999Z';
-       if(!empty ($timeFilterQ)) {
-           $timeFilterQ .= " AND End.Date:[* TO $end_date]";
-       }
-       else {
-           $timeFilterQ = "End.Date:[* TO $end_date]";
-       }
+    if (!empty($end)) {
+        $end_date = str_replace('/', '-', $end);
+        $end_date .='T23:59:59.999Z';
+        if (!empty($timeFilterQ)) {
+            $timeFilterQ .= " AND End.Date:[* TO $end_date]";
+        } else {
+            $timeFilterQ = "End.Date:[* TO $end_date]";
+        }
     }
-    $query='';
-    if(!empty ($bboxFilterQ) && !empty($timeFilterQ)) {
+    $query = '';
+    //TODO use keywords??
+    if (!empty($bboxFilterQ) && !empty($timeFilterQ)) {
         $query = "($bboxFilterQ) AND ($timeFilterQ)";
-    }
-    else { 
-        if(!empty ($bboxFilterQ)){
+    } else {
+        if (!empty($bboxFilterQ)) {
             $query = $bboxFilterQ;
         }
-        
-        if(!empty ($timeFilterQ)){
+
+        if (!empty($timeFilterQ)) {
             $query = $timeFilterQ;
         }
     }
     //unset the session var
-    //issue (TODO), map still has the value on client, shoudl be cleared, but left there for now
+    //map still has the value on client, shoudl be cleared, but left there for now
     unset($_SESSION['mapCoor']);
 
-    if(!empty($query)) {
+    if (!empty($query)) {
         $query = trim($query);
         //dvm($query);
         $query = htmlspecialchars(drupal_urlencode($query), ENT_QUOTES, 'utf-8', false);
         //$query = str_replace('/', '~slsh~', $query); //replace the slash so url doesn't break
         drupal_goto("islandora/solr/search/$query/-");
-    }
-    else {
+    } else {
         throw new Exception("query is empty");
     }
-
 }
 
 ////define the map block
@@ -259,6 +286,6 @@ function geo_solr_search_block($op='list', $delta=0, $edit=array()) {
                 //return null;
             }
         default:
-            //return null;
+        //return null;
     }
 }

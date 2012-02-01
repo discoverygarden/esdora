@@ -1,0 +1,6 @@
+box.north=Bound.North
+box.east=Bound.East
+box.south=Bound.South
+box.west=Bound.West
+time.start=Start.Date
+time.end=End.Date

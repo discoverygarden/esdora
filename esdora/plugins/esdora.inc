@@ -73,7 +73,7 @@ class Esdora {
         $itqlMetaDataQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
       <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType';
 
-        $itqlViwerResults = $collectionClass->getRelatedItems($this->pid, $itqlQuery, $limit = NULL, $offset = NULL);
+        $itqlViwerResults = $collectionClass->getRelatedItems($this->pid, $itqlViewerQuery, $limit = NULL, $offset = NULL);
         $itqlMetadataResults = $collectionClass->getRelatedItems($this->pid, $itqlMetaDataQuery, $limit = NULL, $offset = NULL);
 
         $ds_list_viewers = $this->getListOfStreamsFromItql($itqlViwerResults);
