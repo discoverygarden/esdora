@@ -12,7 +12,13 @@ form#islandora-solr-search-block-form input#edit-fedora-terms2,
 form#islandora-solr-search-block-form input#edit-fedora-terms3,
 form#islandora-solr-simple-search-form input#edit-islandora-simple-search-query
 {
-  width:96%;
+  /* -Jerry width:96%;*/
+  width: 140px;
+}
+
+.container-inline
+{
+    display: inline;
 }
 
 .islandora_solr_search_query_wrap,
