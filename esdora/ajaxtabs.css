@@ -3,15 +3,15 @@
 #tabs button{
     border-bottom: 2px solid #BBBBBB;
     border-collapse:separate;
-    height: 30px;
-    width: 85px;
+    height: 45px;
+    width: 140px;
     line-height: normal;
     list-style: none outside none;
     margin: 1px;
-    padding: 0;
+    padding: 2px;
     white-space: nowrap;
     text-align: center;
-    font-size: 1.0em;
+    font-size: 1.3em;
 }
 #tabs li {
     background-image: none;
@@ -44,10 +44,18 @@
     padding: 0 1em;
     text-decoration: none;
 }
-.Metadata
-{
-	background-color: #E6E6E6;
+.Metadata {
+    background-color: #E6E6E6;
 	
+}
+
+#data-items-table td {
+    padding:25px;
+    
+}
+#descrpt-table td {
+    padding:15px;
+   
 }
 
 

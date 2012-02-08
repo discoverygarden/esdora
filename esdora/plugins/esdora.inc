@@ -60,7 +60,8 @@ class Esdora {
         $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
         $viewerStreams = $this->getListofStreamsFromItql($viewerResults);
         $viewerContent = $this->createViewerContent($viewerStreams);
-        return $viewerContent;
+        $separater = "<p id='item-display' /> <hr/>";
+        return $separater . $viewerContent;
     }
 
     function getItems() { //Items tab
@@ -88,7 +89,9 @@ class Esdora {
         //drupal_set_message('<pre>'. print_r($non_data_streams, TRUE) .'</pre>');
         $streams = $this->getListOfStreams('*', $non_data_streams);
 
-        return $streams;
+        $separater = "<p id='item-display' /> <hr/>";
+
+        return $separater .  $streams;
     }
 
     function getMetadata() { //metadata tab
@@ -105,7 +108,8 @@ class Esdora {
         try {
             $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
             $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
-            return $fdgcAsHtml . $edit_metadata_urls;
+            $separater = "<p id='item-display' /> <hr/>";
+            return $separater . $fdgcAsHtml . $edit_metadata_urls;
         } catch (Exception $e) {
             $msg = 'caught exception: ' . $e->getMessage();
             $msg .= '; fgdc=' . $fdgcText . '; html=' . $fdgcAsHtml . '; pid=' . $this->item->pid;
@@ -114,16 +118,19 @@ class Esdora {
     }
 
     function getDescription() {
+        $separater = "<p id='item-display' /> <hr/>";
+        $descript='';
         if (module_exists("fancybox"))
-            return $this->getDescriptionWFB();
+            $descript = $this->getDescriptionWFB();
         else
-            return $this->getDescriptionWOFB();
+            $descript = $this->getDescriptionWOFB();
+        return $separater . $descript;
     }
 
     function getDescriptionWFB() { //description tab
         global $base_url;
         global $user;
-        $content = '<table>';
+        $content = "<table id='descrpt-table'><tr><th>Document Item</th><th>Inline View</th><th>Download</th></tr>";
         $collectionClass = new CollectionClass();
         $itqlQuery = 'select $datastream  $mimeType from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isMetaDataFor>
     <info:fedora/' . $this->pid . '> and $datastream <info:fedora/fedora-system:def/view#mimeType> $mimeType'; //<info:fedora/Bigfoot:LAI_surfaces>
@@ -239,7 +246,9 @@ class Esdora {
 
     function getHistory() { //histroy tab
         module_load_include('inc', 'fedora_repository', 'ObjectHelper');
-        $fieldSetcontent = "<div>";
+        $separater = "<p id='item-display' /> <hr/>";
+
+        $fieldSetcontent = $separater . "<div>";
         $pid = $this->pid;
 //        if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
 //            $fieldSetDF = array(
@@ -591,16 +600,17 @@ class Esdora {
         // $link;
         //$html .= '<table align="left"><tr><td valign="top" align="right" class="fedora_mods_field" width="15%">';
         $html .= '<table><tr><td align="right" valign="top" class="fedora_mods_field" width="15%">';
-        $html .='<strong>Title</strong></td><td>';
+        $html .='<strong>Title: </strong></td><td>';
         foreach ($title as $t) {
             $html .= $t . '<br />';
         }
-        $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links</strong></td><td>';
+        $html .= '</td></tr><tr><td valign="top" align="right"><strong>Links:</strong></td><td>';
         foreach ($links as $t) {
             $html .= '<a class="links" href="' . $t . '" target="_blank" onClick="sendRequest(' . $t . ');">' . $t . '</a><br />';
         }
-        $html .= $this->htmlSnippet("Contact", $contactPerson);
-        $html .= $this->htmlSnippet("Citation", $resdesc);
+        $html .= $this->htmlSnippet("Contact:", $contactPerson);
+        $html .='<br/>';
+        $html .= $this->htmlSnippet("Citation:", $resdesc);
         $html .='</td></tr></table>';
         // echo $html;
         return $html;
@@ -623,7 +633,7 @@ class Esdora {
             $this->datastreams_list = $this->item->get_datastreams_list_as_SimpleXML();
         }
         if ($this->datastreams_list != FALSE) {
-            $html .='<table><tr><td>Data Item</td><td>Checksum</td><td>Checksum Type</td></tr>';
+            $html .='<table id="data-items-table"><tr><th>Data Item</th><th>Checksum</th><th>Checksum Type</th></tr>';
             foreach ($this->datastreams_list->datastreamDef as $ds) {
                 $ds_info = $this->item->get_datastream_info($ds->ID);
                 if ($mimeTypeToRetrieve == $ds->MIMEType || $mimeTypeToRetrieve == '*') {
