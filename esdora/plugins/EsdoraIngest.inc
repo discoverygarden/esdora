@@ -97,6 +97,7 @@ class EsdoraIngest {
   }
 
   function handleZipIngestForm($collection_pid, $uploaded_file, $content_model_pid, $dataset_name) {
+    global $base_url;
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');
     module_load_include('inc', 'fedora_repository', 'api/dublin_core');
@@ -118,28 +119,32 @@ class EsdoraIngest {
     
     $meta_files = scandir("$tmpDir/$top_folder_name/Metadata");
     module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+    $hasFGDC=FALSE;
     foreach ($meta_files as $file) {//metadata files
       $full_path = "$tmpDir/$top_folder_name/Metadata/$file";
       if (!is_dir($full_path) && $file != '.' && $file != '..' && $file != '__MACOSX') {
         $mime = new MimeClass();
         $m_type = $mime->get_mimetype($file);
         $controlGroup = 'M';
-        $stream_id = $file; //substr($file, 0, strrpos($file, '.'));
-//        if (strpos($file, 'FGDC') === 0) {
-          //$controlGroup = 'X';
-          //$datastream_url = drupal_urlencode($full_path); //using the form builder the fgdc.xml gets created as inline xml so we have to modify by value
-          //$url = file_create_url($datastream_url);  // if this is not desired then we may have to remove the fgdc and readd.
-//          $content = file_get_contents($full_path);
-//          $object->modify_datastream_by_value($content, $file, $file, 'text/xml', $force = FALSE, $logMessage = 'Esdora updated FGDC.xml', $quiet = FALSE);
-//        }
-//        else {
-          if (is_numeric(substr($stream_id, 0, 1))) {//stream ids cannont start with a number
+        $stream_id = $file; 
+        if (strpos($file, 'FGDC') === 0) {
+            $hasFGDC=TRUE;
+        }
+        if (is_numeric(substr($stream_id, 0, 1))) {//stream ids cannont start with a number
             $stream_id = 'n' . $stream_id; //if it starts with a number prfix the id with an n?
-          }
-          $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added metadata datastream at ingest');
-//        }
+        }
+        $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added metadata datastream at ingest');
         Esdora::add_relationship_internal('isMetaDataFor', $pid, $stream_id, "http://esdora.ornl.gov/ontologies/relationships#");
       }
+    }
+    if(!$hasFGDC) {
+        //add an empty FGDC template file
+        $fgdcTemplateFilePath = $_SERVER['DOCUMENT_ROOT'] . base_path() . drupal_get_path('module', 'esdora_islandora');
+        $fgdcTemplateFilePath .= '/' . 'reference-fgdc-record.xml';
+        if(isset ($fgdcTemplateFilePath) ) {
+            $object->add_datastream_from_file($fgdcTemplateFilePath, "FGDC.xml", "FGDC", 'xml', 'M', 'Added templated FGDC at ingest');
+            Esdora::add_relationship_internal('isMetaDataFor', $pid, "FGDC.xml", "http://esdora.ornl.gov/ontologies/relationships#");            
+        }
     }
 
     $files = scandir("$tmpDir/$top_folder_name/Data");

@@ -367,9 +367,11 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
             $header = array(
                 array('data' => t('Name')),
                 array('data' => t('')),
-                array('data' => t('Download')),
+                array('data' => t('Preview')),
                 array('data' => t('')),
                 array('data' => t('Edit')),
+                array('data' => t('')),
+                array('data' => t('Export')),
                 array('data' => t('')),
                 array('data' => t('Delete')),
             );
@@ -380,6 +382,7 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                 $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
                 $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
                 $delete_url = $base_url . '/' . 'node/' . $nid . '/delete?destination=admin%2Fcontent%2Fnode';
+                $export_url=''; //TODO
                 $pos = strrpos($file_path_name, '/');
                 $file_name = substr($file_path_name, $pos + 1);
                 //$items[] =$file_name . l('download', $base_url . '/' . $node->body) .
@@ -387,9 +390,11 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
                 $items[] = array(
                     array('data' => $file_name),
                     array('data' => t(' ')),
-                    array('data' => l('download', $base_url . '/' . $node->body)),
+                    array('data' => l('view', $base_url . '/' . $node->body)),
                     array('data' => t(' ')),
                     array('data' => l('edit', $edit_url)),
+                    array('data' => t(' ')),
+                    array('data' => l('export', $export_url)),
                     array('data' => t(' ')),
                     array('data' => l('delete', $delete_url)),
                 );
