@@ -66,9 +66,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
 //probably should check pid as well here.
         return makeObject($pid, $dsId);
     }
-
-    $content = '<div id="content-fedora">';
-
+    
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
     $collectionClass = new CollectionClass();
     module_load_include('inc', 'fedora_repository', 'ContentModel');
@@ -76,6 +74,7 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
     $breadcrumbs = array();
     $objectHelper->getBreadcrumbs($pid, $breadcrumbs);
     drupal_set_breadcrumb(array_reverse($breadcrumbs));
+    drupal_set_title("Repository");
 
 
     //Jerry Pan @ Nov 2011
