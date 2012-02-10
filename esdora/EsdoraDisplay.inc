@@ -117,15 +117,12 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
         $esdoraCollection = new EsdoraCollection($pid);
         return $esdoraCollection->getContentForDisplay($esdora_collection_model, $hasManagePermission, $pid, $page_number);
     } else if ($esdora_data_model !=NULL){ //data object
-        //TODO: need to find a place on GUI to put back management on object details
-        //TODO: check permission
         $data_display = $esdora_data_model->displayExtraFieldset($pid, $page_number);
         if (!$hasManagePermission) {
             //this calls into Islandora content model so the model objects are still needed
             return $data_display;
         }
         //has the permission, show a tabbed display with View and Manage tabs
-
         $obj = new FedoraObjectDetailedContent($pid);
         $object_details = $obj->showFieldSets();
 
@@ -152,14 +149,18 @@ function displayContent($pid = NULL, $dsId = NULL, $collection = NULL, $page_num
             '#title' => t('Edit FGDC'),
             '#collapsible' => TRUE,
             '#collapsed' => FALSE,
-            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'FGDC.xml', 'fgdc'),
+            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'FGDC.xml', 'fgdc'), 
+            //'fgdc' is the form name, @TODO not hard code it
+            // - 1) content model, or 
+            // - 2) query the database 
         );
         $manage_view_edit_dc = array(
             '#type' => 'fieldset',
             '#title' => t('Edit DC'),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
-            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'DC', 'DC'),
+            '#value' => drupal_get_form('esdora_islandora_edit_form', $pid, 'DC', 'DC'), 
+            //same as 'DC'
         );
         $manage_view_lineage = array(
             '#type' => 'fieldset',

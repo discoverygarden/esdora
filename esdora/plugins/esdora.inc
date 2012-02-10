@@ -36,14 +36,14 @@ class Esdora {
 
 
         $items = $this->getItems();
-        $cont = '<div id="tabs">';
-        $cont .='<button class="Items" style="background-color: #D7D6DB;">Items</button>';
-        $cont.= '<button class="Metadata" style="background-color: #F4F4F4">Metadata</button>';
-        $cont.= '<button class="Description" style="background-color: #F4F4F4">Description</button>';
-        $cont.= '<button class="History" style="background-color: #F4F4F4">History</button>';
+        $cont = '<div id="dataset-ajax-tabs">';
+        $cont .='<button id="Items">Items</button>';
+        $cont.= '<button id="Metadata">Metadata</button>';
+        $cont.= '<button id="Description">Description</button>';
+        $cont.= '<button id="History">History</button>';
         $viewerContent = $this->getViewers();
         if ($viewerContent != null) {
-            $cont.= '<button class="Viewers" style="background-color: #F4F4F4">Viewers</button>';
+            $cont.= '<button id="Viewers">Viewers</button>';
         }
         $cont.= '</div><div id="div1" >' . $items . '</div>';
         $cont.='<input type="hidden" id="pid" value="' . $this->pid . '"/>';

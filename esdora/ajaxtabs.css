@@ -1,25 +1,26 @@
 @CHARSET "ISO-8859-1";
 
-#tabs button{
+#dataset-ajax-tabs button{
     border-bottom: 2px solid #BBBBBB;
     border-collapse:separate;
-    height: 45px;
-    width: 140px;
+    height: 40px;
+    width: 120px;
     line-height: normal;
     list-style: none outside none;
     margin: 1px;
-    padding: 2px;
+    padding: 3px;
     white-space: nowrap;
     text-align: center;
-    font-size: 1.3em;
+    font-size: 1.1em;
+    background-color: #DDDDDD;
 }
-#tabs li {
+#dataset-ajax-tabs li {
     background-image: none;
     margin: 0;
     padding: 0;
     display: inline;
 }
-#tabs li.active a {
+#dataset-ajax-tabs li.active a {
     -moz-border-bottom-colors: none;
     -moz-border-image: none;
     -moz-border-left-colors: none;
@@ -34,7 +35,7 @@
     padding: 0 1em;
     text-decoration: none;
 }
-#tabs li a {
+#dataset-ajax-tabs li a {
     background-color: #E6E6E6;
     border-color: #BBBBBB;
     border-style: solid solid none;
@@ -44,8 +45,10 @@
     padding: 0 1em;
     text-decoration: none;
 }
-.Metadata {
-    background-color: #E6E6E6;
+
+
+#dataset-ajax-tabs #Items {
+    background-color: #FFFFFF;
 	
 }
 
