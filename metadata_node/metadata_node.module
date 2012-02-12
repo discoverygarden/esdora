@@ -4,6 +4,52 @@ define(TYPE, 'metadata_node');
 define(DATA_FOLDER, 'metadata_records');
 define(METADATA_FORM_NAME, 'Metadata_Editor');
 define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
+define(FILE_DOWNLOAD_PATH, 'metadata/filedownload');
+define(VIEW_METADATA_PATH, 'metadata/view');
+
+
+///////call back hook, allow force download/////
+
+/**
+ * Implement hook_mene
+ */
+function metadata_node_menu() {
+    $items = array();
+    $items[FILE_DOWNLOAD_PATH] = array(
+      'title' => t('Dwonload file'),
+      'description' => t('force file download for all file typs'),
+      'page callback' => 'download_file',
+      'access arguments' => array('view metadata_node'),
+      'type' => MENU_CALLBACK,
+    );
+    $items[VIEW_METADATA_PATH] = array (
+      'title' => t('Metadata Records'),
+      'description' => t('View my metadata records'),
+      'page callback' => 'get_tabular_metadata',
+      'access arguments' => array('view metadata_node'),
+      'type' => MENU_CALLBACK,        
+    );
+    return $items;
+}
+
+function download_file() {
+    $file_path = $_GET['path'];
+    //dvm($file_path);
+    if (file_exists($file_path)) {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename='.basename($file_path));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file_path));
+        ob_clean();
+        flush();
+        readfile($file_path);
+        exit;
+    }
+}
 
 ////////////////////////////// NODE CREATION AND CONTENT_TYPE, METADAT FORM, FILE SAVE /////////
 /**
@@ -114,17 +160,6 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
     }
 }
 
-
-//function load_node_form_function() {
-//    dvm('here');
-//    module_load_include('inc', 'node', 'node.pages');
-//    $args = func_get_args();
-//    shift($args);
-//    $form = call_user_func_array('node_form', $args); 
-//    dvm($form);
-//    return $form;
-//}
-
 /**
  * handler for submit button
  */
@@ -175,7 +210,7 @@ function create_update_file($title, DOMDocument $document, $node) {
 function update_file($title, DOMDocument $document, &$node) {
     global $user;
     $file_name = null;
-    $published = $node->status;
+   //$published = $node->status;
     try {
         $file_name = $node->body;
         if (!file_exists($file_name)) {
@@ -183,15 +218,16 @@ function update_file($title, DOMDocument $document, &$node) {
             return '';
         }
         $xml_string = $document->saveXML();
-        if ($published) {
-            file_save_data($xml_string, $file_name, FILE_EXISTS_RENAME);
+        $new_file_name = getFileNameByTitle($title);
+        if(strcmp($file_name, $new_file_name) != 0) {
+           //title changed, update the node title, move file to new name, update node body
+           //do not save node here, the caller is to save
+            $saved_new_file = file_save_data($xml_string, $new_file_name, FILE_EXISTS_RENAME);
+            $node->body = $saved_new_file;
+            $node->title = $$title;
         } else {
             file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
-        }
-        //@TODO
-        //if title changed, update the node title, move file to new name, update node body, do not save here, the caller is to save
-    //
-        
+        }        
     } catch (Exception $e) {
         drupal . setMessage('error:' . $e->getMessage());
     }
@@ -202,23 +238,7 @@ function create_file($title, DOMDocument $document) {
     global $user;
     $file_name = null;
     try {
-        $file_name = htmlentities($title);
-        trim($file_name);
-        $file_path = file_directory_path();
-        $folder = $file_path . '/' . DATA_FOLDER;
-        if (!file_exists($folder)) {
-            drupal_set_message('Directory ' . $folder . ' does not exist. Contact administrator.');
-            exit();
-        }
-        $needles = array("\r\n", "\n", "\r", '\t', ' ');
-        $replace = '_';
-        $user_file_dir = $folder . '/' . str_replace($needles, $replace, $user->name);
-        if (!file_exists($user_file_dir)) {
-            //create it
-            mkdir($user_file_dir, 0777);
-        }
-        $file_name = $user_file_dir . '/' . $file_name . '.xml';
-        $file_name = str_replace($needles, $replace, $file_name);
+        $file_name = getFileNameByTitle($title);
         $xml_string = $document->saveXML();
         file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
     } catch (Exception $e) {
@@ -227,6 +247,29 @@ function create_file($title, DOMDocument $document) {
     return $file_name;
 }
 
+function getFileNameByTitle($title) {
+    $file_name = htmlentities($title);
+    trim($file_name);
+    $file_path = file_directory_path();
+    $folder = $file_path . '/' . DATA_FOLDER;
+    if (!file_exists($folder)) {
+        drupal_set_message('Directory ' . $folder . ' does not exist. Contact administrator.');
+        exit();
+    }
+    $needles = array("\r\n", "\n", "\r", '\t', ' ');
+    $replace = '_';
+    $user_file_dir = $folder . '/' . str_replace($needles, $replace, $user->name);
+    if (!file_exists($user_file_dir)) {
+        //create it
+        mkdir($user_file_dir, 0777);
+    }
+    $file_name = $user_file_dir . '/' . $file_name . '.xml';
+    $file_name = str_replace($needles, $replace, $file_name);
+    return $file_name;
+}
+
+
+//This works for FGDC, for ISO, may need a different thing, which is what?
 function get_docTitle(DOMDocument $document) {
     $domNodeList = $document->getElementsByTagName('title');
     $domNode = $domNodeList->item(0);
@@ -316,21 +359,19 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
     return null;
 }
 
-/////////////////////// BLOCK DEFINITION: LIST EXISTING RECORDS AND EDITING FUNCITONS //////////
+/////////////////////// BLOCK DEFINITION: LIST EXISTING RECORDS AND EDITING FUNCTIONS //////////
 
 /**
  * implementating hook_block()
  */
 function metadata_node_block($op='list', $delta=0, $edit=array()) {
     global $base_url;
-    global $user;
     switch ($op) {
         case 'list' :
             $blocks[0]['info'] = t('My Metadata Records');
             $blocks[0]['cache'] = BLOCK_NO_CACHE;
             $blocks[1]['info'] = t('All Metadata Records');
             $blocks[1]['cache'] = BLOCK_NO_CACHE;
-
             return $blocks;
 
         case 'configure':
@@ -345,63 +386,69 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
             variable_set(NUMBER_OF_RECORDS_BLOCK, (int)$number_of_record_per_block);
             break;
         case 'view' :
-            $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
-            $result = array();
-            if ($delta == 0) {
-                if(!user_access('edit own metadata_node')) {
-                    drupal_set_message("You don't have permission to view any metadata records, contact your site administrator.");
-                    return;
-                }
-                $result = db_query_range(
-                        "SELECT nr.title, nr.nid, nr.body, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", $user->uid, TYPE, 0, $num_of_records);
-            } elseif ($delta == 1) {
-                if(!user_access('edit all metadata_node')) {
-                    drupal_set_message("You don't have permission to view other's metadata records, contact your site administrator.");
-                    return;                    
-                }
-                $result = db_query_range("SELECT nr.title,nr.nid,nr.body, n.uid, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", TYPE, 0, $num_of_records);
-            }
-
-            //$destination = drupal_get_destination();
-            $items = array();
-            $header = array(
-                array('data' => t('Name')),
-                array('data' => t('')),
-                array('data' => t('Preview')),
-                array('data' => t('')),
-                array('data' => t('Edit')),
-                array('data' => t('')),
-                array('data' => t('Export')),
-                array('data' => t('')),
-                array('data' => t('Delete')),
-            );
-
-            while ($node = db_fetch_object($result)) {
-                $file_path_name = $node->body;
-                $nid = $node->nid;
-                $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
-                $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
-                $delete_url = $base_url . '/' . 'node/' . $nid . '/delete?destination=admin%2Fcontent%2Fnode';
-                $export_url=''; //TODO
-                $pos = strrpos($file_path_name, '/');
-                $file_name = substr($file_path_name, $pos + 1);
-                //$items[] =$file_name . l('download', $base_url . '/' . $node->body) .
-                //  l(' edit', $edit_url);
-                $items[] = array(
-                    array('data' => $file_name),
-                    array('data' => t(' ')),
-                    array('data' => l('view', $base_url . '/' . $node->body)),
-                    array('data' => t(' ')),
-                    array('data' => l('edit', $edit_url)),
-                    array('data' => t(' ')),
-                    array('data' => l('export', $export_url)),
-                    array('data' => t(' ')),
-                    array('data' => l('delete', $delete_url)),
-                );
-            }
-            $block['content'] = theme('table', $header, $items);
+            $table_content=get_tabular_metadata($delta);
+            $block['content'] = $table_content;
             return $block;
     }
+}
+
+function get_tabular_metadata($delta=0) {
+    global $user;
+    $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
+    $result = array();
+    if ($delta == 0) {
+        if(!user_access('edit own metadata_node')) {
+            drupal_set_message("You don't have permission to view any metadata records, contact your site administrator.");
+            return;
+        }
+        $result = db_query_range(
+                "SELECT nr.title, nr.nid, nr.body, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", $user->uid, TYPE, 0, $num_of_records);
+    } elseif ($delta == 1) {
+        if(!user_access('edit all metadata_node')) {
+            drupal_set_message("You don't have permission to view other's metadata records, contact your site administrator.");
+            return;                    
+        }
+        $result = db_query_range("SELECT nr.title,nr.nid,nr.body, n.uid, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", TYPE, 0, $num_of_records);
+    }
+    //$destination = drupal_get_destination();
+    $items = array();
+    $header = array(
+        array('data' => t('Name')),
+        array('data' => t('')),
+        array('data' => t('Preview')),
+        array('data' => t('')),
+        array('data' => t('Edit')),
+        array('data' => t('')),
+        array('data' => t('Export')),
+        array('data' => t('')),
+        array('data' => t('Delete')),
+    );
+    while ($node = db_fetch_object($result)) {
+        $file_path_name = $node->body;
+        $nid = $node->nid;
+        $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
+        $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
+        $delete_url = $base_url . '/' . 'node/' . $nid . '/delete?destination=admin%2Fcontent%2Fnode';
+        $file=basename($file_path_name);
+        $export_url=$base_url . '/' . FILE_DOWNLOAD_PATH . '/?path=' . $file_path_name;
+        $pos = strrpos($file_path_name, '/');
+        $file_name = substr($file_path_name, $pos + 1);
+        //$items[] =$file_name . l('download', $base_url . '/' . $node->body) .
+        //  l(' edit', $edit_url);
+        $items[] = array(
+            array('data' => $file_name),
+            array('data' => t(' ')),
+            array('data' => l('view', $base_url . '/' . $node->body)),
+            array('data' => t(' ')),
+            array('data' => l('edit', $edit_url)),
+            array('data' => t(' ')),
+            array('data' => l('export', $export_url)),
+            array('data' => t(' ')),
+            array('data' => l('delete', $delete_url)),
+        );
+    }
+    return theme('table', $header, $items);
+
 }
 
 ?>
