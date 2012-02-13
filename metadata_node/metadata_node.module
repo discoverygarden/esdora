@@ -8,7 +8,7 @@ define(FILE_DOWNLOAD_PATH, 'metadata/filedownload');
 define(VIEW_METADATA_PATH, 'metadata/view');
 
 
-///////call back hook, allow force download/////
+///////call back hook, 1) allow force download 2) make a page so we dont have to use the block /////
 
 /**
  * Implement hook_mene
@@ -184,6 +184,7 @@ function metadata_node_form_submit(array $form, array &$form_state) {
             node_save($node); //just to get a new timestamp
             drupal_set_message('Metadata record modified successfully. Record title: ' . $title);
         }
+        drupal_goto(VIEW_METADATA_PATH);
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
@@ -394,6 +395,7 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
 
 function get_tabular_metadata($delta=0) {
     global $user;
+    global $base_url;
     $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
     $result = array();
     if ($delta == 0) {
@@ -426,15 +428,12 @@ function get_tabular_metadata($delta=0) {
     while ($node = db_fetch_object($result)) {
         $file_path_name = $node->body;
         $nid = $node->nid;
-        $edit_url = $base_url . '/' . 'node/' . $nid; //@TODO http://localhost/esdora/node/60/edit?destination=admin%2Fcontent%2Fnode
-        $edit_url = $edit_url . '/edit?destination=admin%2Fcontent%2Fnode';
-        $delete_url = $base_url . '/' . 'node/' . $nid . '/delete?destination=admin%2Fcontent%2Fnode';
-        $file=basename($file_path_name);
+        $edit_url = $base_url . '/node/' . $nid;
+        $edit_url = $edit_url . '/edit?destination=metadata/view'; //'/edit?destination=admin%2Fcontent%2Fnode';
+        $delete_url = $base_url . '/node/' . $nid . '/delete?destination=metadata/view';
         $export_url=$base_url . '/' . FILE_DOWNLOAD_PATH . '/?path=' . $file_path_name;
         $pos = strrpos($file_path_name, '/');
         $file_name = substr($file_path_name, $pos + 1);
-        //$items[] =$file_name . l('download', $base_url . '/' . $node->body) .
-        //  l(' edit', $edit_url);
         $items[] = array(
             array('data' => $file_name),
             array('data' => t(' ')),
@@ -447,7 +446,12 @@ function get_tabular_metadata($delta=0) {
             array('data' => l('delete', $delete_url)),
         );
     }
-    return theme('table', $header, $items);
+    $create_url = "'$base_url/node/add/metadata-node'";
+    $action_buttons="<p/><div class='action_buttons'> 
+        <button type=\"button\" onClick=\"document.location=$create_url\">Create Record</button>
+        <button type=\"button\" onClick=\"alert('To be implemented')\">Import Record</button>        
+    </div>";
+    return $action_buttons . theme('table', $header, $items);
 
 }
 
