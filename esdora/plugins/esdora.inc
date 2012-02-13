@@ -31,10 +31,7 @@ class Esdora {
      *
      * @return returns a drupal tab tabset
      */
-    public function showFieldSets() {
-        
-
-
+    public function showFieldSets() {       
         $items = $this->getItems();
         $cont = '<div id="dataset-ajax-tabs">';
         $cont .='<button id="Items">Items</button>';
@@ -42,7 +39,7 @@ class Esdora {
         $cont.= '<button id="Description">Description</button>';
         $cont.= '<button id="History">History</button>';
         $viewerContent = $this->getViewers();
-        if ($viewerContent != null) {
+        if ($viewerContent !=null) {
             $cont.= '<button id="Viewers">Viewers</button>';
         }
         $cont.= '</div><div id="div1" >' . $items . '</div>';
@@ -60,8 +57,11 @@ class Esdora {
         $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
         $viewerStreams = $this->getListofStreamsFromItql($viewerResults);
         $viewerContent = $this->createViewerContent($viewerStreams);
-        $separater = "<p id='item-display' /> <hr/>";
-        return $separater . $viewerContent;
+        if($viewerContent!=null) {
+            $separater = "<p id='item-display' /> <hr/>";
+            return $separater . $viewerContent;
+        }
+        return null;
     }
 
     function getItems() { //Items tab
@@ -697,7 +697,7 @@ class Esdora {
 
     function createViewerContent($viewerStreams) {
         if (empty($viewerStreams)) {
-            return;
+            return NULL;
         }
         global $base_url;
         $content = '';
@@ -716,18 +716,6 @@ class Esdora {
                 $content .= theme('fieldset', $fieldSet);
             }
         }
-//      	$url= $base_url.'/fedora/repository/' . $this->pid .'/'. $viewer[0];
-//      	if(module_exists("fancybox"))
-//        	$val = '<div class="text"><a href='.$url.' class="fb_dynamic"  target="_blank">'.$viewer[0].'</a></div>';
-//        else 
-//        	$val= '<div class="text"><a href='.$url.'  target="_blank">'.$viewer[0].'</a></div>';
-//        $content.='<li>'.$val.'</li>';
-//      }
-//    }
-//    if(!empty($content))
-//    {
-//    	$content = '<ul>'.$content.'</ul>';
-//    }   
         return $content;
     }
 
