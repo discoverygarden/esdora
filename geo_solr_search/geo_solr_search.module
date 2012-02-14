@@ -27,8 +27,8 @@ function geo_solr_search_menu() {
             'type' => MENU_CALLBACK,
         ),
         'mapsearch/map' => array(
-            'title' => 'geo_solr_search Test Page',
-            'description' => 'Test Page for geo_solr_search.',
+            'title' => 'Geo Search',
+            'description' => 'Search based on bounding keyword, box, time range.',
             'page callback' => 'geo_solr_search_standalone',
             'access arguments' => array('access content'),
             'type' => MENU_CALLBACK,
@@ -36,24 +36,29 @@ function geo_solr_search_menu() {
     );
 }
 
-//this function is not used, the map is moved to the form in a block
 function geo_solr_search_standalone() {
 
     $path = drupal_get_path('module', 'geo_solr_search');
     drupal_add_js($path . '/mapBox.js');
     drupal_add_js($path . '/OpenLayers.js');
     drupal_add_css($path . '/default_style.css');
-    jquery_ui_add('ui.datepicker');
+    return drupal_get_form('time_range_form');
 
-    $output = '<p><div id="map"></div></p>';
-    $output.= '<p><div><button id="refresh">refresh</button><span style="float:right" id="coordinates"></span></div></p>';
-    $output.= '<label for="from">From</label>
-                        <input type="text" id="from" name="from"/>
-                        <label for="to">to</label>
-                        <input type="text" id="to" name="to"/>';
-    $output.='<p id="date"></p>';
-
-    return $output;
+//    $path = drupal_get_path('module', 'geo_solr_search');
+//    drupal_add_js($path . '/mapBox.js');
+//    drupal_add_js($path . '/OpenLayers.js');
+//    drupal_add_css($path . '/default_style.css');
+//    jquery_ui_add('ui.datepicker');
+//
+//    $output = '<p><div id="map"></div></p>';
+//    $output.= '<p><div><button id="refresh">refresh</button><span style="float:right" id="coordinates"></span></div></p>';
+//    $output.= '<label for="from">From</label>
+//                        <input type="text" id="from" name="from"/>
+//                        <label for="to">to</label>
+//                        <input type="text" id="to" name="to"/>';
+//    $output.='<p id="date"></p>';
+//
+//    return $output;
 }
 
 function geo_solr_search_map() {
@@ -245,7 +250,7 @@ function time_range_form_submit($form, &$form_state) {
         }
     }
     //unset the session var
-    //map still has the value on client, shoudl be cleared, but left there for now
+    //map still has the value on client, should be cleared, but left there for now
     unset($_SESSION['mapCoor']);
 
     if (!empty($query)) {

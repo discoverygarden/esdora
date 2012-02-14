@@ -22,5 +22,6 @@ div.olMap{z-index:0;cursor:default;margin:0!important;padding:0!important;}div.o
     width: 80%;
     border-style: none;
     border-collapse: separate;
+    padding: 5px;
     
 }
