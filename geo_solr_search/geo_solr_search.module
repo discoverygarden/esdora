@@ -101,7 +101,7 @@ function time_range_form() {
         '#title' => 'Keywords',
         '#id' => 'keywords',
         '#size' => '24',
-        '#required' => TRUE,
+        //'#required' => TRUE,
     );
 
     $form['params']['bbox'] = array(
@@ -163,14 +163,12 @@ function time_range_form_validate($form, &$form_state) {
 
 function setSearchTermVariables() {
     //todo best way to read in php config file?
-    $term_file_name = drupal_get_path('module', 'geo_solr_search') . '/seartch.terms.txt';
+    $term_file_name = drupal_get_path('module', 'geo_solr_search') . '/search.terms.txt';
     $file_handle = fopen($term_file_name, "r");
-    $term_string = fread($file_handle, filesize($term_file_name));
-    fclose($file_handle);
-    $tokens = split("\r\n", $term_string); //?
-    foreach ($tokens as $s) {
-        $terms = split("=", $tokens);
-        variable_set("box.north", $terms[1]);
+    while(!feof($file_handle)) {
+        $line=fgets($file_handle); 
+        $tokens = split("=", trim($line)); 
+        variable_set($tokens[0], $tokens[1]);
     }
     fclose($file_handle);
 }
@@ -191,8 +189,8 @@ function time_range_form_submit($form, &$form_state) {
     $box_south = variable_get("box.south");
     $box_west = variable_get("box.west");
 
-    $start_date = variable_get("start.date");
-    $end_date = variable_get("end.date");
+    $start_date = variable_get("time.start");
+    $end_date = variable_get("time.end");
 
     $keyword = $form_state['values']['keyword'];
     $start = $form_state['values']['start'];
