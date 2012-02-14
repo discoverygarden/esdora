@@ -186,7 +186,7 @@ function time_range_form_submit($form, &$form_state) {
     $box_south = variable_get("box.south");
     $box_west = variable_get("box.west");
 
-    $start_date = varibale_get("start.date");
+    $start_date = variable_get("start.date");
     $end_date = variable_get("end.date");
 
     $keyword = $form_state['values']['keyword'];
