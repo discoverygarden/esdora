@@ -1,11 +1,17 @@
 <?php
 
+
+//TODO: get rid off all FGDC specific code, make it generic - use form association?
+
 define(TYPE, 'metadata_node');
 define(DATA_FOLDER, 'metadata_records');
 define(METADATA_FORM_NAME, 'Metadata_Editor');
+define(METADATA_TITLE_FIELD, "title_field");
 define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
 define(FILE_DOWNLOAD_PATH, 'metadata/filedownload');
 define(VIEW_METADATA_PATH, 'metadata/view');
+define(FILE_IMPORT_PATH, 'metadata/fileimport');
+define(CONFIG_PATH, 'admin/settings/metadata_node');
 
 
 ///////call back hook, 1) allow force download 2) make a page so we dont have to use the block /////
@@ -27,9 +33,58 @@ function metadata_node_menu() {
       'description' => t('View my metadata records'),
       'page callback' => 'get_tabular_metadata',
       'access arguments' => array('view metadata_node'),
-      'type' => MENU_CALLBACK,        
+      'type' => MENU_NORMAL_ITEM,        
+    );
+    $items[FILE_IMPORT_PATH] = array(
+      'title' => t('Import External File'),
+      'description' => t('import a preexisting XML record into the system'),
+      'page callback' => 'import_file',
+      'access arguments' => array('create metadata_node'),
+      'type' => MENU_CALLBACK,
+    );
+    $items[CONFIG_PATH] = array(
+        'title' => t('Metadata Editor Configure'),
+        'description' => t('Configure Meadata Settings'),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('metadata_node_admin_form'),
+        'access arguments' => array('administer site configuration'),
+        'type' => MENU_NORMAL_ITEM,
+
     );
     return $items;
+}
+
+
+function metadata_node_admin_form($form_state) {
+    module_load_include('inc', 'metadata_node', 'admin');
+    return createAdminForm($form_state);
+}
+
+
+function metadata_node_admin_form_validate(&$form, &$form_state) {
+//    $form_name=$form_state['values']['xml_form_def'];
+//    $title_field=$form_state['values']['title_option'];
+//    drupal_set_message("validated: " . $form_name . ',' . $title_field);
+}
+
+function metadata_node_admin_form_submit(&$form, &$form_state) {
+    $form_name=$form_state['values']['admin']['xml_form_def'];
+    $title_field=$form_state['values']['admin']['title_option'];
+    if(isset ($form_name)) {
+        variable_set(METADATA_FORM_NAME, $form_name);
+    }
+    if(isset($title_field)) {
+        variable_set(METADATA_TITLE_FIELD, $title_field);        
+    }
+    $form_state['rebuild'] = true;
+    drupal_set_message("Success: the metadata editor is set to use form '$form_name',  and the record title is set to the field '$title_field'", 'status');
+}
+
+function import_file() {
+    //display a form to prompt 1) upload a file from local file system, or 2) from URL
+    //the handler and validater will have to deal with the form.
+    module_load_include('inc', 'metadata_node', 'file_import');
+    return drupal_get_form('metadata_import_form');
 }
 
 function download_file() {
@@ -148,7 +203,7 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
             if ($nid > 0) {
                 $xml_file_path = $form['#node']->body;
             }
-            $my_form = get_predefined_form($form_state, METADATA_FORM_NAME, $nid, $xml_file_path);
+            $my_form = get_predefined_form($form_state, variable_get(METADATA_FORM_NAME), $nid, $xml_file_path);
             $my_form['submit']['#submit'][] = 'metadata_node_form_submit';
             $my_form['submit']['#weight'] = 200; //higher the number lower the position
             //unset($my_form['submit']);
@@ -272,7 +327,8 @@ function getFileNameByTitle($title) {
 
 //This works for FGDC, for ISO, may need a different thing, which is what?
 function get_docTitle(DOMDocument $document) {
-    $domNodeList = $document->getElementsByTagName('title');
+    $docTitle = variable_get(METADATA_TITLE_FIELD, 'title');
+    $domNodeList = $document->getElementsByTagName($docTitle);
     $domNode = $domNodeList->item(0);
     return $domNode->textContent;
 }
@@ -447,12 +503,13 @@ function get_tabular_metadata($delta=0) {
         );
     }
     $create_url = "'$base_url/node/add/metadata-node'";
+    $import_url = $base_url . '/' . FILE_IMPORT_PATH;
+    $import_url = "'$import_url'";
     $action_buttons="<p/><div class='action_buttons'> 
-        <button type=\"button\" onClick=\"document.location=$create_url\">Create Record</button>
-        <button type=\"button\" onClick=\"alert('To be implemented')\">Import Record</button>        
-    </div>";
+        <button type=\"button\" onClick=\"document.location=$create_url\">Create New</button>
+        <button type=\"button\" onClick=\"document.location=$import_url\">Import</button>        
+    </div><p/><p/>";
     return $action_buttons . theme('table', $header, $items);
-
 }
 
 ?>
