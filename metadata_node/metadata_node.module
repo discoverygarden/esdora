@@ -328,9 +328,20 @@ function getFileNameByTitle($title) {
 //This works for FGDC, for ISO, may need a different thing, which is what?
 function get_docTitle(DOMDocument $document) {
     $docTitle = variable_get(METADATA_TITLE_FIELD, 'title');
-    $domNodeList = $document->getElementsByTagName($docTitle);
+    //['idinfo']['citation']['citeinfo']['title']
+    
+    $xpath = 'idinfo/citation/citeinfo/title';
+    $length = strlen($docTitle) - 4;
+    $xpath = substr($docTitle, 2, $length);
+    $xpath = str_replace('\'][\'', '/', $xpath);
+    $domXpath = new DOMXpath($document);
+    $domNodeList = $domXpath ->query($xpath);
+    
+    
+    //$domNodeList = $document->getElementsByTagName($docTitle);
     $domNode = $domNodeList->item(0);
-    return $domNode->textContent;
+    $title = $domNode->textContent;
+    return $title;
 }
 
 function create_node($title, $file_name) {

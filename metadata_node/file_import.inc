@@ -28,7 +28,7 @@ function metadata_import_form(&$form, &$form_state) {
         '#size' => 48,
         '#description' => t('Choose a remote file.'),        
     );
-    
+        
     $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Submit'),
@@ -53,15 +53,16 @@ function metadata_import_form_validate(&$form, &$form_state) {
 
 function metadata_import_form_submit(&$form, &$form_state) {
     $file = file_save_upload('file_upload', null, file_directory_path());
-    $saved_temp_file ='';
+    $xm_content = '';
     if($file) {
-        //file uploaded, processing the file
-        
-        return;
+        //file uploaded, processing the file        
+        $xm_content=file($file);
     }
+    //so if file was uploaded, it is processed above and returned. only if no file
+    //and a url is entered, we process the remote url here
     $url = $form_state['values']['remote_url'];
-    if(isset($url) && strlen($url>0)) {
-        //get remote file and process that file
+    if(!file && isset($url) && strlen($url>0)) {
+        $xm_content = simplexml_load_file($url);
     }
     // TODO validate the file? How?, needs to be xml file, well-formed, and against schema?
     
