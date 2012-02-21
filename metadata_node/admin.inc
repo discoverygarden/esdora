@@ -27,7 +27,6 @@ function createAdminForm($form_state) {
     $selectedFormDef = isset($form_state['values']['admin']['xml_form_def']) ?
             $form_state['values']['admin']['xml_form_def'] :
             key($formDefList);
-
     //select a list of form definitions
     $form['admin']['xml_form_def'] = array(
         '#type' => 'select',
@@ -43,20 +42,52 @@ function createAdminForm($form_state) {
             'method' => 'replace',
         ),
     );
-
+    
     $titleOptions = islandora_content_model_forms_get_title_options($selectedFormDef);
+    $selectedTitleOption = variable_get('title_field', null);
+    if(!isset ($selectedTitleOption)) {
+        $selectedTitleOption = isset($form_state['values']['admin']['title_option']) ?
+                $form_state['values']['admin']['title_option'] :
+                key($titleOptions);
+    }
+
     $form['admin']['title_option'] = array(
         '#type' => 'select',
         '#options' => $titleOptions,
-        '#title' => 'Choose a field to use as the title field of metadata records',
+        '#default_value' => $selectedTitleOption,
+        '#title' => 'Choose a title field',
         '#description' => 'The value of this field is used to form the record name.',
         '#required' => TRUE,
     );
-    
+
+    $templateOptions = getTemplates();
+    $templateOptions['No Tempalte'] = 'No Tempalte';
+    $form['admin']['template_option'] = array(
+        '#type' => 'select',
+        '#options' => $templateOptions,
+        '#default_value' => variable_get('templateFile', NULL),
+        '#title' => 'Choose a template',
+        '#description' => 'The template values are used as the starting values of a new record.',
+    );
+
    $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Submit'),
      );
   
     return $form;
+}
+
+function getTemplates() {
+    $path = drupal_get_path('module', 'metadata_node');
+    $path = $path . '/templates';
+    $fileList = scandir($path);
+    $output = array();
+    foreach($fileList as $file) {
+        $fullName = $path . '/' . $file;
+        if(is_file($fullName)) {
+            $output[$fullName] = $file;
+        }
+    }
+    return $output;
 }

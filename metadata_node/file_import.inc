@@ -43,9 +43,9 @@ function metadata_import_form_validate(&$form, &$form_state) {
         $_FILES['files']['name'][$source] && 
         is_uploaded_file($_FILES['files']['tmp_name'][$source]);
     
-    dvm('file ' . $file ->path);
+//    dvm('file ' . $file ->path);
     $url = $form_state['values']['remote_url'];
-    dvm('url ' . $url);
+//    dvm('url ' . $url);
     if( !$hasFileUpload  && strlen($url)==0) {
         form_set_error("file_import", "Please upload a file or enter remote URL");
     }
@@ -53,16 +53,16 @@ function metadata_import_form_validate(&$form, &$form_state) {
 
 function metadata_import_form_submit(&$form, &$form_state) {
     $file = file_save_upload('file_upload', null, file_directory_path());
-    $xm_content = '';
+    $xml_content = '';
     if($file) {
         //file uploaded, processing the file        
-        $xm_content=file($file);
+        $xml_content=file_get_contents($file->destination);
     }
     //so if file was uploaded, it is processed above and returned. only if no file
     //and a url is entered, we process the remote url here
     $url = $form_state['values']['remote_url'];
     if(!file && isset($url) && strlen($url>0)) {
-        $xm_content = simplexml_load_file($url);
+        $xml_content = simplexml_load_file($url);
     }
     // TODO validate the file? How?, needs to be xml file, well-formed, and against schema?
     
@@ -73,5 +73,11 @@ function metadata_import_form_submit(&$form, &$form_state) {
     * 3) create the node with the link
     * 4) done, set a message
     */
-            
+   $doc = DOMDocument::loadXML($xml_content);
+
+   if($doc) {
+       $node = new stdClass();
+       createUpdateNode($doc, $node);
+   }
+   drupal_goto('metadata/view');            
 }

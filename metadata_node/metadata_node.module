@@ -1,6 +1,5 @@
 <?php
 
-
 //TODO: get rid off all FGDC specific code, make it generic - use form association?
 
 define(TYPE, 'metadata_node');
@@ -12,6 +11,7 @@ define(FILE_DOWNLOAD_PATH, 'metadata/filedownload');
 define(VIEW_METADATA_PATH, 'metadata/view');
 define(FILE_IMPORT_PATH, 'metadata/fileimport');
 define(CONFIG_PATH, 'admin/settings/metadata_node');
+define(METADATA_TEMPLATE_FILE, 'templateFile');
 
 
 ///////call back hook, 1) allow force download 2) make a page so we dont have to use the block /////
@@ -22,25 +22,25 @@ define(CONFIG_PATH, 'admin/settings/metadata_node');
 function metadata_node_menu() {
     $items = array();
     $items[FILE_DOWNLOAD_PATH] = array(
-      'title' => t('Dwonload file'),
-      'description' => t('force file download for all file typs'),
-      'page callback' => 'download_file',
-      'access arguments' => array('view metadata_node'),
-      'type' => MENU_CALLBACK,
+        'title' => t('Dwonload file'),
+        'description' => t('force file download for all file typs'),
+        'page callback' => 'download_file',
+        'access arguments' => array('view metadata_node'),
+        'type' => MENU_CALLBACK,
     );
-    $items[VIEW_METADATA_PATH] = array (
-      'title' => t('Metadata Records'),
-      'description' => t('View my metadata records'),
-      'page callback' => 'get_tabular_metadata',
-      'access arguments' => array('view metadata_node'),
-      'type' => MENU_NORMAL_ITEM,        
+    $items[VIEW_METADATA_PATH] = array(
+        'title' => t('Metadata Records'),
+        'description' => t('View my metadata records'),
+        'page callback' => 'get_tabular_metadata',
+        'access arguments' => array('view metadata_node'),
+        'type' => MENU_NORMAL_ITEM,
     );
     $items[FILE_IMPORT_PATH] = array(
-      'title' => t('Import External File'),
-      'description' => t('import a preexisting XML record into the system'),
-      'page callback' => 'import_file',
-      'access arguments' => array('create metadata_node'),
-      'type' => MENU_CALLBACK,
+        'title' => t('Import External File'),
+        'description' => t('import a preexisting XML record into the system'),
+        'page callback' => 'import_file',
+        'access arguments' => array('create metadata_node'),
+        'type' => MENU_CALLBACK,
     );
     $items[CONFIG_PATH] = array(
         'title' => t('Metadata Editor Configure'),
@@ -49,17 +49,14 @@ function metadata_node_menu() {
         'page arguments' => array('metadata_node_admin_form'),
         'access arguments' => array('administer site configuration'),
         'type' => MENU_NORMAL_ITEM,
-
     );
     return $items;
 }
-
 
 function metadata_node_admin_form($form_state) {
     module_load_include('inc', 'metadata_node', 'admin');
     return createAdminForm($form_state);
 }
-
 
 function metadata_node_admin_form_validate(&$form, &$form_state) {
 //    $form_name=$form_state['values']['xml_form_def'];
@@ -68,16 +65,21 @@ function metadata_node_admin_form_validate(&$form, &$form_state) {
 }
 
 function metadata_node_admin_form_submit(&$form, &$form_state) {
-    $form_name=$form_state['values']['admin']['xml_form_def'];
-    $title_field=$form_state['values']['admin']['title_option'];
-    if(isset ($form_name)) {
+    $form_name = $form_state['values']['admin']['xml_form_def'];
+    $title_field = $form_state['values']['admin']['title_option'];
+    $template_file = $form_state['values']['admin']['template_option'];
+    if (isset($form_name)) {
         variable_set(METADATA_FORM_NAME, $form_name);
     }
-    if(isset($title_field)) {
-        variable_set(METADATA_TITLE_FIELD, $title_field);        
+    if (isset($title_field)) {
+        variable_set(METADATA_TITLE_FIELD, $title_field);
+    }
+    if (isset($template_file)) {
+        variable_set(METADATA_TEMPLATE_FILE, $template_file);
     }
     $form_state['rebuild'] = true;
     drupal_set_message("Success: the metadata editor is set to use form '$form_name',  and the record title is set to the field '$title_field'", 'status');
+    return false;
 }
 
 function import_file() {
@@ -93,7 +95,7 @@ function download_file() {
     if (file_exists($file_path)) {
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename='.basename($file_path));
+        header('Content-Disposition: attachment; filename=' . basename($file_path));
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
@@ -119,6 +121,7 @@ function metadata_node_node_info() {
         )
     );
 }
+
 /**
  * Implementation of hook_view() 
  * 
@@ -203,7 +206,7 @@ function metadata_node_form_alter(&$form, &$form_state, $form_id) {
             if ($nid > 0) {
                 $xml_file_path = $form['#node']->body;
             }
-            $my_form = get_predefined_form($form_state, variable_get(METADATA_FORM_NAME), $nid, $xml_file_path);
+            $my_form = get_predefined_form($form_state, variable_get(METADATA_FORM_NAME, 'Metadata_Editor'), $nid, $xml_file_path);
             $my_form['submit']['#submit'][] = 'metadata_node_form_submit';
             $my_form['submit']['#weight'] = 200; //higher the number lower the position
             //unset($my_form['submit']);
@@ -223,27 +226,30 @@ function metadata_node_form_submit(array $form, array &$form_state) {
     try {
         $xml_form = new XMLForm($form_state);
         $doc = $xml_form->submit($form, $form_state);
-        $document = $doc->document;
-        $title = get_docTitle($document);
-        $node = $form['#node'];
-        $nid = $node->nid;
-        $file_created = create_update_file($title, $document, $node);
-        if (!isset($nid)) {
-            if (isset($file_created)) {
-                create_node($title, $file_created);
-                drupal_set_message('New Metadata record created successfully. Record title: ' . $title);
-            } else {
-                drupal_set_message('Metadata record not created because file save failed. Please contact your administrator.');
-            }
-        } elseif ($nid > 0) {
-            node_save($node); //just to get a new timestamp
-            drupal_set_message('Metadata record modified successfully. Record title: ' . $title);
-        }
-        drupal_goto(VIEW_METADATA_PATH);
+        $node = $form['#node']; //should be $Form_state here??
+        createUpdateNode($doc->document, $node);
     } catch (Exception $e) {
         $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
         drupal_set_message($msg, 'error');
         $form_state['rebuild'] = true;
+    }
+    drupal_goto(VIEW_METADATA_PATH);
+}
+
+function createUpdateNode(DOMDocument $document, $node) {
+    $title = get_docTitle($document);
+    $nid = $node->nid;
+    $file_created = create_update_file($title, $document, $node);
+    if (!isset($nid)) {
+        if (isset($file_created)) {
+            create_node($title, $file_created);
+            drupal_set_message('New Metadata record created successfully. Record title: ' . $title);
+        } else {
+            drupal_set_message('Metadata record not created because file save failed. Please contact your administrator.');
+        }
+    } elseif ($nid > 0) {
+        node_save($node); //just to get a new timestamp
+        drupal_set_message('Metadata record modified successfully. Record title: ' . $title);
     }
 }
 
@@ -253,7 +259,7 @@ function metadata_node_form_submit(array $form, array &$form_state) {
  * @param type $document 
  */
 function create_update_file($title, DOMDocument $document, $node) {
-        if (isset($node)) {
+    if (isset($node)) {
         $nid = $node->nid;
         $vid = $node->vid;
         if ($nid > 0) { //should be true if $node exists
@@ -266,7 +272,7 @@ function create_update_file($title, DOMDocument $document, $node) {
 function update_file($title, DOMDocument $document, &$node) {
     global $user;
     $file_name = null;
-   //$published = $node->status;
+    //$published = $node->status;
     try {
         $file_name = $node->body;
         if (!file_exists($file_name)) {
@@ -275,15 +281,17 @@ function update_file($title, DOMDocument $document, &$node) {
         }
         $xml_string = $document->saveXML();
         $new_file_name = getFileNameByTitle($title);
-        if(strcmp($file_name, $new_file_name) != 0) {
-           //title changed, update the node title, move file to new name, update node body
-           //do not save node here, the caller is to save
+        $old_file_name_main = substr($file_name, 0, strlen($file_name)-6);
+        
+        if (!strstr($new_file_name, $old_file_name_main)) {
+            //title changed, update the node title, move file to new name, update node body
+            //do not save node here, the caller is to save
             $saved_new_file = file_save_data($xml_string, $new_file_name, FILE_EXISTS_RENAME);
             $node->body = $saved_new_file;
             $node->title = $$title;
         } else {
             file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
-        }        
+        }
     } catch (Exception $e) {
         drupal . setMessage('error:' . $e->getMessage());
     }
@@ -296,7 +304,7 @@ function create_file($title, DOMDocument $document) {
     try {
         $file_name = getFileNameByTitle($title);
         $xml_string = $document->saveXML();
-        file_save_data($xml_string, $file_name, FILE_EXISTS_REPLACE);
+        $file_name = file_save_data($xml_string, $file_name, FILE_EXISTS_RENAME);
     } catch (Exception $e) {
         drupal . setMessage('error:' . $e->getMessage());
     }
@@ -304,6 +312,7 @@ function create_file($title, DOMDocument $document) {
 }
 
 function getFileNameByTitle($title) {
+    global $user;
     $file_name = htmlentities($title);
     trim($file_name);
     $file_path = file_directory_path();
@@ -324,20 +333,18 @@ function getFileNameByTitle($title) {
     return $file_name;
 }
 
-
 //This works for FGDC, for ISO, may need a different thing, which is what?
 function get_docTitle(DOMDocument $document) {
     $docTitle = variable_get(METADATA_TITLE_FIELD, 'title');
     //['idinfo']['citation']['citeinfo']['title']
-    
-    $xpath = 'idinfo/citation/citeinfo/title';
+    //$xpath = 'idinfo/citation/citeinfo/title';
     $length = strlen($docTitle) - 4;
     $xpath = substr($docTitle, 2, $length);
     $xpath = str_replace('\'][\'', '/', $xpath);
     $domXpath = new DOMXpath($document);
-    $domNodeList = $domXpath ->query($xpath);
-    
-    
+    $domNodeList = $domXpath->query($xpath);
+
+
     //$domNodeList = $document->getElementsByTagName($docTitle);
     $domNode = $domNodeList->item(0);
     $title = $domNode->textContent;
@@ -409,9 +416,10 @@ function get_predefined_form(array &$form_state, $form_name, $nid, $xml_file_nam
         try {
             //load a template instance so the record will validate against the schema, 
             //but a user  must manually check for correctness
-            $path = drupal_get_path('module', 'metadata_node');
-            $template_fgdc = file_get_contents($path . '/' . 'reference-fgdc-record.xml');
-            $xml = $template_fgdc;
+            //$path = drupal_get_path('module', 'metadata_node');
+            $template = variable_get(METADATA_TEMPLATE_FILE, NULL);
+            if ($template !== NULL)
+                $xml = file_get_contents($template);
         } catch (Exception $e) {
             Drupal_set_message('Could not load metadata instance template: ' . $e . getMessage() . ' check installation of metadata_node module.');
             exit();
@@ -450,11 +458,11 @@ function metadata_node_block($op='list', $delta=0, $edit=array()) {
             );
             return $form;
         case 'save':
-            $number_of_record_per_block=$edit['num_records'];
-            variable_set(NUMBER_OF_RECORDS_BLOCK, (int)$number_of_record_per_block);
+            $number_of_record_per_block = $edit['num_records'];
+            variable_set(NUMBER_OF_RECORDS_BLOCK, (int) $number_of_record_per_block);
             break;
         case 'view' :
-            $table_content=get_tabular_metadata($delta);
+            $table_content = get_tabular_metadata($delta);
             $block['content'] = $table_content;
             return $block;
     }
@@ -466,16 +474,16 @@ function get_tabular_metadata($delta=0) {
     $num_of_records = variable_get(NUMBER_OF_RECORDS_BLOCK, 20);
     $result = array();
     if ($delta == 0) {
-        if(!user_access('edit own metadata_node')) {
+        if (!user_access('edit own metadata_node')) {
             drupal_set_message("You don't have permission to view any metadata records, contact your site administrator.");
             return;
         }
         $result = db_query_range(
                 "SELECT nr.title, nr.nid, nr.body, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.uid=%d AND n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", $user->uid, TYPE, 0, $num_of_records);
     } elseif ($delta == 1) {
-        if(!user_access('edit all metadata_node')) {
+        if (!user_access('edit all metadata_node')) {
             drupal_set_message("You don't have permission to view other's metadata records, contact your site administrator.");
-            return;                    
+            return;
         }
         $result = db_query_range("SELECT nr.title,nr.nid,nr.body, n.uid, n.uid, n.status from {node_revisions} nr, {node} n WHERE n.type='%s' AND n.nid=nr.nid ORDER BY nr.timestamp", TYPE, 0, $num_of_records);
     }
@@ -498,7 +506,7 @@ function get_tabular_metadata($delta=0) {
         $edit_url = $base_url . '/node/' . $nid;
         $edit_url = $edit_url . '/edit?destination=metadata/view'; //'/edit?destination=admin%2Fcontent%2Fnode';
         $delete_url = $base_url . '/node/' . $nid . '/delete?destination=metadata/view';
-        $export_url=$base_url . '/' . FILE_DOWNLOAD_PATH . '/?path=' . $file_path_name;
+        $export_url = $base_url . '/' . FILE_DOWNLOAD_PATH . '/?path=' . $file_path_name;
         $pos = strrpos($file_path_name, '/');
         $file_name = substr($file_path_name, $pos + 1);
         $items[] = array(
@@ -516,7 +524,7 @@ function get_tabular_metadata($delta=0) {
     $create_url = "'$base_url/node/add/metadata-node'";
     $import_url = $base_url . '/' . FILE_IMPORT_PATH;
     $import_url = "'$import_url'";
-    $action_buttons="<p/><div class='action_buttons'> 
+    $action_buttons = "<p/><div class='action_buttons'> 
         <button type=\"button\" onClick=\"document.location=$create_url\">Create New</button>
         <button type=\"button\" onClick=\"document.location=$import_url\">Import</button>        
     </div><p/><p/>";

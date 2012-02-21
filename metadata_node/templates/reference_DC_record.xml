@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <dc:title>Title</dc:title>
+  <dc:creator>Change Me</dc:creator>
+  <dc:contributor>Change Me</dc:contributor>
+  <dc:description>Some Descrition</dc:description>
+  <dc:coverage>Places and times</dc:coverage>
+  <dc:subject>What subject</dc:subject>
+  <dc:type>Text</dc:type>
+  <dc:format>what format</dc:format>
+  <dc:identifier>id fields, can be DOI</dc:identifier>
+  <dc:language/>
+  <dc:publisher/>
+  <dc:relation/>
+  <dc:rights/>
+  <dc:source>ORNL DAAC</dc:source>
+</oai_dc:dc>
