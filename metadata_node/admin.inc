@@ -36,7 +36,7 @@ function createAdminForm($form_state) {
         '#description' => 'If nothing to select, please use the form editor tool to create form definitions.',
         '#ahah' => array(
             //'path' => 'admin/content/model/forms/titles',
-            'path' => ahah_helper_path(array('admin/settings/metadata_node')),
+            'path' => ahah_helper_path(array(CONFIG_PATH)),
             'wrapper' => 'metadata-ahah-wrapper',
             'event' => 'change',
             'method' => 'replace',
@@ -65,7 +65,7 @@ function createAdminForm($form_state) {
     $form['admin']['template_option'] = array(
         '#type' => 'select',
         '#options' => $templateOptions,
-        '#default_value' => variable_get('templateFile', NULL),
+        '#default_value' => variable_get(METADATA_TEMPLATE_FILE, NULL),
         '#title' => 'Choose a template',
         '#description' => 'The template values are used as the starting values of a new record.',
     );

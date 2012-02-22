@@ -2,17 +2,17 @@
 
 //TODO: get rid off all FGDC specific code, make it generic - use form association?
 
-define(TYPE, 'metadata_node');
-define(DATA_FOLDER, 'metadata_records');
-define(METADATA_FORM_NAME, 'Metadata_Editor');
-define(METADATA_TITLE_FIELD, "title_field");
-define(NUMBER_OF_RECORDS_BLOCK, 'metadata_node_block_num');
-define(FILE_DOWNLOAD_PATH, 'metadata/filedownload');
-define(VIEW_METADATA_PATH, 'metadata/view');
-define(FILE_IMPORT_PATH, 'metadata/fileimport');
-define(CONFIG_PATH, 'admin/settings/metadata_node');
-define(METADATA_TEMPLATE_FILE, 'templateFile');
-
+define('TYPE', 'metadata_node');
+define('DATA_FOLDER', 'metadata_records');
+define('METADATA_FORM_NAME', 'Metadata_Editor');
+define('METADATA_TITLE_FIELD', "title_field");
+define('NUMBER_OF_RECORDS_BLOCK', 'metadata_node_block_num');
+define('FILE_DOWNLOAD_PATH', 'metadata/filedownload');
+define('VIEW_METADATA_PATH', 'metadata/view');
+define('FILE_IMPORT_PATH', 'metadata/fileimport');
+define('CONFIG_PATH', 'admin/settings/metadata_node');
+define('METADATA_TEMPLATE_FILE', 'templateFile');
+define('AUTOCOMPLETE_TEST', 'metadata/autocomplete');
 
 ///////call back hook, 1) allow force download 2) make a page so we dont have to use the block /////
 
@@ -50,7 +50,47 @@ function metadata_node_menu() {
         'access arguments' => array('administer site configuration'),
         'type' => MENU_NORMAL_ITEM,
     );
+    $items[AUTOCOMPLETE_TEST] = array(
+        'title' => t('test autocomplete'),
+        'page callback' => 'auto_complete_test',
+        'access arguments' => array('create metadata_node'),
+        'type' => MENU_CALLBACK,
+    );
     return $items;
+}
+
+function auto_complete_test ($input) {
+    global $user;
+    $picklist = array(
+    'Agriculture',
+    'Atmosphere',
+    'Biosphere',
+    'Biological Classification',
+    'Climate Indicators',
+    'Cryosphere',
+    'Human Dimensions',
+    'Land Surface',
+    'Oceans',
+    'Paleoclimate',
+    'Solid Earth',
+    'Spectral/Engineering',
+    'Sun-Earth Interactions',
+    'Terrestrial Hydrosphere',        
+    );
+    $returnList = array();
+    foreach ($picklist as $token) {
+        if(strstr($token, $input)) {
+            $returnList[$token] = check_plain($token);
+        }
+    }
+    
+    if(sizeof($returnList)==0) {
+        print drupal_to_js($picklist);
+    }
+    else {
+        print drupal_to_js($returnList);
+    }
+    exit();
 }
 
 function metadata_node_admin_form($form_state) {

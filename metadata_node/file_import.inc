@@ -1,6 +1,6 @@
 <?php
 
-function metadata_import_form(&$form, &$form_state) {
+function metadata_import_form() {
     $form = array();
     
     $form['file_import'] = array (
@@ -26,7 +26,9 @@ function metadata_import_form(&$form, &$form_state) {
         '#type' => 'textfield',
         '#title' => t('Remote URL'),
         '#size' => 48,
-        '#description' => t('Choose a remote file.'),        
+        '#description' => t('Choose a remote file.'),     
+        //this is a test  @todo remove me
+        '#autocomplete_path' => AUTOCOMPLETE_TEST,
     );
         
     $form['submit'] = array(
@@ -42,10 +44,7 @@ function metadata_import_form_validate(&$form, &$form_state) {
     $hasFileUpload = isset($_FILES['files']) && 
         $_FILES['files']['name'][$source] && 
         is_uploaded_file($_FILES['files']['tmp_name'][$source]);
-    
-//    dvm('file ' . $file ->path);
     $url = $form_state['values']['remote_url'];
-//    dvm('url ' . $url);
     if( !$hasFileUpload  && strlen($url)==0) {
         form_set_error("file_import", "Please upload a file or enter remote URL");
     }
@@ -79,5 +78,5 @@ function metadata_import_form_submit(&$form, &$form_state) {
        $node = new stdClass();
        createUpdateNode($doc, $node);
    }
-   drupal_goto('metadata/view');            
+   drupal_goto(VIEW_METADATA_PATH);            
 }
