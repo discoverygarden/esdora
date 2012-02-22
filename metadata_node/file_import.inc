@@ -27,8 +27,6 @@ function metadata_import_form() {
         '#title' => t('Remote URL'),
         '#size' => 48,
         '#description' => t('Choose a remote file.'),     
-        //this is a test  @todo remove me
-        '#autocomplete_path' => AUTOCOMPLETE_TEST,
     );
         
     $form['submit'] = array(
