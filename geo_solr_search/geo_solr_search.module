@@ -236,7 +236,7 @@ function time_range_form_submit($form, &$form_state) {
             $timeFilterQ = "End.Date:[* TO $end_date]";
         }
     }
-    $query = "$key_word:$keyword_input  AND "; //$keyword_input is required
+    $query = "$key_word:$keyword_input AND "; //$keyword_input is required
     if (!empty($bboxFilterQ) && !empty($timeFilterQ)) {
         $query .= "($bboxFilterQ) AND ($timeFilterQ)";
     } else {
