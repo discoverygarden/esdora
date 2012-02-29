@@ -238,14 +238,14 @@ function time_range_form_submit($form, &$form_state) {
     }
     $query = $keyword_input . " AND "; //$keyword_input is required
     if (!empty($bboxFilterQ) && !empty($timeFilterQ)) {
-        $query = "($bboxFilterQ) AND ($timeFilterQ)";
+        $query .= "($bboxFilterQ) AND ($timeFilterQ)";
     } else {
         if (!empty($bboxFilterQ)) {
-            $query = $bboxFilterQ;
+            $query .= $bboxFilterQ;
         }
 
         if (!empty($timeFilterQ)) {
-            $query = $timeFilterQ;
+            $query .= $timeFilterQ;
         }
     }
     //unset the session var
