@@ -101,7 +101,7 @@ function time_range_form() {
         '#title' => 'Keywords',
         '#id' => 'keywords',
         '#size' => '24',
-        //'#required' => TRUE,
+        '#required' => TRUE,
     );
 
     $form['params']['bbox'] = array(
@@ -184,6 +184,8 @@ function time_range_form_submit($form, &$form_state) {
         setSearchTermVariables();
     }
 
+    
+    $key_word = variable_get("keyword.all");
     $box_north = variable_get("box.north");
     $box_east = variable_get("box.east");
     $box_south = variable_get("box.south");
@@ -192,9 +194,9 @@ function time_range_form_submit($form, &$form_state) {
     $start_date = variable_get("time.start");
     $end_date = variable_get("time.end");
 
-    $keyword = $form_state['values']['keyword'];
-    $start = $form_state['values']['start'];
-    $end = $form_state['values']['end'];
+    $keyword_input = $form_state['values']['keyword'];
+    $start_input = $form_state['values']['start'];
+    $end_input = $form_state['values']['end'];
     $bbox = $_SESSION['mapCoor'];
     $bboxFilterQ = '';
     if (!empty($bbox)) {
@@ -215,18 +217,18 @@ function time_range_form_submit($form, &$form_state) {
     }
 
     $timeFilterQ = '';
-    if (!empty($start)) {
+    if (!empty($start_input)) {
         // fix up time up to ISO 8601 strict - should have been setup by datepicker on client side, but this will fix
         // the case client pass in 1988/02/11, (ideal is 1988-02-11)
         //Start.Date:[10/03/2011 TO *] AND End.Date:[* TO 10/03/2011])
         //needs to be 1976-03-06T23:59:59.999Z
         //note: this query works: Start.Date:[1900-01-01T00:00:00Z TO NOW] AND End.Date:[* TO 2001-01-01T00:00:00Z]
-        $start_date = str_replace('/', '-', $start);
+        $start_date = str_replace('/', '-', $start_input);
         $start_date .='T23:59:59.999Z';
         $timeFilterQ = "Start.Date:[$start_date TO NOW]";
     }
-    if (!empty($end)) {
-        $end_date = str_replace('/', '-', $end);
+    if (!empty($end_input)) {
+        $end_date = str_replace('/', '-', $end_input);
         $end_date .='T23:59:59.999Z';
         if (!empty($timeFilterQ)) {
             $timeFilterQ .= " AND End.Date:[* TO $end_date]";
@@ -234,8 +236,7 @@ function time_range_form_submit($form, &$form_state) {
             $timeFilterQ = "End.Date:[* TO $end_date]";
         }
     }
-    $query = '';
-    //TODO use keywords??
+    $query = $keyword_input . " AND "; //$keyword_input is required
     if (!empty($bboxFilterQ) && !empty($timeFilterQ)) {
         $query = "($bboxFilterQ) AND ($timeFilterQ)";
     } else {

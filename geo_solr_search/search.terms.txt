@@ -1,3 +1,4 @@
+keyword.all=fgdc.combined
 box.north=Bound.North
 box.east=Bound.East
 box.south=Bound.South

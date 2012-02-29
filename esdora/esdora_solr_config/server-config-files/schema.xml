@@ -330,6 +330,8 @@
    <field name="Bound.South" type="sfloat" indexed="true" stored="true" multiValued="true"/>
    <field name="Start.Date" type="date" indexed="true" stored="true" multiValued="true"/>	
    <field name="End.Date" type="date" indexed="true" stored="true" multiValued="true"/>	
+   <!-- define a combined field for keyword + geoboundary + time range search -->
+   <field name="fgdc.combined" type="text" indexed="true"  stored="true" multiValued="true" /> 
    
    <!--the statements below copy one field into the other-->
    <copyField source="fgdc.title" dest="Title" type="string" indexed="true" stored="true" multiValued="true"/>
@@ -345,6 +347,15 @@
    <copyField source="fgdc.south" dest="Bound.South" type="sfloat" indexed="true" stored="true" multiValued="true"/>
    <copyField source="fgdc.start_time" dest="Start.Date" type="date" indexed="true" stored="true" multiValued="true"/>
    <copyField source="fgdc.end_time" dest="End.Date" type="date" indexed="true" stored="true" multiValued="true"/>
+
+   <copyField source="fgdc.title" dest="fgdc.combined" type="text" indexed="true" stored="true" multiValued="true"/>
+   <copyField source="fgdc.creator" dest="fgdc.combined" type="text" indexed="true" stored="true" multiValued="true"/>
+   <copyField source="fgdc.summary" dest="fgdc.combined" type="text" indexed="true" stored="true" multiValued="true"/>
+   <copyField source="fgdc.theme_keywords" dest="fgdc.combined" type="text" indexed="true" stored="true" multiValued="true"/>
+   <copyField source="fgdc.place_keywords" dest="fgdc.combined" type="text" indexed="true" stored="true" multiValued="true"/>
+
+
+
 
    <!-- Dynamic field definitions.  If a field name is not found, dynamicFields
      will be used if the name matches any of the patterns.
@@ -379,7 +390,7 @@
  <uniqueKey>PID</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <defaultSearchField>dc.description</defaultSearchField>
+ <defaultSearchField>fgdc.title</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="OR"/>
@@ -390,169 +401,12 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
   <copyField source="dc.type" dest="type" type="string" maxChars="300"/>
   <copyField source="dc.subject" dest="subject" type="string" maxChars="300"/>
-  <copyField source="mods.title" dest="title" type="string" maxChars="300"/>
-  <copyField source="mods.country" dest="country" type="string" maxChars="300"/>
-  <copyField source="mods.county" dest="county" type="string" maxChars="300"/>
-  <copyField source="mods.region" dest="region" type="string" maxChars="300"/>
-  <copyField source="mods.city" dest="city" type="string" maxChars="300"/>
-  <copyField source="mods.citySection" dest="city section" type="string" maxChars="300"/>
-  <copyField source="mods.subject" dest="subject" type="string" maxChars="300"/>
-  <copyField source="mods.genre" dest="genre" type="string" maxChars="300"/>
-  <copyField source="mods.form" dest="form" type="string" maxChars="300"/>
-  <copyField source="mods.Contributor" dest="contributor" type="string" maxChars="300"/>
-  <copyField source="mods.Surveyor" dest="surveyor" type="string" maxChars="300"/>
-  <copyField source="refworks.a1" dest="author" type="string" maxChars="300"/>
-  <copyField source="refworks.u2" dest="department" type="string" maxChars="300"/>
   <copyField source="rels.isMemberOf" dest="collection" type="string" maxChars="300"/>
   <copyField source="rels.isMemberOfCollection" dest="collection" type="string" maxChars="300"/>
   <copyField source="date" dest="dc.date" type="string" maxChars="300"/>
   <copyField source="dc:contributor" dest="contributor" type="string" maxChars="300"/>
   <copyField source="dc:source" dest="source" type="string" maxChars="300"/>
   
-  <!--*********************************************MNPL****************************************************-->
-   
-  <copyField source="specimen.samplesize" dest="sample_size" type="string" maxChars="300"/>
-  <copyField source="specimen.type" dest="type" type="string" maxChars="300"/>
-  <copyField source="specimen.lab_id" dest="lab_id" type="string" maxChars="300"/>
-  <copyField source="specimen.phylum" dest="phylum" type="string" maxChars="300"/>
-  <copyField source="specimen.subPhylum" dest="subPhylum" type="string" maxChars="300"/>
-  <copyField source="specimen.class" dest="class" type="string" maxChars="300"/>
-  <copyField source="specimen.order" dest="order" type="string" maxChars="300"/>
-  <copyField source="specimen.family" dest="family" type="string" maxChars="300"/>
-  <copyField source="specimen.genus" dest="genus" type="string" maxChars="300"/>
-  <copyField source="specimen.sitename" dest="sitename" type="string" maxChars="300"/>
-  <copyField source="specimen.country" dest="country" type="string" maxChars="300"/>
-  <copyField source="specimen.region" dest="region" type="string" maxChars="300"/>
-  <copyField source="specimen.latitude" dest="latitude" type="string" maxChars="300"/>
-  <copyField source="specimen.longitude" dest="longitude" type="string" maxChars="300"/>
-  <copyField source="specimen.depth" dest="depth" type="string" maxChars="300"/>
-  <copyField source="specimen.collector" dest="collector" type="string" maxChars="300"/>
-  
-  <copyField dest="ptp1b.fraction" source="fraction.ptp1b" type="string" maxChars="300"/>
-  <copyField dest="are.fraction" source="fraction.are" type="string" maxChars="300"/>
-  <copyField dest="antiproliferative.fraction" source="fraction.antiproliferative" type="string" maxChars="300"/>
-  <copyField dest="hct116.fraction" source="fraction.hct116" type="string" maxChars="300"/>
-  <copyField dest="hela.fraction" source="fraction.hela" type="string" maxChars="300"/>
-  <copyField dest="identifier.fraction" source="fraction.identifier" type="string" maxChars="300"/>
-  <copyField dest="pc3.fraction" source="fraction.pc3" type="string" maxChars="300"/>
-  <copyField dest="plate.fraction" source="fraction.plate" type="string" maxChars="300"/>
-  
-  <copyField dest="ptp1b.compound" source="compound.ptp1b" type="string" maxChars="300"/>
-  <copyField dest="are.compound" source="compound.are" type="string" maxChars="300"/>
-  <copyField dest="antiproliferative.compound" source="compound.antiproliferative" type="string" maxChars="300"/>
-  <copyField dest="hct116.compound" source="compound.hct116" type="string" maxChars="300"/>
-  <copyField dest="hela.compound" source="compound.hela" type="string" maxChars="300"/>
-  <copyField dest="identifier.compound" source="compound.identifier" type="string" maxChars="300"/>
-  <copyField dest="pc3.compound" source="compound.pc3" type="string" maxChars="300"/>
-  <copyField dest="plate.compound" source="compound.plate" type="string" maxChars="300"/>
-    
-  <!-- *************************************** CHBMR **************************************************** -->
-
-	<copyField dest="company_name" source="chbmr.company_name"/>
-	<copyField dest="address" source="chbmr.address_1"/>
-	<copyField dest="address" source="chbmr.address_2"/>
-	<copyField dest="address" source="chbmr.address_3"/>
-	<copyField dest="city" source="chbmr.city"/>
-	<copyField dest="postal_code" source="chbmr.postal_code"/>
-	<copyField dest="province" source="chbmr.province"/>
-	<copyField dest="website" source="chbmr.website"/>
-	<copyField dest="year_founded" source="chbmr.year_founded"/>
-	<copyField dest="foundation_source" source="chbmr.foundation_source"/>
-	<copyField dest="foundation_source_remarks" source="chbmr.foundation_source_remarks"/>
-	<copyField dest="employees_in_country" source="chbmr.employees_in_country"/>
-	<copyField dest="employees_worldwide" source="chbmr.employees_worldwide"/>
-	<copyField dest="r_d_employees_in_country" source="chbmr.r_d_employees_in_country"/>
-	<copyField dest="r_d_employees_worldwide" source="chbmr.r_d_employees_worldwide"/>
-	<copyField dest="description" source="chbmr.description"/>
-	<copyField dest="ownership" source="chbmr.ownership"/>
-	<copyField dest="main_stock_market" source="chbmr.main_stock_market"/>
-	<copyField dest="ticker_symbol" source="chbmr.ticker_symbol"/>
-	<copyField dest="remarks" source="chbmr.remarks"/>
-	<copyField dest="sector" source="chbmr.sector"/>
-	<copyField dest="product_description" source="chbmr.product_description"/>
-	<copyField dest="technology_platform_description" source="chbmr.technology_platform_description"/>
-	<copyField dest="subsectors" source="chbmr.subsectors"/>
-	<copyField dest="indications" source="chbmr.indications"/>
-	<copyField dest="business_model" source="chbmr.business_model"/>
-	<copyField dest="customer_segments" source="chbmr.customer_segments"/>
-	<copyField dest="distribution" source="chbmr.distribution"/>
-  
-  <!-- *********************************** CBMRN (Mastitis) ********************************************** -->
-
-	<copyField source="sample.numvalidation" dest="cbmrn.numvalidation"/>
-	<copyField source="sample.barcode" dest="cbmrn.barcode"/>
-	<copyField source="sample.culturedate" dest="cbmrn.culturedate"/>
-	<copyField source="sample.nbofcol" dest="cbmrn.nbofcol"/>
-	<copyField source="sample.hemolysistype" dest="cbmrn.hemolysistype"/>
-	<copyField source="sample.specie" dest="cbmrn.specie"/>
-	<copyField source="sample.status" dest="cbmrn.status"/>
-	<copyField source="sample.sampletype" dest="cbmrn.sampletype"/>
-	<copyField source="sample.animal_id" dest="cbmrn.animal_id"/>
-	<copyField source="sample.animal_unique_id" dest="cbmrn.animal_unique_id"/>
-	<copyField source="sample.quarter" dest="cbmrn.quarter"/>
-	<copyField source="sample.datesampletaken" dest="cbmrn.datesampletaken"/>
-	<copyField source="sample.mastitisscore" dest="cbmrn.mastitisscore"/>
-	<copyField source="sample.dim" dest="cbmrn.dim"/>
-	<copyField source="sample.lactnumber" dest="cbmrn.lactnumber"/>
-	<copyField source="sample.calvingdate" dest="cbmrn.calvingdate"/>
-	<copyField source="sample.drydate" dest="cbmrn.drydate"/>
-	<copyField source="sample.birthdate" dest="cbmrn.birthdate"/>
-	<copyField source="sample.teatscore" dest="cbmrn.teatscore"/>
-	<copyField source="sample.cleanscore" dest="cbmrn.cleanscore"/>
-	<copyField source="sample.scc" dest="cbmrn.scc"/>
-	<copyField source="sample.scc_issues" dest="cbmrn.scc_issues"/>
-	<copyField source="sample.scc_comments" dest="cbmrn.scc_comments"/>
-	<copyField source="sample.herdprid" dest="cbmrn.herdprid"/>
-	<copyField source="sample.dhinum" dest="cbmrn.dhinum"/>
-	<copyField source="sample.dhicownumber" dest="cbmrn.dhicownumber"/>
-	
-	<!-- <copyField source="bulktank.datesampletaken" dest="cbmrn.datesampletaken"/> -->  <!-- duplicate -->
-	<copyField source="bulktank.nbrofmilkings" dest="cbmrn.nbrofmilkings"/>
-	<copyField source="bulktank.sampling_time" dest="cbmrn.sampling_time"/>
-	<copyField source="bulktank.date_sample_plating" dest="cbmrn.date_sample_plating"/>
-	<copyField source="bulktank.tc_besc" dest="cbmrn.tc_besc"/>
-	<copyField source="bulktank.tc_mac" dest="cbmrn.tc_mac"/>
-	<copyField source="bulktank.tc_dvm" dest="cbmrn.tc_dvm"/>
-	<copyField source="bulktank.besc_cfu_ml" dest="cbmrn.besc_cfu_ml"/>
-	<copyField source="bulktank.besc_hemo" dest="cbmrn.besc_hemo"/>
-	<copyField source="bulktank.besc_spp_code" dest="cbmrn.besc_spp_code"/>
-	<copyField source="bulktank.dvm_cfu_ml" dest="cbmrn.dvm_cfu_ml"/>
-	<copyField source="bulktank.dvm_hemo" dest="cbmrn.dvm_hemo"/>
-	<copyField source="bulktank.dvm_spp_code" dest="cbmrn.dvm_spp_code"/>
-	<copyField source="bulktank.mac_cfu_ml" dest="cbmrn.mac_cfu_ml"/>
-	<copyField source="bulktank.mac_spp_code" dest="cbmrn.mac_spp_code"/>
-	<!-- <copyField source="bulktank.mac_cfu_ml"          dest="cbmrn.mac_cfu_ml"/> -->
-	<copyField source="bulktank.petri_stx_cfu_ml" dest="cbmrn.petri_stx_cfu_ml"/>
-	<copyField source="bulktank.petri_stx_spp_code" dest="cbmrn.petri_stx_spp_code"/>
-	<copyField source="bulktank.sample_status" dest="cbmrn.sample_status"/>
-	
-	<!-- <copyField source="fc_case.number" dest="cbmrn.number"/> -->
-	<copyField source="fc_case.fc_case" dest="cbmrn.fc_case"/>
-	<copyField source="fc_case.herdprid" dest="cbmrn.herdprid"/>
-	<copyField source="fc_case.animal_id" dest="cbmrn.animal_id"/>
-	<copyField source="fc_case.animal_unique_id" dest="cbmrn.animal_unique_id"/>
-	<copyField source="fc_case.sample_date" dest="cbmrn.sample_date"/>
-	<copyField source="fc_case.sample_barcode" dest="cbmrn.sample_barcode"/>
-	<copyField source="fc_case.drydate_dhi" dest="cbmrn.drydate_dhi"/>
-	<copyField source="fc_case.drydate_herd" dest="cbmrn.drydate_herd"/>
-	<copyField source="fc_case.comments" dest="cbmrn.comments"/>
-
-	<!-- <copyField source="mastitis_case.number" dest="cbmrn.number"/> -->
-	<copyField source="mastitis_case.cm_case" dest="cbmrn.cm_case"/>
-	<copyField source="mastitis_case.mastitisscore" dest="cbmrn.mastitisscore"/>
-	<copyField source="mastitis_case.temp" dest="cbmrn.temp"/>
-	<copyField source="mastitis_case.normal_milk" dest="cbmrn.normal_milk"/>
-	<copyField source="mastitis_case.bulktank_back" dest="cbmrn.bulktank_back"/>
-	<copyField source="mastitis_case.herdprid" dest="cbmrn.herdprid"/>
-	<copyField source="mastitis_case.animal_id" dest="cbmrn.animal_id"/>
-	<copyField source="mastitis_case.animal_unique_id" dest="cbmrn.animal_unique_id"/>
-	<copyField source="mastitis_case.sample_date" dest="cbmrn.sample_date"/>
-	<copyField source="mastitis_case.sample_barcode" dest="cbmrn.sample_barcode"/>
-	<copyField source="mastitis_case.comments" dest="cbmrn.comments"/>
-
-	<copyField source="freezer.box" dest="cbmrn.box"/>
-	<copyField source="freezer.grid" dest="cbmrn.grid"/>	
-
  <!-- Similarity is the scoring routine for each document vs. a query.
       A custom similarity may be specified here, but the default is fine
       for most applications.  -->
