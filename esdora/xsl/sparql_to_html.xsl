@@ -7,20 +7,76 @@
  <xsl:variable name="PATH">
   <xsl:value-of select="$path"/>
  </xsl:variable>
- <xsl:variable name="thisPid" select="$collectionPid"/>
- <xsl:variable name="thisTitle" select="$collectionTitle"/>
- <xsl:variable name="size"  select="20"/>
+ <xsl:variable name="thisPid" >
+  <xsl:value-of select="$collectionPid"/>
+ </xsl:variable>
+ 
+ <xsl:variable name="thisTitle" >
+  test ttiles
+  <!--<xsl:value-of select="$collectionTitle"/>-->
+ </xsl:variable>
+ <xsl:variable name="size"  select="2"/>
  <xsl:variable name="page" select="$hitPage"/>
  <xsl:variable name="start" select="((number($page) - 1) * number($size)) + 1"/>
  <xsl:variable name="end" select="($start - 1) + number($size)"/>
-  <xsl:variable name="cellsPerRow" select="3"/>
+  <xsl:variable name="cellsPerRow" select="1"/>
  <xsl:variable name="count" select="count(s:sparql/s:results/s:result)"/>
  
  
  
 <xsl:template match="/">
  <xsl:if test="$count>0">
- 
+  
+  <!-- start previous next -->
+  <div class="item-list">
+   <ul class="pager">
+    <xsl:choose>
+     <xsl:when test="$end >= $count and $start = 1">
+      <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+      of <xsl:value-of select="$count"/>&#160;<br />
+     </xsl:when>
+     <xsl:when test="$end >= $count">
+      
+      <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
+      of <xsl:value-of select="$count"/>&#160;<br />
+      <li class="pager-previous">
+       <a>
+        <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/Collection/<xsl:value-of select="$page - 1"/>
+        </xsl:attribute>
+        &lt;Prev
+       </a></li>
+     </xsl:when>
+     <xsl:when test="$start = 1">
+      <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+      of <xsl:value-of select="$count"/>&#160;<br />
+      <li class="pager-next">
+       <a>
+        <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/Collection/<xsl:value-of select="$page + 1"/>
+        </xsl:attribute>
+        Next>
+       </a></li>
+     </xsl:when>
+     <xsl:otherwise>
+      <xsl:value-of select="$start"/>-<xsl:value-of select="$end"/>
+      of <xsl:value-of select="$count"/>&#160;<br />
+      <li class="pager-previous">
+       <a>
+        <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/Collection/<xsl:value-of select="$page - 1"/>
+        </xsl:attribute>
+        &lt;Prev
+       </a>&#160;</li>
+      <li class="pager-next">
+       <a>
+        <xsl:attribute name="href"><xsl:value-of select="$BASEURL"/>/fedora/repository/<xsl:value-of select="$thisPid"/>/-/Collection/<xsl:value-of select="$page + 1"/>
+        </xsl:attribute>
+        Next>
+       </a></li>
+     </xsl:otherwise>
+    </xsl:choose>
+   </ul>
+  </div>
+  <!-- end previous next-->
+  <br clear="all" />
  <p></p><p></p>
 <table cellpadding="2" margin="2" cellspacing="1" border="0" width="80%" style="border:0px;padding-top:8px; padding-bottom:8px;" >
   <tr style="border-bottom:1px solid #000; margin-bottom:8px;">
@@ -32,7 +88,8 @@
  </xsl:if>
 </xsl:template>
 <xsl:template match="s:sparql/s:results">
-   <xsl:for-each select="s:result">
+  <!-- <xsl:for-each select="s:result">-->
+ <xsl:for-each select="s:result[position()>=$start and position() &lt;=$end]">
    
   <tr>
   <xsl:variable name='OBJECTURI' select="s:object/@uri"/>
@@ -48,7 +105,8 @@
   </xsl:variable>
   
   <xsl:variable name="cleanTitle">
-    <xsl:value-of select="php:functionString('fedora_repository_urlencode_string', $newTitle)"/>
+    <!--<xsl:value-of select="php:functionString('fedora_repository_urlencode_string', $newTitle)"/>-->
+   <xsl:value-of select = "$newTitle"/>
   </xsl:variable>
   
   <xsl:variable name="linkUrl">
@@ -105,7 +163,7 @@
    <img width="16" height="16">
     <xsl:attribute name="src"><xsl:value-of select="$imagUrl"/>
     </xsl:attribute>
-	<xsl:attribute name="alt"><xsl:value-of select="$newTitle" disable-output-escaping="yes"/>
+	<xsl:attribute name="alt"><xsl:value-of select="$newTitle" />
     </xsl:attribute>
    </img>
    </a>
