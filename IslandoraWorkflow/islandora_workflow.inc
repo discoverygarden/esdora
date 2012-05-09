@@ -1,7 +1,5 @@
 <?php
 
-
-define('APPROVED', 'In Review');
 /**
  * @file
  *   This is a collection of helper functions and such for the islandora_workflow module.

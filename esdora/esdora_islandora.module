@@ -9,9 +9,9 @@
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 
-define(ESDORA_COLLECTION_PID, 'esdora:defaultCollectionCModel');
-define(ESDORA_COMPUND_DATA_PID, 'esdora:defaultDataCModel');
-define(ESDORA_ATOMISTIC_DATA_PID, 'esdora:atomicDataCModel');
+define('ESDORA_COLLECTION_PID', 'esdora:defaultCollectionCModel');
+define('ESDORA_COMPUND_DATA_PID', 'esdora:defaultDataCModel');
+define('ESDORA_ATOMISTIC_DATA_PID', 'esdora:atomicDataCModel');
 
 /**
  * Drupal hook for admin form
