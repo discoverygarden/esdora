@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /*
  * Created 2011
  *
@@ -12,6 +10,10 @@
 define('ESDORA_COLLECTION_PID', 'esdora:defaultCollectionCModel');
 define('ESDORA_COMPUND_DATA_PID', 'esdora:defaultDataCModel');
 define('ESDORA_ATOMISTIC_DATA_PID', 'esdora:atomicDataCModel');
+define('THEME_ESDORA_ISLANDORA_OBJECT', 'esdora_islandora_object');
+define('THEME_ESDORA_ISLANDORA_OBJECT_TABS', 'esdora_islandora_object_tabs');
+define('THEME_ESDORA_ISLANDORA_OBJECT_TAB_MANAGE', 'esdora_islandora_object_manage_tab');
+define('THEME_ESDORA_ISLANDORA_COLLECTION', 'esdora_islandora_collection');
 
 /**
  * Drupal hook for admin form
@@ -21,7 +23,7 @@ define('ESDORA_ATOMISTIC_DATA_PID', 'esdora:atomicDataCModel');
  * the name and pid can also be passed as url parameters
  */
 function esdora_islandora_admin() {
-    return "";
+  return "";
 }
 
 /**
@@ -30,18 +32,18 @@ function esdora_islandora_admin() {
  * @param <type> $items
  *
  *  $items['fedora/repository/purgeStream'] = array(
-  'title' => t('Purge data stream'),
-  'page callback' => 'fedora_repository_purge_stream',
-  'type' => MENU_CALLBACK,
-  'access arguments' => array('purge objects and datastreams')
-  );
- * Nov 2011 Jerry: routing collection view differently from default so has the chance to 
+ 'title' => t('Purge data stream'),
+ 'page callback' => 'fedora_repository_purge_stream',
+ 'type' => MENU_CALLBACK,
+ 'access arguments' => array('purge objects and datastreams')
+ );
+ * Nov 2011 Jerry: routing collection view differently from default so has the chance to
  * re-arrange admin functions - this is the esdora entry for repository page, deviated from ISLANDORA default
  */
 function esdora_islandora_menu_alter(&$items) {
-    $items['fedora/repository/purgeStream']['page callback'] = 'esdora_islandora_prepare_stream_for_removall';
-    $items['fedora/repository/purgeStream']['module'] = 'esdora_islandora';
-    $items['fedora/repository']['page callback'] = 'esdora_repository_page';
+  $items['fedora/repository/purgeStream']['page callback'] = 'esdora_islandora_prepare_stream_for_removall';
+  $items['fedora/repository/purgeStream']['module'] = 'esdora_islandora';
+  $items['fedora/repository']['page callback'] = 'esdora_repository_page';
 }
 
 /**
@@ -51,15 +53,15 @@ function esdora_islandora_menu_alter(&$items) {
  * @param <type> $name
  */
 function esdora_islandora_prepare_stream_for_removall($pid = NULL, $dsid = NULL, $name = NULL) {
-    //call our function then call islandora's purge stream
-    module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
-    $value = Esdora::remove_relationship_internal($pid, $dsid);
-    //TODO: not sure what gets returned on succes from this function but we should check the value and let the user knwo if removing the relationhip failed
-    return fedora_repository_purge_stream($pid, $dsid, $name);
+  //call our function then call islandora's purge stream
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $value = Esdora::remove_relationship_internal($pid, $dsid);
+  //TODO: not sure what gets returned on succes from this function but we should check the value and let the user knwo if removing the relationhip failed
+  return fedora_repository_purge_stream($pid, $dsid, $name);
 }
 
 function esdora_islandora_admin_settings_submit($form, $form_values) {
-    drupal_set_message("Custom form handler.");
+  drupal_set_message("Custom form handler.");
 }
 
 /**
@@ -68,49 +70,74 @@ function esdora_islandora_admin_settings_submit($form, $form_values) {
  * also adds a callback to render forms
  */
 function esdora_islandora_menu() {
-    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
-    return array(
-        'ajax/gettabs/compound' => array(
-            'access callback' => 'user_access',
-            'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
-            'page callback' => 'esdora_islandora_get_tabs_compound',
-            'type' => MENU_CALLBACK,
-        ),
-        'ajax/gettabs/atomic' => array(
-            'access callback' => 'user_access',
-            'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
-            'page callback' => 'esdora_islandora_get_tabs_atomic',
-            'type' => MENU_CALLBACK,
-        ),
-        'esdora/render/form' => array(
-            'access callback' => 'user_access',
-            'access arguments' => array(OBJECTHELPER::$EDIT_FEDORA_METADATA),
-            'page callback' => 'esdora_islandora_render_form',
-            'type' => MENU_CALLBACK,
-        ),
-       'esdora/addtoworkflow' => array(
-            'access callback' => 'user_access',
-            'access arguments' => array(OBJECTHELPER::$EDIT_FEDORA_METADATA),
-            'page callback' => 'esdora_islandora_add_to_workflow',
-            'type' => MENU_CALLBACK,
-        ),
-    );
+  module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+  return array(
+    'ajax/gettabs/compound' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
+      'page callback' => 'esdora_islandora_get_tabs_compound',
+      'type' => MENU_CALLBACK,
+    ),
+    'ajax/gettabs/atomic' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
+      'page callback' => 'esdora_islandora_get_tabs_atomic',
+      'type' => MENU_CALLBACK,
+    ),
+    'esdora/render/form' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$EDIT_FEDORA_METADATA),
+      'page callback' => 'esdora_islandora_render_form',
+      'type' => MENU_CALLBACK,
+    ),
+    'esdora/addtoworkflow' => array(
+      'access callback' => 'user_access',
+      'access arguments' => array(OBJECTHELPER::$EDIT_FEDORA_METADATA),
+      'page callback' => 'esdora_islandora_add_to_workflow',
+      'type' => MENU_CALLBACK,
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function esdora_islandora_theme() {
+  return array(
+    THEME_ESDORA_ISLANDORA_OBJECT => array(
+      'arguments' => array('pid' => NULL, 'page_number' => NULL),
+      'file' => 'EsdoraDisplay.inc'
+    ),
+    THEME_ESDORA_ISLANDORA_OBJECT_TABS => array(
+      'arguments' => array('pid' => NULL, 'page_number' => NULL),
+      'file' => 'EsdoraDisplay.inc'
+    ),
+    THEME_ESDORA_ISLANDORA_OBJECT_TAB_MANAGE => array(
+      'arguments' => array('pid' => NULL),
+      'template' => 'templates/ManageTab',
+      'file' => 'EsdoraDisplay.inc'
+    ),
+    THEME_ESDORA_ISLANDORA_COLLECTION => array(
+      'arguments' => array('pid' => NULL, 'page_number' => NULL),
+      'file' => 'EsdoraDisplay.inc'
+    )
+  );
 }
 
 /**
  * drupal hook to show help
  */
 function esdora_islandora_help($path, $arg) {
-    switch ($path) {
-        case 'admin/modules#description' :
-            return t('Grabs a list of items from a collection in Drupal that are presented on the home page.');
-        case 'node/add#fedora_repository' :
-            return t('Use this page to grab a list of items from a Fedora collection.');
-    }
+  switch ($path) {
+    case 'admin/modules#description' :
+      return t('Grabs a list of items from a collection in Drupal that are presented on the home page.');
+    case 'node/add#fedora_repository' :
+      return t('Use this page to grab a list of items from a Fedora collection.');
+  }
 }
 
 function esdora_islandora_add_to_workflow ($pid) {
-    
+
   module_load_include('inc','islandora_workflow','islandora_workflow');
   $result = islandora_workflow_init_workflow($pid);
   if($result){
@@ -119,7 +146,7 @@ function esdora_islandora_add_to_workflow ($pid) {
   } else {
     drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$pid)));
   }
- return 'attempted to update object';
+  return 'attempted to update object';
 }
 
 
@@ -131,7 +158,7 @@ function esdora_islandora_add_to_workflow ($pid) {
  * @return array
  */
 function esdora_islandora_render_form($pid, $dsid, $form_name) {
-    return drupal_get_form('esdora_islandora_edit_form', $pid, $dsid, $form_name);
+  return drupal_get_form('esdora_islandora_edit_form', $pid, $dsid, $form_name);
 }
 
 /**
@@ -143,16 +170,15 @@ function esdora_islandora_render_form($pid, $dsid, $form_name) {
  * @return array
  */
 function esdora_islandora_edit_form($form_state, $pid, $dsid, $form_name) {
-    module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
-    module_load_include('inc', 'fedora_repository', 'ConnectionHelper');
-    $soapHelper = new ConnectionHelper();
-    $client = $soapHelper->getSoapClient(variable_get('fedora_soap_url', 'http://localhost:8080/fedora/services/access?wsdl'));
-    $form_state = array();
-    $form_state['values']['forms'] = $form_name;
-    $editObjectForm = new EditObjectMetadataForm();
-    $form = $editObjectForm->createPageTwo($pid, $client, $form_state);
-
-    return $form;
+  module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
+  module_load_include('inc', 'fedora_repository', 'ConnectionHelper');
+  $soapHelper = new ConnectionHelper();
+  $client = $soapHelper->getSoapClient(variable_get('fedora_soap_url', 'http://localhost:8080/fedora/services/access?wsdl'));
+  $form_state = array();
+  $form_state['values']['forms'] = $form_name;
+  $editObjectForm = new EditObjectMetadataForm();
+  $form = $editObjectForm->createPageTwo($pid, $client, $form_state);
+  return $form;
 }
 
 /**
@@ -161,9 +187,9 @@ function esdora_islandora_edit_form($form_state, $pid, $dsid, $form_name) {
  * @param array $form_state
  */
 function esdora_islandora_edit_form_submit($form, &$form_state) {
-    module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
-    $xml_form = new EditObjectMetadataForm($form_state);
-    $xml_form->submit($form, $form_state);
+  module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
+  $xml_form = new EditObjectMetadataForm($form_state);
+  $xml_form->submit($form, $form_state);
 }
 
 /**
@@ -174,124 +200,124 @@ function esdora_islandora_edit_form_submit($form, &$form_state) {
  * @param array $form_state
  */
 function esdora_islandora_derivative_form_submit(&$form, &$form_state) {
-    global $base_url;
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
-    $pid_data = $form_state['values']['related_pid'];
-    $pid = $form_state['values']['pid'];
-    $item = new Fedora_Item($pid);
-    $pids = explode(',', $pid_data);
-    foreach ($pids as $derived_from_pid) {
-        if (valid_pid(trim($derived_from_pid))) {
-            $item->add_relationship('isDerivedFrom', $derived_from_pid);
-        }
+  global $base_url;
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  $pid_data = $form_state['values']['related_pid'];
+  $pid = $form_state['values']['pid'];
+  $item = new Fedora_Item($pid);
+  $pids = explode(',', $pid_data);
+  foreach ($pids as $derived_from_pid) {
+    if (valid_pid(trim($derived_from_pid))) {
+      $item->add_relationship('isDerivedFrom', $derived_from_pid);
     }
-    $txt = $form_state['values']['txt'];
-    //this will overwrite the txt stream if it exists or create it if it doesn't
-    if (!empty($txt)) {
-        $ds_list = $item->get_datastreams_list_as_array();
-        if (empty($ds_list['processing.txt'])) {
-            $item->add_datastream_from_string($txt, 'processing.txt', 'processing text', $datastream_mimetype = 'text/plain', 'M');
-            //mark it as metadata:
-            $esdora = new Esdora($pid);
-            $esdora->add_relationship_internal('isMetaDataFor', $pid, 'processing.txt', "http://esdora.ornl.gov/ontologies/relationships#");
-        } else {
-            //TODO: add this to an api call called modify_datastream_by_txt or something similar
-            $dir = file_directory_temp();
-            $tmpfilename = tempnam($dir, 'fedoratmp');
-            $tmpfile = fopen($tmpfilename, 'w');
-            fwrite($tmpfile, $txt, strlen($txt));
-            fclose($tmpfile);
-            file_copy($tmpfilename, file_directory_path());
-            //$datastream_url = drupal_urlencode($tmpfilename);
-            $url = file_create_url($tmpfilename);
-            $item->modify_datastream_by_reference($url, 'processing.txt', 'processing text', 'text/plain', $force = FALSE, $logMessage = 'Modified by Islandora API');
-            unlink($tmpfilename);
-        }
+  }
+  $txt = $form_state['values']['txt'];
+  //this will overwrite the txt stream if it exists or create it if it doesn't
+  if (!empty($txt)) {
+    $ds_list = $item->get_datastreams_list_as_array();
+    if (empty($ds_list['processing.txt'])) {
+      $item->add_datastream_from_string($txt, 'processing.txt', 'processing text', $datastream_mimetype = 'text/plain', 'M');
+      //mark it as metadata:
+      $esdora = new Esdora($pid);
+      $esdora->add_relationship_internal('isMetaDataFor', $pid, 'processing.txt', "http://esdora.ornl.gov/ontologies/relationships#");
+    } else {
+      //TODO: add this to an api call called modify_datastream_by_txt or something similar
+      $dir = file_directory_temp();
+      $tmpfilename = tempnam($dir, 'fedoratmp');
+      $tmpfile = fopen($tmpfilename, 'w');
+      fwrite($tmpfile, $txt, strlen($txt));
+      fclose($tmpfile);
+      file_copy($tmpfilename, file_directory_path());
+      //$datastream_url = drupal_urlencode($tmpfilename);
+      $url = file_create_url($tmpfilename);
+      $item->modify_datastream_by_reference($url, 'processing.txt', 'processing text', 'text/plain', $force = FALSE, $logMessage = 'Modified by Islandora API');
+      unlink($tmpfilename);
     }
-    drupal_goto('/fedora/repository/' . $pid); //would like to use a form redirect but since we are using a combination of ajax and drupal formapi does not see to redirect doesn't seem to work
+  }
+  drupal_goto('/fedora/repository/' . $pid); //would like to use a form redirect but since we are using a combination of ajax and drupal formapi does not see to redirect doesn't seem to work
 }
 
 
 /**
- * 
+ *
  * This is a php call back function referenced in the islandora/xsl/sparcal_to_html.xsl
- * the call back is a general mechanism for php xslt engine to call any functions from 
+ * the call back is a general mechanism for php xslt engine to call any functions from
  * within the xsl template, and the function can be located in any loaded php libraries files.
  * The usage is in the context of the php core class, XsltProcessor. The class need to register the callback: ->registerPHPFunctions()
- * which may put restrictions on which functions - parseContent() has no restriction, maiking 
- * it open to all php functions. 
+ * which may put restrictions on which functions - parseContent() has no restriction, maiking
+ * it open to all php functions.
  * @see ObjectHelper.inc->parseContent($content, $pid, $dsId, $collection, $pageNumber = NULL)
  * @see XSLTProcessor
  * @param string $collection_pid: the PID of the collection object
  */
 function get_child_count($collection_pid) {
 
-    $query = 'select count (select $object from <#ri>
+  $query = 'select count (select $object from <#ri>
 			where $object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $collection_pid . '>)
 			from <#ri>
 			where
 			$s $p $o
                         and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>';
 
-    $query_string = htmlentities(urlencode($query));
-    $content = '';
-    $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
-    $url .= "?lang=itql&format=Simple&query=" . $query_string;
-    $content .= ( do_curl($url));
-    if (strlen($content) > 0) {
-        $tokens = explode('"', trim($content));
-        $value = $tokens[1];
-        if ($value == 0) {
-            return "Data Object"; //TODO this is wrong when create a new empty collection
-        } else {
-            return 'Collection Object (total items: ' . $value . ')';
-        }
+  $query_string = htmlentities(urlencode($query));
+  $content = '';
+  $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+  $url .= "?lang=itql&format=Simple&query=" . $query_string;
+  $content .= ( do_curl($url));
+  if (strlen($content) > 0) {
+    $tokens = explode('"', trim($content));
+    $value = $tokens[1];
+    if ($value == 0) {
+      return "Data Object"; //TODO this is wrong when create a new empty collection
+    } else {
+      return 'Collection Object (total items: ' . $value . ')';
     }
-    return $content;
+  }
+  return $content;
 }
 
 function esdora_islandora_get_tabs_compound() {
-    //echo drupal_json('call compound');return;
-    $pid = $_POST['pid'];
-    $case = $_POST['tab'];
-    $pid = str_replace('"/', "", $pid);
-    $pid = trim($pid);
-    $case = trim($case);
-    module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
-    $esdora = new Esdora($pid);
-    //echo drupal_json('call hi ' . $case);return;
-    esdora_islandora_get_tabs($esdora, $case);
+  //echo drupal_json('call compound');return;
+  $pid = $_POST['pid'];
+  $case = $_POST['tab'];
+  $pid = str_replace('"/', "", $pid);
+  $pid = trim($pid);
+  $case = trim($case);
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $esdora = new Esdora($pid);
+  //echo drupal_json('call hi ' . $case);return;
+  esdora_islandora_get_tabs($esdora, $case);
 }
 
 function esdora_islandora_get_tabs_atomic() {
-    $pid = $_POST['pid'];
-    $case = $_POST['tab'];
-    $pid = str_replace('"/', "", $pid);
-    $pid = trim($pid);
-    $case = trim($case);
-    module_load_include('inc', 'esdora_islandora', 'plugins/esdora_atomic');
-    $esdora = new Esdora_Atomic($pid);
-    esdora_islandora_get_tabs($esdora, $case);
+  $pid = $_POST['pid'];
+  $case = $_POST['tab'];
+  $pid = str_replace('"/', "", $pid);
+  $pid = trim($pid);
+  $case = trim($case);
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora_atomic');
+  $esdora = new Esdora_Atomic($pid);
+  esdora_islandora_get_tabs($esdora, $case);
 }
 
 function esdora_islandora_get_tabs($esdora_obj, $case) {
 
-    $content = '';
-    if ($case == "Items")
-        $content.= $esdora_obj->getItems();
-    elseif ($case == "Metadata") {
-        $content.= $esdora_obj->getMetadata();
-    } elseif ($case == "Description") {
-        $content.= $esdora_obj->getDescription();
-    } elseif ($case == "History")
+  $content = '';
+  if ($case == "Items")
+    $content.= $esdora_obj->getItems();
+  elseif ($case == "Metadata") {
+    $content.= $esdora_obj->getMetadata();
+  } elseif ($case == "Description") {
+    $content.= $esdora_obj->getDescription();
+  } elseif ($case == "History")
         $content.= $esdora_obj->getHistory();
-    elseif ($case == "Viewers") {
-        $content.= $esdora_obj->getViewers();
-    }
-    else
-        $content.= 'oops';
-    echo drupal_json($content);
+  elseif ($case == "Viewers") {
+    $content.= $esdora_obj->getViewers();
+  }
+  else
+    $content.= 'oops';
+  echo drupal_json($content);
 }
 
 /**
@@ -303,70 +329,69 @@ function esdora_islandora_get_tabs($esdora_obj, $case) {
  * we also alter the ingest form to add a file upload for zip ingest
  */
 function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
-    if ($form_id === "add_stream_form") {
-        //$form = esdora_add_stream_form();
-                $form['is_metadata'] = array(
-            '#type' => 'checkbox',
-            '#weight' => '-1',
-            '#title' => t('is this metadata'),
-            '#description' => t('If this file is not actual data but describes the data please mark it as metadata by checking the checkbox'));
+  if ($form_id === "add_stream_form") {
+    //$form = esdora_add_stream_form();
+    $form['is_metadata'] = array(
+      '#type' => 'checkbox',
+      '#weight' => '-1',
+      '#title' => t('is this metadata'),
+      '#description' => t('If this file is not actual data but describes the data please mark it as metadata by checking the checkbox')
+    );
+    $form['stream_id'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
+      '#type' => 'textfield',
+      '#title' => 'datastream id',
+      '#weight' => '0',
+      '#description' => 'machine readable datastream id',
+    );
+    $form['is_viewer'] = array(
+      '#type' => 'fieldset',
+      '#weight' => '-2',
+      '#title' => t('Is this a reference to a viewer.'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#description' => t('Enter a URL to an external viewer.  Marking this as Metadata or uploading a file will be ingnored as a Viewer cannot be Metadata and there will not be a file associated with this datastream.')
+    );
+    $form['is_viewer']['viewer_url'] = array(
+      '#type' => 'textfield',
+      '#title' => t('The URL for the viewer'),
+      '#description' => t('A URL for a viewer for this object'),
+    );
+    //is derived from should not live in this form should be its own  probably in the details section i'll remove this when i find a home for it
+    /* $form['is_derived_from'] = array(
+       '#type' => 'fieldset',
+       '#title' => 'Is this Object derived from other Objects',
+       '#weight' => '-1',
+       '#collapsible' => TRUE,
+       '#collapsed' => TRUE,
+       '#description' => 'Is this Object derived from other Objects',
+       );
+       $form['is_derived_from']['derived_from_pid'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
+       '#type' => 'textfield',
+       '#title' => 'PID of the object this is derived from',
+       //'#weight' => '-1',
+       '#description' => 'A PID from a Fedora object that this object is derived from.  This information will be stored in the relationship stream'
+       ); */
+    $form['#submit'][0] = 'esdora_rels_int_handler'; //add a new handler Actually replacing the orginal here but we call it from our function now, this should not affect other handlers as they would still be called after bit is a bit of a hack
+    $form['#validate'][0] = 'esdora_rels_int_handler_validate'; //same for this function
 
-        $form['stream_id'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
-            '#type' => 'textfield',
-            '#title' => 'datastream id',
-            '#weight' => '0',
-            '#description' => 'machine readable datastream id',
-        );
-        $form['is_viewer'] = array(
-            '#type' => 'fieldset',
-            '#weight' => '-2',
-            '#title' => t('Is this a reference to a viewer.'),
-            '#collapsible' => TRUE,
-            '#collapsed' => FALSE,
-            '#description' => t('Enter a URL to an external viewer.  Marking this as Metadata or uploading a file will be ingnored as a Viewer cannot be Metadata and there will not be a file associated with this datastream.'));
+  }
 
-        $form['is_viewer']['viewer_url'] = array(
-            '#type' => 'textfield',
-            '#title' => t('The URL for the viewer'),
-            '#description' => t('A URL for a viewer for this object'),
-        );
-
-        //is derived from should not live in this form should be its own  probably in the details section i'll remove this when i find a home for it
-        /* $form['is_derived_from'] = array(
-          '#type' => 'fieldset',
-          '#title' => 'Is this Object derived from other Objects',
-          '#weight' => '-1',
-          '#collapsible' => TRUE,
-          '#collapsed' => TRUE,
-          '#description' => 'Is this Object derived from other Objects',
-          );
-          $form['is_derived_from']['derived_from_pid'] = array(//This overrides the dropdown as it is usually generated from a list of available ids but we want free form text.
-          '#type' => 'textfield',
-          '#title' => 'PID of the object this is derived from',
-          //'#weight' => '-1',
-          '#description' => 'A PID from a Fedora object that this object is derived from.  This information will be stored in the relationship stream'
-          ); */
-        $form['#submit'][0] = 'esdora_rels_int_handler'; //add a new handler Actually replacing the orginal here but we call it from our function now, this should not affect other handlers as they would still be called after bit is a bit of a hack
-        $form['#validate'][0] = 'esdora_rels_int_handler_validate'; //same for this function
-
+  if ($form_id == "fedora_repository_ingest_form") {
+    //the below depend on certain content models and form names. with xml form builder form names are arbitrary so this is tightly tied to a certain setup
+    //we have created basically a blank form and given it a name of "import from zip" everything we need is in the zip so we just show the file chooser.
+    //this is really indepentent of the form builder but once we associate a form with a cmodel the formbuilder takes over.
+    if (isset($form_state['values']['models']) && strstr($form_state['values']['models'], '/', TRUE) == 'esdora:defaultDataCModel' && $form_state['values']['forms'] == 'import from zip') {
+      //module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
+      //$uploader = new IslandoraYuiUploader();
+      //$form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
+      //$form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
+      //moved away from the flash yuiuploader for now using normal file upload
+      $form['#attributes'] = array('enctype' => "multipart/form-data");
+      $form['file_upload'] = array('#type' => 'file', '#title' => 'upload a zip file');
+      $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
+      $form['#submit'][] = 'esdora_file_upload_handler'; //add a new handler
     }
-
-    if ($form_id == "fedora_repository_ingest_form") {
-        //the below depend on certain content models and form names. with xml form builder form names are arbitrary so this is tightly tied to a certain setup
-        //we have created basically a blank form and given it a name of "import from zip" everything we need is in the zip so we just show the file chooser.
-        //this is really indepentent of the form builder but once we associate a form with a cmodel the formbuilder takes over.
-        if (isset($form_state['values']['models']) && strstr($form_state['values']['models'], '/', TRUE) == 'esdora:defaultDataCModel' && $form_state['values']['forms'] == 'import from zip') {
-            //module_load_include('inc', 'islandora_yui_uploader', 'IslandoraYuiUploader');
-            //$uploader = new IslandoraYuiUploader();
-            //$form['#prefix'] = $uploader->islandora_yui_uploader_add_js($form_state,'{description:"Zip File", extensions:"*.zip"}');
-            //$form['yui_form_build_id'] = array('#type' => 'hidden','#value' => $form_state['values']['yui_form_build_id']);//we need to add the yui_form_build_id se we can find the files the yui_build_id was created in the add_js function
-            //moved away from the flash yuiuploader for now using normal file upload
-            $form['#attributes'] = array('enctype' => "multipart/form-data");
-            $form['file_upload'] = array('#type' => 'file', '#title' => 'upload a zip file');
-            $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
-            $form['#submit'][] = 'esdora_file_upload_handler'; //add a new handler
-        }
-    }
+  }
 }
 
 /**
@@ -375,14 +400,14 @@ function esdora_islandora_form_alter(&$form, &$form_state, $form_id) {
  * @param <type> $form_state
  */
 function esdora_file_upload_handler(&$form, &$form_state) {
-    $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
-    //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
-    //$files_dir = "$tmp_directory/$form_build_id";
-    if ($file = file_save_upload('file_upload', null, file_directory_path())) {
-        module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
-        $esdora_ingest = new EsdoraIngest();
-        $esdora_ingest->handleZipIngestForm($form_state['values'], $file);
-    }
+  $tmp_directory = file_directory_temp(); //drupals tmp directory could be the same as sys temp
+  //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
+  //$files_dir = "$tmp_directory/$form_build_id";
+  if ($file = file_save_upload('file_upload', null, file_directory_path())) {
+    module_load_include('inc', 'esdora_islandora', 'plugins/EsdoraIngest');
+    $esdora_ingest = new EsdoraIngest();
+    $esdora_ingest->handleZipIngestForm($form_state['values'], $file);
+  }
 }
 
 /**
@@ -392,15 +417,15 @@ function esdora_file_upload_handler(&$form, &$form_state) {
  * @return
  */
 function esdora_rels_int_handler_validate(&$form, &$form_state) {
-    if (empty($form_state['values']['viewer_url'])) {//if the viewer_url is populated we are adding a redirect stream only
-        $files = $_FILES["files"]["name"];
-        $file_name = $files['add-stream-file-location'];
-        if (empty($file_name) && !($form_state['values']['submit'] == 'OK')) {//islandora is doing something with the form instead of a redirect. it changes the submit button ot OK and when you click it redirects
-            form_set_error('', t('No File uploaded. Please Choose a file.'));
-            return FALSE;
-        }
-        add_stream_form_validate($form, $form_state);
+  if (empty($form_state['values']['viewer_url'])) {//if the viewer_url is populated we are adding a redirect stream only
+    $files = $_FILES["files"]["name"];
+    $file_name = $files['add-stream-file-location'];
+    if (empty($file_name) && !($form_state['values']['submit'] == 'OK')) {//islandora is doing something with the form instead of a redirect. it changes the submit button ot OK and when you click it redirects
+      form_set_error('', t('No File uploaded. Please Choose a file.'));
+      return FALSE;
     }
+    add_stream_form_validate($form, $form_state);
+  }
 }
 
 /**
@@ -410,53 +435,44 @@ function esdora_rels_int_handler_validate(&$form, &$form_state) {
  * This is the form handler that gets called now that we have implemented hood form alter
  */
 function esdora_rels_int_handler(&$form, &$form_state) {
-    module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
-    $esdora = new Esdora($form_state['values']['pid']);
-    if (!empty($form_state['values']['viewer_url'])) {
-        $viewer_url = $form_state['values']['viewer_url'];
-        $filtered_url = $viewer_url; //filter_var($viewer_url, FILTER_VALIDATE_URL);
-        if (!isset($filtered_url)) {
-            drupal_set_message(t('You must enter a valid URL in the URL for Viewer textbox'));
-            //TODO: we should check to see if they attached a file and delete it if they did maybe or at least verify that we are not leaving files hanging around shouldn't happen very often but could
-            return ' ';
-        }
-        //module_load_include('inc', 'fedora_repository', 'plugins/fedora_item');
-        $pid = $form_state['values']['pid'];
-        $dsid = $form_state['values']['stream_id'];
-        $dsLabel = $form_state['values']['stream_label'];
-        $item = new Fedora_Item($pid);
-        $item->add_datastream_from_url($filtered_url, $dsid, $dsLabel, NULL, 'R');
-        $esdora->add_relationship_internal('isViewerFor', $pid, $dsid, "http://esdora.ornl.gov/ontologies/relationships#");
-        //drupal_set_message(t('Successfully added viewer to @pid'),array('@pid'=>$pid));
-        return ' '; //we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
+  module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
+  $esdora = new Esdora($form_state['values']['pid']);
+  if (!empty($form_state['values']['viewer_url'])) {
+    $viewer_url = $form_state['values']['viewer_url'];
+    $filtered_url = $viewer_url; //filter_var($viewer_url, FILTER_VALIDATE_URL);
+    if (!isset($filtered_url)) {
+      drupal_set_message(t('You must enter a valid URL in the URL for Viewer textbox'));
+      //TODO: we should check to see if they attached a file and delete it if they did maybe or at least verify that we are not leaving files hanging around shouldn't happen very often but could
+      return ' ';
     }
-    //call the orginal handler where this is where this gets brittle if the orginal form handler changes this may break (the add stream form is core so shouldn't change unless it is major refactor like going from 6 to 7 which would require changes
-    add_stream_form_submit($form, $form_state);
-    if ($form_state['values']['is_metadata'] === 1) {
-        $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'], $form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
-    }
+    //module_load_include('inc', 'fedora_repository', 'plugins/fedora_item');
+    $pid = $form_state['values']['pid'];
+    $dsid = $form_state['values']['stream_id'];
+    $dsLabel = $form_state['values']['stream_label'];
+    $item = new Fedora_Item($pid);
+    $item->add_datastream_from_url($filtered_url, $dsid, $dsLabel, NULL, 'R');
+    $esdora->add_relationship_internal('isViewerFor', $pid, $dsid, "http://esdora.ornl.gov/ontologies/relationships#");
+    //drupal_set_message(t('Successfully added viewer to @pid'),array('@pid'=>$pid));
+    return ' '; //we don't want to do add an actual file as we have already added the datatstream here and it is externally managed by Fedora
+  }
+  //call the orginal handler where this is where this gets brittle if the orginal form handler changes this may break (the add stream form is core so shouldn't change unless it is major refactor like going from 6 to 7 which would require changes
+  add_stream_form_submit($form, $form_state);
+  if ($form_state['values']['is_metadata'] === 1) {
+    $esdora->add_relationship_internal('isMetaDataFor', $form_state['values']['pid'], $form_state['values']['stream_id'], "http://esdora.ornl.gov/ontologies/relationships#");
+  }
 }
 
 /**
- * This becomes the main entry of the ESDORA repository
- * @global type $user
- * @param type $pid
- * @param type $dsId
- * @param type $collection
- * @param type $page_number
- * @param type $limit
- * @return type 
+ * Menu callback for fedora/respository. This becomes the main entry of the ESDORA repository
  */
-function esdora_repository_page($pid = NULL, $dsId = NULL, $collection = NULL, $page_number = NULL, $limit = NULL) {
-    try {
-    module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');    
-    return displayContent($pid, $dsId, $collection, $page_number, $limit);
-    }
-    catch (Exception $e) {
-        drupal_set_message("error trying to display $pid: error: ". $e->getMessage());
-    }
+function esdora_repository_page($pid = NULL, $dsid = NULL, $collection = NULL, $page_number = NULL, $limit = NULL) {
+  module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
+  try {
+    //return displayContent($pid, $dsid, $collection, $page_number, $limit);
+    return esdora_menu_alter_fedora_repository($pid, $dsid, $collection, $page_number, $limit);
+  }
+  catch (Exception $e) {
+    drupal_set_message(t('Error trying to display @pid: @msg', array('@pid' => $pid, '@msg' => $e->getMessage())));
+    drupal_not_found();
+  }
 }
-
-
-
-
