@@ -200,6 +200,7 @@ function theme_esdora_islandora_object_tabs($pid, $page_number) {
  */
 function template_preprocess_esdora_islandora_object_manage_tab(array &$variables) {
   module_load_include('inc', 'fedora_repository', 'plugins/FedoraObjectDetailedContent');
+  module_load_include('inc', 'esdora_islandora', 'esdora_forms');
   $pid = $variables['pid'];
   $obj = new FedoraObjectDetailedContent($pid);
   $variables['object_details'] = $object_details = $obj->showFieldSets();
