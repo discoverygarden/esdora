@@ -13,42 +13,42 @@
 <div style="display: none;">
   <div id="dataset_add_component" class="esdora-fancy-box-item">
     <?php print drupal_render($manage_view_add_component); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>
   </div>
   <div id="dataset_edit_fgdc" class="esdora-fancy-box-item" >
     <?php print drupal_render($manage_view_edit_fgdc); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>
   </div>
   <div id="dataset_edit_dc"  class="esdora-fancy-box-item">
     <?php print drupal_render($manage_view_edit_dc); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>
   </div>
   <div id="dataset_add_lineage" class="esdora-fancy-box-item">
     <?php print drupal_render($manage_view_lineage); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>
   </div>
   <div id="dataset_object_details" class="esdora-fancy-box-item">
     <?php  print drupal_render($object_details); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>
   </div>
   <div id="add_to_workflow" class="esdora-fancy-box-item">
     <?php  print drupal_render($add_to_workflow); ?>
-    <p/><br/>
+    <br/>
     <a onclick="$.fancybox.close();" href="javascript:;">
       <center>Close</center>
     </a>

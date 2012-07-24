@@ -3,6 +3,7 @@ name = esdora islandora cmodel
 dependencies[] = fedora_repository
 dependencies[] = islandora_workflow
 dependencies[] = tabs
+dependencies[] = fancybox
 description = esdora content models.
 package = ESDORA
 version = 6.1dev

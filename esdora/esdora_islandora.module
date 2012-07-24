@@ -468,7 +468,6 @@ function esdora_rels_int_handler(&$form, &$form_state) {
 function esdora_repository_page($pid = NULL, $dsid = NULL, $collection = NULL, $page_number = NULL, $limit = NULL) {
   module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
   try {
-    //return displayContent($pid, $dsid, $collection, $page_number, $limit);
     return esdora_menu_alter_fedora_repository($pid, $dsid, $collection, $page_number, $limit);
   }
   catch (Exception $e) {

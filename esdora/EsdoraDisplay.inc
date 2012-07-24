@@ -173,8 +173,11 @@ function theme_esdora_islandora_object($pid, $page_number) {
  * Implements theme_hook().
  */
 function theme_esdora_islandora_object_tabs($pid, $page_number) {
+  $path = drupal_get_path('module', 'esdora_islandora');
   drupal_add_css("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.css");
   drupal_add_js("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.js");
+  drupal_add_css($path . '/css/esdora.css');
+  drupal_add_js($path . '/js/esdora.js');
   $content_model = _esdora_menu_alter_fedora_repository_get_content_model_matching($pid, array(ESDORA_COMPUND_DATA_PID, ESDORA_ATOMISTIC_DATA_PID));
   return tabs_render(array(
       '#type' => 'tabset',
@@ -195,18 +198,15 @@ function theme_esdora_islandora_object_tabs($pid, $page_number) {
 /**
  * Implements template_preprocess_hook().
  */
-function template_preprocess_esdora_islandora_manage_tab(array &$variables) {
+function template_preprocess_esdora_islandora_object_manage_tab(array &$variables) {
   module_load_include('inc', 'fedora_repository', 'plugins/FedoraObjectDetailedContent');
-  $path = drupal_get_path('module', 'esdora_islandora');
-  drupal_add_css($path . '/css/esdora.css');
-  drupal_add_js($path . '/js/esdora.js');
   $pid = $variables['pid'];
   $obj = new FedoraObjectDetailedContent($pid);
   $variables['object_details'] = $object_details = $obj->showFieldSets();
   $variables['manage_view_add_component'] = array(
     'component' => array(
       '#type' => 'fieldset',
-      '#title' => 'Add Component',
+      '#title' => t('Add Component'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
       '#value' => drupal_get_form('addstream_form', $pid),
@@ -214,7 +214,7 @@ function template_preprocess_esdora_islandora_manage_tab(array &$variables) {
     ),
     'viewer' => array(
       '#type' => 'fieldset',
-      '#title' => 'Add Viewer',
+      '#title' => t('Add Viewer'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
       '#value' => drupal_get_form('esdora_addviewer_form', $pid),
