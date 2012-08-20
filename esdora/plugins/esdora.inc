@@ -627,20 +627,24 @@ class Esdora {
      */
     function getListOfStreams($mimeTypeToRetrieve, $exclude=null) {
       global $base_url, $pager_page_array, $pager_total, $pager_total_items;
-      // Configure Pager
-      $pager_id = 0;
-      $page = isset($_GET['page']) ? $_GET['page'] : '';
-      $pager_total_items[$pager_id] = $total;
-      $pager_total[$pager_id] = ceil($pager_total_items[$pager_id] / $limit);
-      $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
-      // Build Table
-      $header = array(t('Data Item'), t('Checksum'), t('Checksum Type'));
+      // Build list of datastreams to be displayed.
       $this->datastreams_list = ($this->datastreams_list) ? $this->datastreams_list : $this->item->get_datastreams_list_as_SimpleXML();
       $datastreams = isset($this->datastreams_list->datastreamDef) ? $this->datastreams_list->datastreamDef : array();
       $allow_all_mime_types = $mimeTypeToRetrieve == '*';
       $datastreams = $allow_all_mime_types ? $datastreams : array_filter($datastreams, function($ds) use($mime_typeToRetrieve) { return $mimeTypeToRetrieve == $ds->MIMEType; });
       $exclude = empty($exclude) ? NULL : array_map(function($ex) { return isset($ex[0]) ? $ex[0] : NULL; }, $exclude);
       $datastreams = empty($exclude) ? $datastreams : array_filter($datastreams, function($ds) use($exclude) { return array_search($ds->ID, $exclude) === FALSE; });
+      // Configure Pager
+      $pager_id = 0;
+      $limit = 10;
+      $page = isset($_GET['page']) ? $_GET['page'] : '';
+      // Convert comma-separated $page to an array, used by other functions.
+      $pager_page_array = explode(',', $page);
+      $pager_total_items[$pager_id] = count($datastreams);
+      $pager_total[$pager_id] = ceil($pager_total_items[$pager_id] / $limit);
+      $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
+      // Build list of Rows
+      $datastreams = array_slice($datastreams, $page * $limit, $limit); // Split out the number to be rendered.
       $rows = array();
       foreach ($datastreams as $ds) {
         $ds_info = $this->item->get_datastream_info($ds->ID);
@@ -649,7 +653,8 @@ class Esdora {
         $url = ($cg == 'E' || $cg == 'R') ? $ds_info->datastream->location : "fedora/repository/{$this->pid}/{$ds->ID}";
         $rows[] = array(l($label, $url), $ds_info->datastream->checksum, $ds_info->datastream->checksumType);
       }
-      return theme_table($header, $rows);
+      $header = array(t('Data Item'), t('Checksum'), t('Checksum Type'));
+      return theme_table($header, $rows) . theme_pager();
     }
 
     /**
