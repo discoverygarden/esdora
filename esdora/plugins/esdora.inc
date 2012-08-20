@@ -31,7 +31,7 @@ class Esdora {
      *
      * @return returns a drupal tab tabset
      */
-    public function showFieldSets() {       
+    public function showFieldSets() {
         $items = $this->getItems();
         $cont = '<div id="dataset-ajax-tabs">';
         $cont .='<button id="Items">Items</button>';
@@ -291,7 +291,7 @@ class Esdora {
     }
 
     //============ END KEY TAB FUNCTIONS  ======================================================//
-    
+
     //============ START HELP FUNCTIONS ========================================================//
     function getLineageAsGraph($pid) {
 
@@ -626,49 +626,30 @@ class Esdora {
      * @return string
      */
     function getListOfStreams($mimeTypeToRetrieve, $exclude=null) {
-        // $list_of_streams = array();
-        global $base_url;
-        $html = '';
-        if ($this->datastreams_list == FALSE) { //used the cached copy if we have it
-            $this->datastreams_list = $this->item->get_datastreams_list_as_SimpleXML();
-        }
-        if ($this->datastreams_list != FALSE) {
-            $html .='<table id="data-items-table"><tr><th>Data Item</th><th>Checksum</th><th>Checksum Type</th></tr>';
-            foreach ($this->datastreams_list->datastreamDef as $ds) {
-                $ds_info = $this->item->get_datastream_info($ds->ID);
-                if ($mimeTypeToRetrieve == $ds->MIMEType || $mimeTypeToRetrieve == '*') {
-                    // $list_of_streams[] = $ds;
-                    $include = TRUE;
-                    //drupal_set_message('<pre>'. print_r($exclude, TRUE) .'</pre>');
-                    if (isset($exclude)) {
-                        foreach ($exclude as $value) {
-                            if (!empty($value[0]) && stristr($ds->ID, $value[0])) {
-
-
-                                $include = FALSE;
-                            }
-                        }
-                    }
-                    if ($include) {
-                        $label = $ds->label;
-                        if (empty($label)) {
-                            $label = $ds->ID;
-                        }
-                        $html .= '<tr><td>';
-                        if ($ds_info->datastream->controlGroup == 'E' || $ds_info->datastream->controlGroup == 'R') {//link to external viewer
-                            //$txtValue = $this->item->get_datastream_dissemination($ds->ID);
-                            $txtValue = $ds_info->datastream->location;
-                            $html .= '<a href = "' . $txtValue . '" target="_blank">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
-                            //don't do anything here as we don't want show external links here
-                        } else {
-                            $html .= '<a href = "' . $base_url . base_path() . 'fedora/repository/' . $this->pid . '/' . $ds->ID . '/' . drupal_urlencode($label) . '">' . $ds->label . '</a></td><td> ' . $ds_info->datastream->checksum . '</td><td> ' . $ds_info->datastream->checksumType . '</td></tr>';
-                        }
-                    }
-                }
-            }
-        }
-        //return $list_of_streams;
-        return $html . '</table>';
+      global $base_url, $pager_page_array, $pager_total, $pager_total_items;
+      // Configure Pager
+      $pager_id = 0;
+      $page = isset($_GET['page']) ? $_GET['page'] : '';
+      $pager_total_items[$pager_id] = $total;
+      $pager_total[$pager_id] = ceil($pager_total_items[$pager_id] / $limit);
+      $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
+      // Build Table
+      $header = array(t('Data Item'), t('Checksum'), t('Checksum Type'));
+      $this->datastreams_list = ($this->datastreams_list) ? $this->datastreams_list : $this->item->get_datastreams_list_as_SimpleXML();
+      $datastreams = isset($this->datastreams_list->datastreamDef) ? $this->datastreams_list->datastreamDef : array();
+      $allow_all_mime_types = $mimeTypeToRetrieve == '*';
+      $datastreams = $allow_all_mime_types ? $datastreams : array_filter($datastreams, function($ds) use($mime_typeToRetrieve) { return $mimeTypeToRetrieve == $ds->MIMEType; });
+      $exclude = empty($exclude) ? NULL : array_map(function($ex) { return isset($ex[0]) ? $ex[0] : NULL; }, $exclude);
+      $datastreams = empty($exclude) ? $datastreams : array_filter($datastreams, function($ds) use($exclude) { return array_search($ds->ID, $exclude) === FALSE; });
+      $rows = array();
+      foreach ($datastreams as $ds) {
+        $ds_info = $this->item->get_datastream_info($ds->ID);
+        $cg = $ds_info->datastream->controlGroup;
+        $label = empty($ds->label) ? $ds->ID : $ds->label;
+        $url = ($cg == 'E' || $cg == 'R') ? $ds_info->datastream->location : "fedora/repository/{$this->pid}/{$ds->ID}";
+        $rows[] = array(l($label, $url), $ds_info->datastream->checksum, $ds_info->datastream->checksumType);
+      }
+      return theme_table($header, $rows);
     }
 
     /**
