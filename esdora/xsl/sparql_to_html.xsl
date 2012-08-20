@@ -10,23 +10,23 @@
  <xsl:variable name="thisPid" >
   <xsl:value-of select="$collectionPid"/>
  </xsl:variable>
- 
+
  <xsl:variable name="thisTitle" >
   test ttiles
   <!--<xsl:value-of select="$collectionTitle"/>-->
  </xsl:variable>
- <xsl:variable name="size"  select="2"/>
+ <xsl:variable name="size"  select="20"/>
  <xsl:variable name="page" select="$hitPage"/>
  <xsl:variable name="start" select="((number($page) - 1) * number($size)) + 1"/>
  <xsl:variable name="end" select="($start - 1) + number($size)"/>
   <xsl:variable name="cellsPerRow" select="1"/>
  <xsl:variable name="count" select="count(s:sparql/s:results/s:result)"/>
- 
- 
- 
+
+
+
 <xsl:template match="/">
  <xsl:if test="$count>0">
-  
+
   <!-- start previous next -->
   <div class="item-list">
    <ul class="pager">
@@ -36,7 +36,7 @@
       of <xsl:value-of select="$count"/>&#160;<br />
      </xsl:when>
      <xsl:when test="$end >= $count">
-      
+
       <xsl:value-of select="$start"/>-<xsl:value-of select="$count"/>
       of <xsl:value-of select="$count"/>&#160;<br />
       <li class="pager-previous">
@@ -90,7 +90,7 @@
 <xsl:template match="s:sparql/s:results">
   <!-- <xsl:for-each select="s:result">-->
  <xsl:for-each select="s:result[position()>=$start and position() &lt;=$end]">
-   
+
   <tr>
   <xsl:variable name='OBJECTURI' select="s:object/@uri"/>
   <xsl:variable name='CONTENTURI' select="s:content/@uri"/>
@@ -103,12 +103,12 @@
 	   <xsl:with-param name="to" select="' '"/>
 	  </xsl:call-template>
   </xsl:variable>
-  
+
   <xsl:variable name="cleanTitle">
     <!--<xsl:value-of select="php:functionString('fedora_repository_urlencode_string', $newTitle)"/>-->
    <xsl:value-of select = "$newTitle"/>
   </xsl:variable>
-  
+
   <xsl:variable name="linkUrl">
    <xsl:choose>
     <xsl:when test="($CONTENTMODEL='islandora:collectionCModel')"> <!-- ? the test result not matter? -->
@@ -120,7 +120,7 @@
    </xsl:choose>
    <xsl:value-of select="s:content"/>
   </xsl:variable>
-  
+
   <xsl:variable name ="imagUrl">
 	<xsl:choose>
 	<xsl:when test ="($CONTENTMODEL='esdora:defaultCollectionCModel')">  <!-- this is the data object that has this model -->
@@ -129,14 +129,14 @@
 	<xsl:otherwise>
   	<xsl:value-of select="$BASEURL"/>/sites/default/files/islandora_img/file-2-icon.png
 	</xsl:otherwise>
-	</xsl:choose>  
+	</xsl:choose>
   </xsl:variable>
 
   <xsl:variable name="childCount">
     <xsl:value-of select="php:functionString('get_child_count', $PID)"/>
   </xsl:variable>
 
-  <td colspan="2" width="50%">   
+  <td colspan="2" width="50%">
     <a>
     <xsl:attribute name="href"><xsl:value-of select="$linkUrl"/>
     </xsl:attribute>
@@ -152,14 +152,14 @@
   		<input type="submit" value="view details"/>
   	</form>
   </td>
-   
+
    -->
-   
+
    <td colspan="1" width="10%">
    	<a>
     <xsl:attribute name="href"><xsl:value-of select="$linkUrl"/>
     </xsl:attribute>
-    
+
    <img width="16" height="16">
     <xsl:attribute name="src"><xsl:value-of select="$imagUrl"/>
     </xsl:attribute>
@@ -170,7 +170,7 @@
    </td>
 	<td>
    	<xsl:value-of select="$childCount"></xsl:value-of>
-   	<!-- 
+   	<!--
    	<xsl:value-of select="$BASEURL"/>/fedora/risearch?lang=itql&format=Sparql&query=select+count+%28select+%24object+from+%3C%23ri%3E+where+%24object+%3Cfedora-rels-ext%3AisMemberOf%3E+%3Cinfo%3Afedora%2F<xsl:copy-of select="$PID"/>%3E%29+from+%3C%23ri%3E+where+%24s+%24p+%24o
    	-->
    </td>
