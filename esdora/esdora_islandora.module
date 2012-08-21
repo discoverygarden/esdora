@@ -208,9 +208,7 @@ function esdora_islandora_derivative_form_submit(&$form, &$form_state) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
   $pid = $form_state['values']['pid'];
-  dsm($pid);
   $item = new Fedora_Item($pid);
-  dsm('Dude');
   $pids = array_map('trim', explode(',', $form_state['values']['related_pid']));
   $valid_pids = array_filter($pids, 'valid_pid');
   foreach($valid_pids as $key => $valid_pid) {
