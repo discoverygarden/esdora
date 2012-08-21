@@ -159,7 +159,7 @@ function theme_esdora_islandora_collection($pid, $page_number) {
 /**
  * Implements theme_hook().
  */
-function theme_esdora_islandora_object($pid, $page_number) {
+function theme_esdora_islandora_object($pid, $page_number = NULL) {
   if(!user_access(ObjectHelper::$MANAGE_COLLECTIONS)) {
     $content_model = _esdora_menu_alter_fedora_repository_get_content_model_matching($pid, array(ESDORA_COMPUND_DATA_PID, ESDORA_ATOMISTIC_DATA_PID));
     return $content_model->displayExtraFieldset($pid, $page_number);
@@ -172,7 +172,7 @@ function theme_esdora_islandora_object($pid, $page_number) {
 /**
  * Implements theme_hook().
  */
-function theme_esdora_islandora_object_tabs($pid, $page_number) {
+function theme_esdora_islandora_object_tabs($pid, $page_number = NULL) {
   $path = drupal_get_path('module', 'esdora_islandora');
   drupal_add_css("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.css");
   drupal_add_js("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.js");

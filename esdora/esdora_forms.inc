@@ -24,13 +24,13 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         '#description' => t('Please enter a unique name for this dataset.'),
         '#required' => TRUE,
     );
-    
+
     $form['add_to_workflow'] = array(
         '#type' => 'checkbox',
         '#title' => t('Add to workflow'),
         '#description' => t('If checked, the dataset will not be publised until approval.'),
     );
-    
+
     $form['#attributes'] = array('enctype' => 'multipart/form-data');
 
     $form['file_upload'] = array(
@@ -38,7 +38,7 @@ function dataset_ingest_form(&$form_state, $content_models, $collection_pid) {
         '#title' => t('Upload a zipped package file'),
         '#size' => 48,
         //'#required' => TRUE, //TODO: why not???
-        '#description' => t('Please create a zipped ingestion package with "Data" and "Metadata" subfolders. 
+        '#description' => t('Please create a zipped ingestion package with "Data" and "Metadata" subfolders.
             Place FGDC.xml and other descriptive files in the "Metadata" subfolder; and place
             data files in the "Data" subfolder.'),
     );
@@ -63,7 +63,7 @@ function dataset_ingest_form_validate(&$form, &$form_state) {
 //    $dataset_name=$form_state['values']['dataset_name'];
 //    if(!isset($dataset_name) || empty ($dataset_name)) {
 //        form_set_error('Dataset name is required, please enter a dataset name');
-//        return FALSE;        
+//        return FALSE;
 //    }
     $form_state['rebuild'] = FALSE;
 }
@@ -73,7 +73,7 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
     //$form_build_id = $form_state['values']['yui_form_build_id']; //the id of the form being submitted should match the directory name, we injected this into the form before we post the upload
     //$files_dir = "$tmp_directory/$form_build_id";
     if ($file = file_save_upload('file_upload', null, file_directory_path())) {
-       try {    
+       try {
             $collection_pid = $form_state['values']['collection_pid'];
             $cmodel_pid = $form_state['values']['model'];
             $dataset_name=$form_state['values']['dataset_name'];
@@ -92,14 +92,14 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
                     drupal_goto('/islandora_workflow'); //TODO correct tab?? landing to the pid?
                   } else {
                     drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$new_pid)));
-                  }                      
+                  }
             }
             else {
                 drupal_set_message(t("Successfully added @pid to collection @collection_pid, and the object is published",
                         array('@pid'=>$new_pid,'@collection_pid'=>$collection_pid)));
                 drupal_goto('/fedora/repository/' . $new_pid);
             }
-        }  
+        }
         catch (Exception $e)   {
             //set message here
             drupal_set_message("Ingesting of zipped package encountered a problem, $e->getMessage()");
@@ -114,59 +114,119 @@ function dataset_ingest_form_submit(&$form, &$form_state) {
     }
 }
 
-/**
- * creates a form on that we are currently calling from the history tab
+/** creates a form on that we are currently calling from the history tab
  * @param array $form_state
  * @param string $pid
  * @return string
  */
 function esdora_islandora_derivative_form(&$form_state, $pid) {
-    if (!isset($pid)) {
-        drupal_set_message(t("Can't create derivative form no pid supplied"));
-        return;
-    }
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $item = new Fedora_Item($pid);
-    $txt = $item->get_datastream_dissemination('processing.txt');
-    $rels = $item->get_datastream_dissemination('RELS-EXT');
-    $derivatives_string = '<b>Derived from:</b> ';
-    $src = new DOMDocument('1.0', 'utf-8');
-    $src->formatOutput = true;
-    $src->preserveWhiteSpace = false;
-
-    //Loading extern file
-    $src->loadXML($rels);
-    $isDerivedFrom = $src->getElementsByTagName('isDerivedFrom');
-    foreach ($isDerivedFrom as $derived) {
-        $derivatives_string .= substr($derived->getAttribute('rdf:resource'), 12) . ', ';
-    }
-    //$form['redirect'] = $base_url.'fedora/repository/'.$pid;
-    $form = array();
-    $form['txt'] = array(
-        '#type' => 'textarea',
-        '#title' => t('Text'),
-        '#default_value' => $txt,
-        '#description' => t('Text contained in the processing stream'),
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  if (!isset($pid)) {
+    drupal_set_message(t("Can't create derivative form no pid supplied"));
+    return;
+  }
+  $item = new Fedora_Item($pid);
+  $processing_text = $item->get_datastream_dissemination('processing.txt');
+  $ancestors = esdora_get_ancestors($pid);
+  $table = array(
+    '#tree' => TRUE,
+    '#theme' => THEME_ESDORA_DERIVATIVE_FORM_TABLE,
+    'rows' => array(),
+    'selections' => array(
+      '#type' => 'checkboxes',
+      '#options' => array_fill_keys($ancestors, '')
+    )
+  );
+  foreach($ancestors as $ancestor) {
+    $item = new Fedora_Item($ancestor);
+    $table['rows'][$ancestor] = array(
+      'pid' => array('#value' => $ancestor),
+      'label' => array('#value' => $item->objectProfile->objLabel),
     );
-    $form['related_pid'] = array(
-        '#prefix' => $derivatives_string,
-        '#type' => 'textfield',
-        '#title' => t('Add Derived From relationship'),
-        '#maxlength' => 64,
-        '#description' => t('comma seperated list of pids. If this object is already marked as being derived from an object then you don\'t need to mention the object here.  This is for new relationships.'),
-    );
-    $form['pid'] = array(
-        '#type' => 'hidden',
-        '#value' => $pid,
-    );
-    $form['tab'] = array(//the tabs are built using ajax and expect a post varible of tab we know we are on the History tab so add it here
-        '#type' => 'hidden',
-        '#value' => 'History',
-    );
-    $form['submit'] = array('#type' => 'submit', '#value' => t('Submit'));
-    return $form;
+  }
+  return array(
+    'txt' => array(
+      '#type' => 'textarea',
+      '#title' => t('Text'),
+      '#default_value' => $processing_text,
+      '#description' => t('Text contained in the processing stream'),
+    ),
+    'table' => $table,
+    'remove' => array(
+      '#type' => 'submit',
+      '#value' => t('Remove'),
+      '#description' => t('Removed the selected derviations.'),
+      '#submit' => array('esdora_islandora_derivative_form_remove_selection_submit')
+    ),
+    'related_pid' => array(
+      '#type' => 'textfield',
+      '#title' => t('Add Derived From relationship'),
+      '#maxlength' => 64,
+      '#description' => t('Comma seperated list of pids. If this object is already marked as being derived from an object then you don\'t need to mention the object here.  This is for new relationships.'),
+    ),
+    'pid' => array(
+      '#type' => 'hidden',
+      '#value' => $pid,
+    ),
+    'tab' => array( // The tabs are built using ajax and expect a post varible of tab we know we are on the History tab so add it here
+      '#type' => 'hidden',
+      '#value' => 'History',
+    ),
+    'submit' => array(
+      '#type' => 'submit',
+      '#value' => t('Add')
+    )
+  );
 }
 
+function theme_esdora_derivative_form_table(array $element) {
+  $rows = array();
+  foreach (element_children($element['rows']) as $child) {
+    $setting = $element['rows'][$child];
+    $pid = $child;
+    $fields = array(
+      drupal_render($element['selections'][$pid]) // First field is a checkbox
+    );
+    foreach (element_children($setting) as $property) {
+      $field = $setting[$property];
+      $fields[] = array('data' => drupal_render($field));
+    }
+    $rows[] = array(
+      'data' => $fields,
+      'class' => isset($setting['#attributes']['class']) ? $setting['#attributes']['class'] : NULL
+    );
+  }
+  $header = array(theme('table_select_header_cell'), array('data' => t('PID')), array('data' => t('Label')));
+  $attributes = isset($element['#id']) ? array('id' => $element['#id']) : NULL;
+  return theme_table($header, $rows, $attributes);
+}
+
+function esdora_get_ancestors($pid) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $item = new Fedora_Item($pid);
+  $rels = $item->get_datastream_dissemination('RELS-EXT');
+  $doc = new DOMDocument('1.0', 'utf-8');
+  $doc->formatOutput = true;
+  $doc->preserveWhiteSpace = false;
+  $doc->loadXML($rels);
+  $elements = $doc->getElementsByTagName('isDerivedFrom');
+  $pids = array();
+  foreach ($elements as $element) {
+    $pids[] = substr($element->getAttribute('rdf:resource'), 12);
+  }
+  return $pids;
+}
+
+function esdora_islandora_derivative_form_remove_selection_submit(array $form, array &$form_state) {
+  $pid = $form_state['values']['pid'];
+  $selections = $form_state['values']['table']['selections'];
+  $selections = array_filter($selections, function($v) { return $v != FALSE; });
+  $item = new Fedora_Item($pid);
+  foreach($selections as $selected) {
+    $item->purge_relationship('isDerivedFrom', $selected);
+  }
+  drupal_goto('fedora/repository/' . $pid);
+}
 
 function esdora_add_to_workflow_form(&$form_state, $pid) {
     $form['confirm']['are you sure'] = array(
@@ -189,13 +249,13 @@ function esdora_add_to_workflow_form(&$form_state, $pid) {
     );
     $form['confirm']['cancel'] = array(
       '#type' => 'button',
-      '#value' => t('Cancel'),  
+      '#value' => t('Cancel'),
       '#attributes' => array(
           'onclick' => '$.fancybox.close();',
           'onsubmit' => 'return false',
           ),
     );
-    
+
     return $form;
 
 }
@@ -212,7 +272,7 @@ function esdora_add_to_workflow_form_submit(&$form, &$form_state) {
             drupal_goto('/islandora_workflow'); //TODO correct tab?? landing to the pid?
         } else {
             drupal_set_message (t('Could not add object @pid to workflow',array('@pid'=>$pid)));
-        }                      
+        }
     }
-    
+
 }
