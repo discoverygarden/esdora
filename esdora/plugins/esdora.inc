@@ -654,7 +654,12 @@ class Esdora {
         $rows[] = array(l($label, $url), $ds_info->datastream->checksum, $ds_info->datastream->checksumType);
       }
       $header = array(t('Data Item'), t('Checksum'), t('Checksum Type'));
-      return theme_table($header, $rows) . theme_pager();
+      $table = theme_table($header, $rows);
+      $q = $_GET['q'];
+      $_GET['q'] = 'fedora/repository/' . $this->pid; // Hack for dealing with ajax tabs.
+      $pager = theme_pager();
+      $_GET['q'] = $q;
+      return $table . $pager;
     }
 
     /**
