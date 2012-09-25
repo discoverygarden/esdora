@@ -638,6 +638,7 @@ class Esdora {
       $pager_id = 0;
       $limit = 10;
       $page = isset($_GET['page']) ? $_GET['page'] : '';
+      $page = isset($_POST['page']) ? $_POST['page'] : $page; // Tabs send POST request they take precedent.
       // Convert comma-separated $page to an array, used by other functions.
       $pager_page_array = explode(',', $page);
       $pager_total_items[$pager_id] = count($datastreams);
