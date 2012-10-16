@@ -140,7 +140,7 @@ class EsdoraIngest {
     if(!$hasFGDC) {
       //add an empty FGDC template file
       $fgdcTemplateFilePath = $_SERVER['DOCUMENT_ROOT'] . base_path() . drupal_get_path('module', 'esdora_islandora');
-      $fgdcTemplateFilePath .= '/data/datastreams/reference-fgdc-record.xml';
+      $fgdcTemplateFilePath .= '/data/datastreams/FGDC.xml';
       if(isset ($fgdcTemplateFilePath) ) {
         $object->add_datastream_from_file($fgdcTemplateFilePath, "FGDC.xml", "FGDC", 'xml', 'M', 'Added templated FGDC at ingest');
         Esdora::add_relationship_internal('isMetaDataFor', $pid, "FGDC.xml", "http://esdora.ornl.gov/ontologies/relationships#");
