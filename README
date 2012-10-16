@@ -1,3 +1,11 @@
 Esdora requires a custom version of fedora. Located here: data/fedora/fcrepo-installer-modified-3.4.2.jar
 
 This family of modules can be deployed by using features.
+
+The following modules are included inline in the /modules folder of this repository and at some point should be changed to rely on thier canonical versions.
+
+    islandora
+    islandora_solr_search
+    islandora_workflow
+
+It looks like there have been some customizations applied to each of those modules.
