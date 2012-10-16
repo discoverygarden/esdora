@@ -36,13 +36,13 @@ class EsdoraIngest {
    * for now it is just a esdora function
    */
   function getNextPID($collection_pid, $dataset_name) {
-      $temp=trim($dataset_name);
-      $temp=str_replace(' ', '_', $temp);
-      $temp=str_replace('.', '_', $temp);
-      $temp=str_replace(':', '_', $temp);
-      return $collection_pid . '.' . $temp; 
+    $temp=trim($dataset_name);
+    $temp=str_replace(' ', '_', $temp);
+    $temp=str_replace('.', '_', $temp);
+    $temp=str_replace(':', '_', $temp);
+    return $collection_pid . '.' . $temp;
   }
-  
+
 
   /**
    *
@@ -59,8 +59,8 @@ class EsdoraIngest {
     $foxml = Fedora_Item::create_object_FOXML($pid, 'A', $label, $user->name);
     $object = Fedora_Item::ingest_from_FOXML($foxml);
     if (!isset($object)) {
-        drupal_set_message("Could not create new object: $pid, check fedora log messages for details.");
-        return false;
+      drupal_set_message("Could not create new object: $pid, check fedora log messages for details.");
+      return false;
     }
     $object->add_relationship('isMemberOfCollection', $collection_pid);
     $object->add_relationship('hasModel', $content_model, FEDORA_MODEL_URI);
@@ -70,12 +70,12 @@ class EsdoraIngest {
 
   function add_viewer_streams($file, $object) {
     if(!is_file($file)) {
-        return;
-    }  
+      return;
+    }
     $viewers = file($file); //read the file each line is a member of an array
     foreach ($viewers as $viewer) {
       $viewer_parts = explode(',', $viewer);
-//TODO: add error checking for text processing
+      //TODO: add error checking for text processing
       $object->add_datastream_from_url($viewer_parts[2], $viewer_parts[0], $viewer_parts[1], '', $controlGroup = 'R', 'added viewer stream');
       Esdora::add_relationship_internal('isViewerFor', $object->pid, $viewer_parts[0], "http://esdora.ornl.gov/ontologies/relationships#");
     }
@@ -101,7 +101,7 @@ class EsdoraIngest {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     module_load_include('inc', 'fedora_repository', 'MimeClass');
     module_load_include('inc', 'fedora_repository', 'api/dublin_core');
-    
+
     $pid = $this->getNextPID($collection_pid, $dataset_name);
     $label=$dataset_name;
     //create a new data object here, if the following call pass, pid will be a real pid
@@ -111,12 +111,12 @@ class EsdoraIngest {
     $tmpDir = $this->unzip_file($uploaded_file);
     $top_folder_name = NULL;
     $files = scandir($tmpDir);
-     foreach ($files as $file) {
+    foreach ($files as $file) {
       if (is_dir("$tmpDir/$file") && $file != '.' && $file != '..' && $file != '__MACOSX') {
         $top_folder_name = $file; //also part of the file path as this is the top level directory
       }
     }
-    
+
     $meta_files = scandir("$tmpDir/$top_folder_name/Metadata");
     module_load_include('inc', 'esdora_islandora', 'plugins/esdora');
     $hasFGDC=FALSE;
@@ -126,25 +126,25 @@ class EsdoraIngest {
         $mime = new MimeClass();
         $m_type = $mime->get_mimetype($file);
         $controlGroup = 'M';
-        $stream_id = $file; 
+        $stream_id = $file;
         if (strpos($file, 'FGDC') === 0) {
-            $hasFGDC=TRUE;
+          $hasFGDC=TRUE;
         }
         if (is_numeric(substr($stream_id, 0, 1))) {//stream ids cannont start with a number
-            $stream_id = 'n' . $stream_id; //if it starts with a number prfix the id with an n?
+          $stream_id = 'n' . $stream_id; //if it starts with a number prfix the id with an n?
         }
         $object->add_datastream_from_file($full_path, $stream_id, $file, $m_type, $controlGroup, 'Added metadata datastream at ingest');
         Esdora::add_relationship_internal('isMetaDataFor', $pid, $stream_id, "http://esdora.ornl.gov/ontologies/relationships#");
       }
     }
     if(!$hasFGDC) {
-        //add an empty FGDC template file
-        $fgdcTemplateFilePath = $_SERVER['DOCUMENT_ROOT'] . base_path() . drupal_get_path('module', 'esdora_islandora');
-        $fgdcTemplateFilePath .= '/' . 'reference-fgdc-record.xml';
-        if(isset ($fgdcTemplateFilePath) ) {
-            $object->add_datastream_from_file($fgdcTemplateFilePath, "FGDC.xml", "FGDC", 'xml', 'M', 'Added templated FGDC at ingest');
-            Esdora::add_relationship_internal('isMetaDataFor', $pid, "FGDC.xml", "http://esdora.ornl.gov/ontologies/relationships#");            
-        }
+      //add an empty FGDC template file
+      $fgdcTemplateFilePath = $_SERVER['DOCUMENT_ROOT'] . base_path() . drupal_get_path('module', 'esdora_islandora');
+      $fgdcTemplateFilePath .= '/data/datastreams/reference-fgdc-record.xml';
+      if(isset ($fgdcTemplateFilePath) ) {
+        $object->add_datastream_from_file($fgdcTemplateFilePath, "FGDC.xml", "FGDC", 'xml', 'M', 'Added templated FGDC at ingest');
+        Esdora::add_relationship_internal('isMetaDataFor', $pid, "FGDC.xml", "http://esdora.ornl.gov/ontologies/relationships#");
+      }
     }
 
     $files = scandir("$tmpDir/$top_folder_name/Data");
@@ -160,25 +160,25 @@ class EsdoraIngest {
         }
         $checksumType="MD5";
         $checksum = $checksum = md5_file($full_path);
-        $object->add_datastream_from_file($full_path, 
-                $stream_id, 
-                $file, 
-                $m_type, 
-                $controlGroup, 
-                'Added data datastream at ingest',
-                $checksumType,
-                $checksum);
+        $object->add_datastream_from_file($full_path,
+          $stream_id,
+          $file,
+          $m_type,
+          $controlGroup,
+          'Added data datastream at ingest',
+          $checksumType,
+          $checksum);
       }
     }
-        Esdora::add_oai_to_rels($object);
-//    $object->modify_object($top_folder_name);//add the label property ??
+    Esdora::add_oai_to_rels($object);
+    //    $object->modify_object($top_folder_name);//add the label property ??
     $this->add_viewer_streams("$tmpDir/$top_folder_name/viewers.txt", $object);
     $doi_file="$tmpDir/$top_folder_name/DOI.txt";
     if(is_file($doi_file)) {
-        $text = file($doi_file);
-        $this->update_dc($object,$text[0],$new_object_label);
+      $text = file($doi_file);
+      $this->update_dc($object,$text[0],$new_object_label);
     }
-        
+
     //cleanup now
     $this->deleteDirectory($tmpDir);
     unlink($uploaded_file->filepath);
