@@ -45,12 +45,12 @@ class EsdoraCollection extends CollectionClass {
       $query = $item->get_datastream_dissemination('QUERY');
     }
     if ($query == NULL) {
-      //because of the multiple models in the collection object, 
+      //because of the multiple models in the collection object,
       //need a slightly different query form Islandora, for all ESDORA colleciton object
       //that does not have the QUERY datastream
       $query = 'select $object $title $content
                 from <#ri>
-                where 
+                where
                 ($object <dc:title> $title
                 and $object <fedora-model:hasModel> $content
                 and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
@@ -107,24 +107,24 @@ class EsdoraCollection extends CollectionClass {
     $collectionClass = new CollectionClass();
     $xslContent = $collectionClass->getCollectionViewStream($pid);
     if (!$xslContent && $canUseDefault) { //no xslt so we will use the default sent with the module
-      $xslContent = file_get_contents($path . '/xsl/sparql_to_html.xsl');
+      $xslContent = file_get_contents($path . '/data/xsl/sparql_to_html.xsl');
     }
     return $xslContent;
   }
 
   /**
    * THE main entry for displaying ESDORA collection objects jerry nov. 2011
-   * 
+   *
    * @param type $esdora_collection_model
    * @param type $hasManagePermission
    * @param type $page_number
-   * @return type 
-   * 
+   * @return type
+   *
    */
   function getContentForDisplay($esdora_collection_model, $hasManagePermission, $page_number) {
     //note: copied from CollectionClass->showFieldSets($page_number)
     //so ESDORA will no longer need the Islandora Conent Model and we can delete some tab views
-    //this is for Collection Object only     
+    //this is for Collection Object only
     //
     //TODO: the tabs jumps and need to have a way to rem the position of the selected tab
 
@@ -194,11 +194,11 @@ class EsdoraCollection extends CollectionClass {
     $my_manage_view .= '<li><a href=' . $url_object_details . '>Object Details</a></li></ul></fieldset></div>';
 
     $my_manage_view .= '<div style="display: none;">
-        
+
         <div id="collection_add_dataset" style="width:' . $fancybox_width . ' height:' . $fancybox_height . ' overflow:auto;">'
         . drupal_render($add_to_collection_view) .
         '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
-            
+
         <div id="collection_manage" style="width:' . $fancybox_width . ' height:' . $fancybox_height . ' overflow:auto;">'
         . drupal_render($manage_collection_view) .
         '<p/><br/><a onclick="$.fancybox.close();" href="javascript:;"><center>Close</center></a></div>
