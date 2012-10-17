@@ -3,6 +3,7 @@
 /**
  * @file
  *
+ * @todo Find out how plugins work in this module.
  */
 
 class Esdora {
@@ -20,7 +21,7 @@ class Esdora {
   }
 
   /**
-   * this is function is referenced in the esdora_data_xxx_cmodel and creates the object level diplay
+   * This is function is referenced in the esdora_data_xxx_cmodel and creates the object level diplay
    *
    * This function iterates through the list of datastreams and creates fieldsets within
    * tabs to display the text and pdf streams.  another tab just lists all the datastreams
@@ -35,7 +36,7 @@ class Esdora {
     $cont.= '<button id="Description">Description</button>';
     $cont.= '<button id="History">History</button>';
     $viewerContent = $this->getViewers();
-    if ($viewerContent !=null) {
+    if ($viewerContent != null) {
       $cont.= '<button id="Viewers">Viewers</button>';
     }
     $cont.= '</div><div id="div1" >' . $items . '</div>';
@@ -53,7 +54,7 @@ class Esdora {
     $viewerResults = $collectionClass->getRelatedItems($this->pid, $viewerQuery, NULL, NULL);
     $viewerStreams = $this->getListofStreamsFromItql($viewerResults);
     $viewerContent = $this->createViewerContent($viewerStreams);
-    if($viewerContent!=null) {
+    if ($viewerContent!=null) {
       $separater = "<p id='item-display' /> <hr/>";
       return $separater . $viewerContent;
     }
@@ -82,7 +83,6 @@ class Esdora {
     $non_data_streams[] = array('RELS-EXT', 'text/xml', 'X');
     $non_data_streams[] = array('RELS-INT', 'text/xml', 'X');
     $non_data_streams[] = array('islandora_workflow', 'text/xml', 'X');
-    //drupal_set_message('<pre>'. print_r($non_data_streams, TRUE) .'</pre>');
     $streams = $this->getListOfStreams('*', $non_data_streams);
 
     $separater = "<p id='item-display' /> <hr/>";

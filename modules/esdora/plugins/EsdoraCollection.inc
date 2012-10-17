@@ -103,6 +103,7 @@ class EsdoraCollection extends CollectionClass {
   }
 
   function getXslContent($pid, $path, $canUseDefault = TRUE) {
+    module_load_include('inc', 'esdora_islandora', 'esdora.utils');
     module_load_include('inc', 'fedora_repository', 'CollectionClass');
     $collectionClass = new CollectionClass();
     $xslContent = $collectionClass->getCollectionViewStream($pid);

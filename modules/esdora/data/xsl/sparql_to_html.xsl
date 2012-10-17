@@ -133,7 +133,7 @@
   </xsl:variable>
 
   <xsl:variable name="childCount">
-    <xsl:value-of select="php:functionString('get_child_count', $PID)"/>
+    <xsl:value-of select="php:functionString('esdora_get_collection_child_count', $PID)"/>
   </xsl:variable>
 
   <td colspan="2" width="50%">
