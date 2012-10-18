@@ -1,4 +1,4 @@
-; $Id$
+B0;95;c; $Id$
 name = esdora islandora cmodel
 dependencies[] = fedora_repository
 dependencies[] = islandora_workflow

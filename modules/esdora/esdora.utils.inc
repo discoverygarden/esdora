@@ -136,6 +136,24 @@ function esdora_get_rels_int_xpath(Fedora_Item $item) {
 }
 
 /**
+ * Gets DOMXPath object for the given fedora objects AUDIT datastream.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object to fetch the RELS-INT datastream from.
+ *
+ * @return DOMXPath
+ *   An xpath object configured with the proper namespaces for the AUDIT datastream of the given fedora object.
+ */
+function esdora_get_audit_xpath(Fedora_Item $item) {
+  $foxml = $item->export_as_foxml(); // Can only get the AUDIT trail via FOXML get datastream dissemination doesn't work for the AUDIT trail
+  $doc = new DOMDocument();
+  $doc->loadXML($foxml);
+  $xpath = new DOMXPath($doc);
+  $xpath->registerNamespace('audit', 'info:fedora/fedora-system:def/audit#');
+  return $xpath;
+}
+
+/**
  * Gets the object/value from the triples defined by the given predicate.
  *
  * @param string $predicate
@@ -158,6 +176,61 @@ function esdora_get_rels_triples($predicate, DOMXPath $xpath) {
     $ret[$dsid][] = $value;
   }
   return $ret;
+}
+
+/**
+ * Gets the list of all decendant derivatives of the given object.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object used to query for decendant derivatives.
+ *
+ * @return array
+ *   An array of arrays containg values each object that derivatives from the given object and any object that derives from that ad infinitum.
+ */
+function esdora_get_derivative_decendants(Fedora_Item $item) {
+  $query = 'select $subject $object from <#ri> where walk(
+            $subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> <info:fedora/' . $item->pid . '> and
+            $subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object)';
+  return esdora_itql_query($query);
+}
+
+
+/**
+ * Gets the list of all derivative ancestor objects that the given object is derivatived from.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object used to query for derivative ancestors.
+ *
+ * @return array
+ *   An array of arrays containg values each object that the given object is derivatived from ad infinitum.
+ */
+function esdora_get_derivative_ancestors(Fedora_Item $item) {
+  $query = 'select  $subject $object from <#ri> where walk(
+            <info:fedora/' . $item->pid . '> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object and
+            $subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object)';
+  return esdora_itql_query($query);
+}
+
+/**
+ * Simple ITQL risearch query which returns an array of values in the same order as the select expression of the query.
+ * Also trims "info:fedora/" from the values, as it is rarely useful.
+ *
+ * @param string $query
+ *   The itql query to execute in risearch.
+ *
+ * @return array
+ *   An array of arrays containg values for each identifier in the select expression of the query.
+ */
+function esdora_itql_query($query) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  $risearch_url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch');
+  $risearch_url .= '?type=tuples&flush=true&format=csv&lang=itql&stream=on&query=' . urlencode($query);
+  $content = do_curl($risearch_url);
+  $rows = explode("\n", $content);
+  array_shift($rows); // Remove subject/object line
+  $rows = array_map(function($o) { return str_replace('info:fedora/', '', $o); }, $rows); // Strip out "info:fedora/"
+  $rows = array_filter($rows, function($o) { return !empty($o); }); // Remove empty rows (trailing new lines).
+  return array_map(function($o) { return explode(',', $o); }, $rows); // Convert into an array of values from the select expression.
 }
 
 /**

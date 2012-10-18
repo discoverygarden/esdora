@@ -274,6 +274,7 @@ function esdora_islandora_get_tabs_atomic() {
   $case = trim($case);
   module_load_include('inc', 'esdora_islandora', 'plugins/esdora_atomic');
   $esdora = new Esdora_Atomic($pid);
+
   esdora_islandora_get_tabs($esdora, $case);
 }
 

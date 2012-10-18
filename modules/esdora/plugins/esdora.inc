@@ -97,12 +97,12 @@ class Esdora {
     $fdgcAsHtml;
     $edit_metadata_urls = '';
     if (user_access(ObjectHelper::$EDIT_FEDORA_METADATA)) {
-      $edit_metadata_urls = l('Edit DC',  '/esdora/render/form/' . $this->pid . '/DC/DC/');
-      $edit_metadata_urls .= ' / ' . l(' Edit FGDC', '/esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
+      $edit_metadata_urls = l('Edit DC',  'esdora/render/form/' . $this->pid . '/DC/DC/');
+      $edit_metadata_urls .= ' / ' . l(' Edit FGDC', 'esdora/render/form/' . $this->pid . '/FGDC.xml/fgdc/');
     }
 
     try {
-      $fdgcText = $this->item->get_datastream_dissemination("FGDC.xml");
+      $fdgcText = $this->item->get_datastream_dissemination("fgdc.xml");
       $fdgcAsHtml = $this->getFdgcAsHtml($fdgcText);
       $separater = "<p id='item-display' /> <hr/>";
       return $separater . $fdgcAsHtml . $edit_metadata_urls;
