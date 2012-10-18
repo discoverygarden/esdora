@@ -239,6 +239,8 @@ function esdora_get_history_tab(Fedora_Item $item, array $datastreams) {
 /**
  * Get the lineage fieldset containing a table describing the AUDIT trail.
  *
+ * @todo Use labels instead of PIDS.
+ *
  * @param Fedora_Item $item
  *   The fedora object used to display this tab.
  *
@@ -247,7 +249,7 @@ function esdora_get_history_tab(Fedora_Item $item, array $datastreams) {
  */
 function esdora_get_history_tab_lineage_fieldset(Fedora_Item $item) {
   if (module_exists('graphviz_filter')) {
-    $content = getLineageAsGraph($item);
+    $content = esdora_get_history_tab_derivation_graph($item);
   } else {
     $content = esdora_get_history_tab_ancestors_table($item);
     $content .= esdora_get_history_tab_decendants_table($item);
@@ -299,106 +301,38 @@ function esdora_get_history_tab_decendants_table(Fedora_Item $item) {
   return '';
 }
 
-function getLineageAsGraph(Fedora_Item $item) {
-  $rows = esdora_get_derivative_ancestors($item); // Testing
-  $lineage = null;
-  $isnull = true;
-  $html = '<div style="width:inherit;">';
-  $process = array();
-  $processName = array();
-  $subjectArray = array();
-  $cnt = 0;
-  $processCnt = 0;
-  $name = '';
-  $graph .= 'strict digraph G{rankdir=LR ';
-  if (count($rows) > 2) {
-    $count = 0;
-    $isnull = false;
-    foreach ($rows as $row) {
-      if ($count > 0 && $row != null) {
-        $entities = explode(",", $row);
-        $subject = str_replace("info:fedora/", "", $entities[0]);
-        $object = str_replace("info:fedora/", "", $entities[2]);
-        $link = $subject;
-        $subjects = explode(".", $subject);
-        $subject = $subjects[count($subjects) - 1];
-        $objects = explode(".", $object);
-        $object = $objects[count($objects) - 1];
-        if (in_array($subject, $subjectArray)) {
-          $temp = array_search($subject, $subjectArray);
-          $name = 'process' . ($temp + 1);
-        } else {
-          $name = 'process' . ($processCnt + 1);
-          $process[$processCnt] = $name;
-          $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/processing.txt';
-          $processCnt = $processCnt + 1;
-        }
-        $graph.= $object . '->' . $name . ' ';
-        $graph.=$name . '->' . $subject . ' ';
-        $graph.=$object . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
-        $graph.=$subject . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
-        $subjectArray[$cnt] = $subject;
-        $graph.=$label;
-        $cnt = $cnt + 1;
-      }
-      $count = $count + 1;
+/**
+ * Get the derivation graph.
+ *
+ * Removed the process stuff, didn't work anyways.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object used to display this table.
+ *
+ * @return string
+ *   An html repersentation of the decendants table.
+ */
+function esdora_get_history_tab_derivation_graph(Fedora_Item $item) {
+  $get_identifier = function($pid) {
+    static $identifiers = array();
+    if (isset($identifiers[$pid])) {
+      return $identifiers[$pid];
     }
-  }
-  $rows = esdora_get_derivative_decendants($item); // Testing
-  if (count($rows) > 2) {
-    $count = 0;
-    $isnull = false;
-    foreach ($rows as $row) {
-      if ($count > 0 && $row != null) {
-        $entities = explode(",", $row);
-        $subject = str_replace("info:fedora/", "", $entities[0]);
-        $object = str_replace("info:fedora/", "", $entities[2]);
-        $link = $subject;
-        $subjects = explode(".", $subject);
-        $subject = $subjects[count($subjects) - 1];
-        $objects = explode(".", $object);
-        $object = $objects[count($objects) - 1];
-        if (in_array($subject, $subjectArray)) {
-          $temp = array_search($subject, $subjectArray);
-          $name = 'process' . ($temp + 1);
-        } else {
-          $name = 'process' . ($processCnt + 1);
-          $process[$processCnt] = $name;
-          $processName[$processCnt] = $base_url . base_path() . 'fedora/repository/' . $link . '/processing.txt';
-          $processCnt = $processCnt + 1;
-        }
-        $graph.= $object . '->' . $name . '  ';
-        $graph.=$name . '->' . $subject . '  ';
-        $graph.=$object . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
-        $graph.=$subject . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
-        $graph.=$label;
-        $subjectArray[$cnt] = $subject;
-        $cnt = $cnt + 1;
-      }
-      $count = $count + 1;
-    }
-  }
-  foreach ($process as $p) {
-    $graph.=$p . ' [shape=none,fontsize=10,]   ';
+    return $identifiers[$pid] = count($identifiers);
+  };
+  $node_attributes = "shape=ellipse,style=filled,color=\"#D7D6DB\",fontname=\"Helvetica-Outline\",fontsize=10";
+  $relations = array_merge(esdora_get_derivative_ancestors($item), esdora_get_derivative_ancestors($item));
+  $graph = 'strict digraph G{rankdir=LR ';
+  foreach ($relations as $relation) {
+    list($subject, $object) = $relation;
+    $subject_id = $get_identifier($subject);
+    $object_id = $get_identifier($object);
+    $graph .= "$object_id -> $subject_id ";
+    $graph .= "$subject_id [label=\"$subject\",$node_attributes] ";
+    $graph .= "$object_id [label=\"$object\",$node_attributes] ";
   }
   $graph .='}';
-  $lineage = graphviz_filter_process($graph);
-  $html.=$lineage;
-  $html.='</div><br><div>';
-  $count = 0;
-  foreach ($processName as $desc) {
-    if (module_exists('fancybox')) {
-      $html.='<a class="fb_dynamic" style="font-size:10;font-family:Helvetica-Outline;font-style:italic;" href="' . $desc . '"> ' . $process[$count] . '</a><br>';
-    } else {
-      $html.='<a style="font-size:10;font-family:Helvetica-Outline;font-style:italic;" href="' . $desc . '" target="_blank"> ' . $process[$count] . '</a><br>';
-    }
-    $count = $count + 1;
-  }
-  $html.='</div>';
-  if ($isnull == true)
-    return null;
-  else
-    return $html;
+  return '<div style="width:inherit;">' . graphviz_filter_process($graph). '</div>';
 }
 
 /**

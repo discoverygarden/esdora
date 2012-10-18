@@ -341,10 +341,10 @@ class Esdora {
 	    $processCnt = $processCnt + 1;
 	  }
 
-
-	  $graph.= $object . '->' . $name . ' ';
-	  $graph.=$name . '->' . $subject . ' ';
-	  $graph.=$object . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
+	  dsm("$object -> $name -> $subject");
+	  $graph.= '1' . '->' . $name . ' ';
+	  $graph.=$name . '->' . '2' . ' ';
+	  $graph.=  '1 [label="test:123.321",shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
 	  $graph.=$subject . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
 	  $subjectArray[$cnt] = $subject;
 	  // $label = $name.' [shape=none,fontsize=8];';
@@ -391,7 +391,7 @@ class Esdora {
 	    $processCnt = $processCnt + 1;
 	  }
 
-
+	  dsm("$object -> $name -> $subject");
 	  $graph.= $object . '->' . $name . '  ';
 	  $graph.=$name . '->' . $subject . '  ';
 	  $graph.=$object . '[shape=ellipse,style=filled,color="#D7D6DB",fontname = "Helvetica-Outline",fontsize=10] ';
@@ -409,6 +409,10 @@ class Esdora {
       $graph.=$p . ' [shape=none,fontsize=10,]   ';
     }
     $graph .='}';
+    dsm($graph);
+    dsm($processName);
+    dsm($process);
+    dsm($subjectArray);
     $lineage = graphviz_filter_process($graph);
     $html.=$lineage;
     $html.='</div><br><div>';
