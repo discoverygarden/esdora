@@ -185,7 +185,7 @@ function esdora_get_rels_triples($predicate, DOMXPath $xpath) {
  *   The fedora object used to query for decendant derivatives.
  *
  * @return array
- *   An array of arrays containg values each object that derivatives from the given object and any object that derives from that ad infinitum.
+ *   An array of arrays containing values each object that derivatives from the given object and any object that derives from that ad infinitum.
  */
 function esdora_get_derivative_decendants(Fedora_Item $item) {
   $query = 'select $subject $object from <#ri> where walk(
@@ -202,12 +202,27 @@ function esdora_get_derivative_decendants(Fedora_Item $item) {
  *   The fedora object used to query for derivative ancestors.
  *
  * @return array
- *   An array of arrays containg values each object that the given object is derivatived from ad infinitum.
+ *   An array of arrays containing values each object that the given object is derivatived from ad infinitum.
  */
 function esdora_get_derivative_ancestors(Fedora_Item $item) {
   $query = 'select  $subject $object from <#ri> where walk(
             <info:fedora/' . $item->pid . '> <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object and
             $subject <info:fedora/fedora-system:def/relations-external#isDerivedFrom> $object)';
+  return esdora_itql_query($query);
+}
+
+/**
+ * Gets the list of all viewers for this object.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object used to query for viewers.
+ *
+ * @return array
+ *   An array of arrays containing the viewable datastreams dsid's and their mime types.
+ */
+function esdora_get_viewers(Fedora_Item $item) {
+  $query = 'select $datastream from <#ri> where $datastream <http://esdora.ornl.gov/ontologies/relationships#isViewerFor>
+            <info:fedora/' . $item->pid . '>';
   return esdora_itql_query($query);
 }
 
@@ -219,7 +234,7 @@ function esdora_get_derivative_ancestors(Fedora_Item $item) {
  *   The itql query to execute in risearch.
  *
  * @return array
- *   An array of arrays containg values for each identifier in the select expression of the query.
+ *   An array of arrays containing values for each identifier in the select expression of the query.
  */
 function esdora_itql_query($query) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');

@@ -367,43 +367,6 @@ function esdora_get_history_tab_audit_history_fieldset(Fedora_Item $item) {
   );
 }
 
-function getHistory() { //histroy tab
-  module_load_include('inc', 'fedora_repository', 'ObjectHelper');
-  $separater = "<p id='item-display' /> <hr/>";
-
-  $fieldSetcontent = $separater . "<div>";
-  $pid = $this->pid;
-
-  if (module_exists('graphviz_filter')) {
-    $lineage = $this->getLineageAsGraph($pid);
-  } else {
-    $lineage = $this->getLineage($pid);
-  }
-
-  $versions = $this->getVersionTrails($pid);
-
-  if ($lineage != null) {
-    $fieldSetP1 = array(
-      '#title' => t("Data History"),
-      '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
-      '#value' => $lineage,
-    );
-    $fieldSetcontent.= theme('fieldset', $fieldSetP1);
-  }
-  $fieldSetP2 = array(
-    '#type' => 'fieldset',
-    '#title' => t("Audit History"),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#value' => $versions,
-  );
-  $fieldSetcontent.= theme('fieldset', $fieldSetP2);
-  $fieldSetcontent.='</div>';
-  return $fieldSetcontent;
-}
-
-
 /**
  * Render the history tab for the given object.
  *
@@ -416,7 +379,20 @@ function getHistory() { //histroy tab
  *   The html repersentation of the requested tab.
  */
 function esdora_get_viewers_tab(Fedora_Item $item, array $datastreams) {
-
+  $datastreams = esdora_get_viewers($item);
+  $content = '';
+  foreach ($datastreams as $dsid) {
+    $datastream = $item->get_datastream_dissemination($dsid);
+    $content .= theme('fieldset', array(
+                  '#title' => $dsid,
+                  '#attributes' => array(),
+                  '#collapsible' => TRUE,
+                  '#collapsed' => TRUE,
+                  '#value' => "<div class='text'><iframe src='$datastream' &embedded='TRUE' style='width:800px; height:800px;' frameborder='0'></iframe></div>",
+                )
+    );
+  }
+  return '<p id="item-display"/><hr/>' . $content;
 }
 
 /**
