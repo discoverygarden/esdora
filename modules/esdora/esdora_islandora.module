@@ -8,10 +8,11 @@ define('ESDORA_COLLECTION_PID', 'esdora:defaultCollectionCModel');
 define('ESDORA_COMPUND_DATA_PID', 'esdora:defaultDataCModel');
 define('ESDORA_ATOMISTIC_DATA_PID', 'esdora:atomicDataCModel');
 define('MENU_ESDORA_GET_TAB', 'esdora/tab');
+define('THEME_ESDORA_REPOSITORY_PAGE', 'esdora_repository_page');
 define('THEME_ESDORA_OBJECT', 'esdora_object');
 define('THEME_ESDORA_OBJECT_TABS', 'esdora_object_tabs');
 define('THEME_ESDORA_OBJECT_MANAGE_TAB', 'esdora_islandora_object_manage_tab');
-define('THEME_ESDORA_ISLANDORA_COLLECTION', 'esdora_islandora_collection');
+define('THEME_ESDORA_COLLECTION', 'esdora_islandora_collection');
 define('THEME_ESDORA_DERIVATIVE_FORM_TABLE', 'esdora_derivative_form_table');
 
 /**
@@ -64,10 +65,12 @@ function esdora_islandora_menu() {
  * Alters the main fedora_repository display page to render esdora custom collection/object views.
  */
 function esdora_islandora_menu_alter(array &$items) {
-  // @todo check out the comments in the purgeStream Menu Callback
-  $items['fedora/repository/purgeStream']['page callback'] = 'esdora_islandora_prepare_stream_for_removal';
-  $items['fedora/repository/purgeStream']['module'] = 'esdora_islandora';
-  $items['fedora/repository']['page callback'] = 'esdora_repository_page';
+  // @todo Implement this though a hook form alter.
+  // $items['fedora/repository/purgeStream']['page callback'] = 'esdora_islandora_prepare_stream_for_removal';
+  $items['fedora/repository']['module'] = 'esdora_islandora';
+  $items['fedora/repository']['file'] = 'esdora.repository.inc';
+  $items['fedora/repository']['page callback'] = 'theme';
+  $items['fedora/repository']['page arguments'] = array(THEME_ESDORA_REPOSITORY_PAGE);
 }
 
 /**
@@ -75,6 +78,10 @@ function esdora_islandora_menu_alter(array &$items) {
  */
 function esdora_islandora_theme() {
   return array(
+    THEME_ESDORA_REPOSITORY_PAGE => array(
+      'arguments' => array('pid' => NULL, 'dsid' => NULL),
+      'file' => 'esdora.repository.inc'
+    ),
     THEME_ESDORA_OBJECT => array(
       'arguments' => array('item' => NULL),
       'file' => 'esdora.object.inc'
@@ -89,7 +96,7 @@ function esdora_islandora_theme() {
       'template' => 'templates/ManageTab',
       'file' => 'EsdoraDisplay.inc'
     ),
-    THEME_ESDORA_ISLANDORA_COLLECTION => array(
+    THEME_ESDORA_COLLECTION => array(
       'arguments' => array('pid' => NULL, 'page_number' => NULL),
       'file' => 'EsdoraDisplay.inc'
     ),
@@ -435,12 +442,6 @@ function esdora_rels_int_handler(array &$form, array &$form_state) {
  * Menu callback for fedora/respository. This becomes the main entry of the ESDORA repository
  */
 function esdora_repository_page($pid = NULL, $dsid = NULL, $collection = NULL, $page_number = NULL) {
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $item = new Fedora_Item($pid);
-  $is_collection = FALSE;
-  return $is_collection ? theme(THEME_ESDORA_COLLECTION) : theme(THEME_ESDORA_OBJECT, $item);
-
-
  module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
   try {
     return esdora_menu_alter_fedora_repository($pid, $dsid, $collection, $page_number, $limit);

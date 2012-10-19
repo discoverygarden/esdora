@@ -137,6 +137,23 @@ function esdora_get_rels_int_xpath(Fedora_Item $item) {
 }
 
 /**
+ * Gets DOMXPath object for the given fedora objects RELS-EXT datastream.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object to fetch the RELS-EXT datastream from.
+ *
+ * @return DOMXPath
+ *   An xpath object configured with the proper namespaces for the RELS-EXT datastream of the given fedora object.
+ */
+function esdora_get_rels_ext_xpath(Fedora_Item $item) {
+  $rels_int = $item->get_datastream_dissemination('RELS-EXT');
+  $doc = new DOMDocument();
+  $doc->loadXML($rels_int);
+  $xpath = new DOMXPath($doc);
+  return $xpath;
+}
+
+/**
  * Gets DOMXPath object for the given fedora objects AUDIT datastream.
  *
  * @param Fedora_Item $item
@@ -167,14 +184,15 @@ function esdora_get_audit_xpath(Fedora_Item $item) {
  */
 function esdora_get_rels_triples($predicate, DOMXPath $xpath) {
   $ret = array();
-  $results = $xpath->query("//$predicate/..");
+  $results = $xpath->query("//$predicate");
+  $results = $xpath->query("//$predicate");
   for ($i = 0; $i < $results->length; $i++) {
     $node = $results->item($i);
-    $dsid = $xpath->evaluate('string(@rdf:about)', $node);
-    $dsid = substr($dsid, strrpos($dsid, '/') + 1);
-    $value = $xpath->evaluate("string($predicate/@rdf:resource)", $node);
-    $value = substr($value, strrpos($value, '/') + 1);
-    $ret[$dsid][] = $value;
+    $subject = $xpath->evaluate('string(../@rdf:about)', $node);
+    $subject = substr($subject, strrpos($subject, '/') + 1);
+    $object = $xpath->evaluate("string(@rdf:resource)", $node);
+    $object = substr($object, strrpos($object, '/') + 1);
+    $ret[$subject][] = $object;
   }
   return $ret;
 }
@@ -269,4 +287,37 @@ function esdora_configure_pager($pager_id, $total, $limit = 10) {
   $pager_total[$pager_id] = ceil($total / $limit);
   $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
   return $page;
+}
+
+/**
+ * Checks if the given object has the given model in its hasModel relationship.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object to check.
+ * @param string $model
+ *   The model to check for.
+ *
+ * @return boolean
+ *   TRUE if the given object has the given model in its hasModel relationship, FALSE otherwise.
+ */
+function esdora_has_model(Fedora_Item $item, $model) {
+  $models = esdora_get_models($item);
+  return array_search($model, $models) !== FALSE;
+}
+
+/**
+ * Fetches the given object's content models.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object to fetch from.
+ *
+ * @return array
+ *   A list of content models the given model has.
+ */
+function esdora_get_models(Fedora_Item $item) {
+  $xpath = esdora_get_rels_ext_xpath($item);
+  $xpath->registerNamespace('fedora-model', 'info:fedora/fedora-system:def/model#');
+  $models = esdora_get_rels_triples('fedora-model:hasModel', $xpath);
+  $models = $models[$item->pid];
+  return $models;
 }
