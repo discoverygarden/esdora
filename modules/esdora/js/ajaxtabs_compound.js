@@ -2,20 +2,17 @@ var pid;
 var ajaxUrl;
 $(document).ready(function(){
   pid = $('#pid').val();
-  ajaxUrl=Drupal.settings.basePath;
-  ajaxUrl=ajaxUrl.concat("ajax/gettabs/compound");
+  ajaxUrl = Drupal.settings.basePath;
+  ajaxUrl = undefined;//ajaxUrl.concat("ajax/gettabs/compound");
   var page;
-  //alert(ajaxUrl);
   $('#Items').click(function(){
-    //alert('click items');
     $('#div1').css('display','block');
     $('#viewers').css('display','none');
-
     $('#div1').html('loading...');
     $.ajax({
-      type:'POST',
+      type:'GET',
       url:ajaxUrl,
-      data: {'pid' : pid,'tab':'Items', 'page': page},
+      data: {'pid' : pid, 'tab': 'items', 'page': page },
       success: function(result){
 	$('#div1').html(result);
 	$('#Metadata').css('background-color','#DDDDDD');
@@ -39,9 +36,9 @@ $(document).ready(function(){
     $('#div1').html('loading...');
     page = decodeURI((RegExp('page' + '=' + '(.+?)(&|$)').exec($(this).attr('href'))||[,null])[1]);
     $.ajax({
-      type:'POST',
+      type: 'GET',
       url:ajaxUrl,
-      data: {'pid' : pid, 'tab':'Items', 'page': page },
+      data: {'pid' : pid, 'tab':'items', 'page': page },
       success: function(result){
 	$('#div1').html(result);
 	$('#Metadata').css('background-color','#DDDDDD');
@@ -63,9 +60,9 @@ $(document).ready(function(){
 
     $('#div1').html('loading...');
     $.ajax({
-      type:'POST',
+      type: 'GET',
       url:ajaxUrl,
-      data: {'pid' : pid,'tab':'Metadata'},
+      data: {'pid' : pid,'tab':'metadata'},
       success: function(result){
 	$('#div1').html(result);
 	$('#Metadata').css('background-color','#FFFFFF');
@@ -90,9 +87,9 @@ $(document).ready(function(){
     var dWidth  = $(document).width()*.50;
     var dHeight = $(document).height()*.75;
     $.ajax({
-      type:'POST',
+      type: 'GET',
       url:ajaxUrl,
-      data: {'pid' : pid,'tab':'Description'},
+      data: {'pid' : pid,'tab':'description'},
       success: function(result){
 	$('#div1').html(result);
 	$('#Description').css('background-color','#FFFFFF');
@@ -127,9 +124,9 @@ $(document).ready(function(){
     var dHeight = $(document).height()*.75;
 
     $.ajax({
-      type:'POST',
+      type: 'GET',
       url:ajaxUrl,
-      data: {'pid' : pid,'tab':'History'},
+      data: {'pid' : pid,'tab':'history'},
       success: function(result){
 	$('#div1').html(result);
 	$('#History').css('background-color','#FFFFFF');
@@ -162,9 +159,9 @@ $(document).ready(function(){
     var dWidth  = $(document).width()*.70;
     var dHeight = $(document).height()*.85;
     $.ajax({
-      type:'POST',
+      type: 'GET',
       url:ajaxUrl,
-      data: {'pid' : pid,'tab':'Viewers'},
+      data: {'pid' : pid,'tab':'viewers'},
       success: function(result){
 	$('#div1').html(result);
 	$('#Viewers').css('background-color','#FFFFFF');

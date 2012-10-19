@@ -16,11 +16,11 @@ function esdora_menu_alter_fedora_repository($pid = NULL, $dsid = NULL, $collect
   // Display the root object by default.
   $pid = ($pid == NULL) ? variable_get('fedora_repository_pid', 'islandora:root') : $pid;
   // Verifiy that we can display the page.
-  if(!esdora_menu_alter_fedora_repository_can_display($pid, $dsid)) {
+  if (!esdora_menu_alter_fedora_repository_can_display($pid, $dsid)) {
     return '';
   }
   // Verifiy that we are allowed to display the page.
-  if(!esdora_menu_alter_fedora_repository_allowed_to_display($pid, $dsid)) {
+  if (!esdora_menu_alter_fedora_repository_allowed_to_display($pid, $dsid)) {
     drupal_access_denied();
     exit();
   }
@@ -28,12 +28,12 @@ function esdora_menu_alter_fedora_repository($pid = NULL, $dsid = NULL, $collect
   $download_datastream = ($dsid != NULL && $dsid != '-');
   if ($download_datastream) {
     return makeObject($pid, $dsid);
-  }
+ }
   // Set Title/Breadcrumbs
   drupal_set_title(t('Repository'));
   esdora_menu_alter_fedora_repository_set_breadcrumbs($pid);
   // Display the Object as a Collection or as a Single Object.
-  if(esdora_menu_alter_fedora_repository_display_as_collection($pid)) {
+  if (esdora_menu_alter_fedora_repository_display_as_collection($pid)) {
     return theme(THEME_ESDORA_ISLANDORA_COLLECTION, $pid, $page_number);
   }
   else if (esdora_menu_alter_fedora_repository_display_as_object($pid)) {
@@ -160,9 +160,10 @@ function theme_esdora_islandora_collection($pid, $page_number) {
  * Implements theme_hook().
  */
 function theme_esdora_islandora_object($pid, $page_number = NULL) {
-  if(!user_access(ObjectHelper::$MANAGE_COLLECTIONS)) {
+  if (!user_access(ObjectHelper::$MANAGE_COLLECTIONS)) {
     $content_model = _esdora_menu_alter_fedora_repository_get_content_model_matching($pid, array(ESDORA_COMPUND_DATA_PID, ESDORA_ATOMISTIC_DATA_PID));
-    return $content_model->displayExtraFieldset($pid, $page_number);
+    print_r($content_model);
+    return '<b>test</b>' .  $content_model->displayExtraFieldset($pid, $page_number);
   }
   else {
     return theme(THEME_ESDORA_ISLANDORA_OBJECT_TABS, $pid);
@@ -173,18 +174,21 @@ function theme_esdora_islandora_object($pid, $page_number = NULL) {
  * Implements theme_hook().
  */
 function theme_esdora_islandora_object_tabs($pid, $page_number = NULL) {
-  $path = drupal_get_path('module', 'esdora_islandora');
+  // @todo replace with a call to the fancybox module.
   drupal_add_css("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.css");
   drupal_add_js("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.js");
+
+  $path = drupal_get_path('module', 'esdora_islandora');
   drupal_add_css($path . '/css/esdora.css');
   drupal_add_js($path . '/js/esdora.js');
   $content_model = _esdora_menu_alter_fedora_repository_get_content_model_matching($pid, array(ESDORA_COMPUND_DATA_PID, ESDORA_ATOMISTIC_DATA_PID));
+
   return tabs_render(array(
       '#type' => 'tabset',
       'data_view' => array(
         '#type' => 'tabpage',
         '#title' => t('View'),
-        '#content' => $content_model->displayExtraFieldset($pid, $page_number)
+        '#content' =>  $content_model->displayExtraFieldset($pid, $page_number)
       ),
       'manage_view' => array(
         '#type' => 'tabpage',

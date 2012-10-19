@@ -11,23 +11,34 @@ define('PAGER_ESDORA_ITEMS_ID', 0);
 define('PAGER_ESDORA_ITEMS_LIMIT', 10);
 
 /**
- * Menu callback for esdora/tab. Renders the requested tab, or the error tab if the request is invalid.
+  * Implements template_preprocess_hook().
+ */
+function template_preprocess_esdora_object_tabs(array &$variables) {
+  $item = &$variables['item'];
+  $variables['pid'] = $item->pid;
+  $variables['active_tab'] = esdora_get_tab($item);
+  $variables['can_manage'] = user_access('edit fedora meta data');
+  $variables['has_viewer'] = count(esdora_get_viewers($item));
+}
+
+/**
+ * Renders the requested tab, or the error tab if the request is invalid.
  *
- * Called via AJAX
+ * @param Fedora_Item $item
+ *   The fedora object used to display this tab.
+ * @param string $tab
+ *   The tab to display.
  *
  * @return string
- *   A JSON object containing the html repersentation of the requested tab.
+ *   A html repersentation of the requested tab.
  */
-function esdora_get_tabs() {
+function esdora_get_tab(Fedora_Item $item, $tab = NULL) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $valid_tabs = array('items', 'metadata', 'description', 'history', 'viewers');
-  $pid = isset($_GET['pid']) ? $_GET['pid'] : 'esdora:dataset-A'; //variable_get('fedora_repository_pid', 'islandora:root');
-  $tab = isset($_GET['tab']) ? $_GET['tab'] : 'history';
+  $valid_tabs = array('items', 'metadata', 'description', 'history', 'viewers', 'manage');
+  $tab = isset($tab) ? $tab : 'items';
   $valid_tab = array_search($tab, $valid_tabs) !== FALSE;
-  $item = new Fedora_Item($pid);
-  $tab = ($valid_tab && $item->exists()) ? $tab : 'error';
+  $tab = (array_search($tab, $valid_tabs) !== FALSE) ? $tab : 'error';
   return call_user_func("esdora_get_{$tab}_tab", $item, esdora_get_datastreams_info($item));
-  // @todo Should return JSON
 }
 
 /**
@@ -42,13 +53,9 @@ function esdora_get_tabs() {
  *   The html repersentation of the requested tab.
  */
 function esdora_get_items_tab(Fedora_Item $item, array $datastreams) {
-  $datastreams = esdora_get_items_tab_datastreams($item);
+  $datastreams = esdora_get_items_tab_datastreams($item, $datastreams);
   $table = esdora_get_items_tab_datastream_table($item, $datastreams);
-  // @todo remove this hack by having tabs rendered via the same path as the main page. Use get parameters to determine which tab should be to rendered, and if the response should be JSON/html?
-  $q = $_GET['q'];
-  $_GET['q'] = "fedora/repository/{$item->pid}"; // Hack for dealing with ajax tabs.
   $pager = theme_pager(array(), PAGER_ESDORA_ITEMS_LIMIT,  PAGER_ESDORA_ITEMS_ID);
-  $_GET['q'] = $q;
   return '<p id="item-display"/><hr/>' . $table . $pager;
 }
 
@@ -393,6 +400,14 @@ function esdora_get_viewers_tab(Fedora_Item $item, array $datastreams) {
     );
   }
   return '<p id="item-display"/><hr/>' . $content;
+}
+
+
+/**
+ * @todo Clean up rendering of the manage tab.
+ */
+function esdora_get_manage_tab(Fedora_Item $item) {
+  return theme(THEME_ESDORA_OBJECT_MANAGE_TAB, $item->pid);
 }
 
 /**

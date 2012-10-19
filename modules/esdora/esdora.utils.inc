@@ -113,6 +113,7 @@ function esdora_get_datastreams_rels_int_info(Fedora_Item $item) {
     $viewer_for = esdora_get_rels_triples('ns:isViewerFor', $xpath);
     $info = array_map(function($o) { return array('metadata_for' => array_pop($o)); }, $metadata_for); // Assumes one triple per datastream
     $info = array_merge_recursive($info, array_map(function($o) { return array('viewer_for' => array_pop($o)); }, $viewer_for));  // Assumes one triple per datastream
+    $info = array_intersect_key($info, $item->datastreams); // Don't consider relationships for datastreams that don't exist.
   }
   return $info;
 }
@@ -262,12 +263,10 @@ function esdora_itql_query($query) {
  *   The current page.
  */
 function esdora_configure_pager($pager_id, $total, $limit = 10) {
-  global $pager_page_array, $pager_total, $pager_total_items;
+  global $pager_page_array, $pager_total;
   $page = isset($_GET['page']) ? $_GET['page'] : '';
-  $page = isset($_POST['page']) ? $_POST['page'] : $page; // Tabs send POST request they take precedent. @todo should all be GETS
   $pager_page_array = explode(',', $page); // Convert comma-separated $page to an array, used by other functions.
-  $pager_total_items[$pager_id] = count($datastreams);
-  $pager_total[$pager_id] = ceil($pager_total_items[$pager_id] / $limit);
+  $pager_total[$pager_id] = ceil($total / $limit);
   $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
   return $page;
 }

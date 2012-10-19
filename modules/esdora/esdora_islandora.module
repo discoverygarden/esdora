@@ -8,9 +8,9 @@ define('ESDORA_COLLECTION_PID', 'esdora:defaultCollectionCModel');
 define('ESDORA_COMPUND_DATA_PID', 'esdora:defaultDataCModel');
 define('ESDORA_ATOMISTIC_DATA_PID', 'esdora:atomicDataCModel');
 define('MENU_ESDORA_GET_TAB', 'esdora/tab');
-define('THEME_ESDORA_ISLANDORA_OBJECT', 'esdora_islandora_object');
-define('THEME_ESDORA_ISLANDORA_OBJECT_TABS', 'esdora_islandora_object_tabs');
-define('THEME_ESDORA_ISLANDORA_OBJECT_TAB_MANAGE', 'esdora_islandora_object_manage_tab');
+define('THEME_ESDORA_OBJECT', 'esdora_object');
+define('THEME_ESDORA_OBJECT_TABS', 'esdora_object_tabs');
+define('THEME_ESDORA_OBJECT_MANAGE_TAB', 'esdora_islandora_object_manage_tab');
 define('THEME_ESDORA_ISLANDORA_COLLECTION', 'esdora_islandora_collection');
 define('THEME_ESDORA_DERIVATIVE_FORM_TABLE', 'esdora_derivative_form_table');
 
@@ -23,7 +23,7 @@ function esdora_islandora_menu() {
     MENU_ESDORA_GET_TAB => array(
       'access callback' => 'user_access',
       'access arguments' => array(OBJECTHELPER::$OBJECT_HELPER_VIEW_FEDORA),
-      'page callback' => 'esdora_get_tabs',
+      'page callback' => 'esdora_get_tab',
       'file' => 'esdora.tabs.inc',
       'type' => MENU_CALLBACK,
     ),
@@ -75,15 +75,16 @@ function esdora_islandora_menu_alter(array &$items) {
  */
 function esdora_islandora_theme() {
   return array(
-    THEME_ESDORA_ISLANDORA_OBJECT => array(
-      'arguments' => array('pid' => NULL, 'page_number' => NULL),
-      'file' => 'EsdoraDisplay.inc'
+    THEME_ESDORA_OBJECT => array(
+      'arguments' => array('item' => NULL),
+      'file' => 'esdora.object.inc'
     ),
-    THEME_ESDORA_ISLANDORA_OBJECT_TABS => array(
-      'arguments' => array('pid' => NULL, 'page_number' => NULL),
-      'file' => 'EsdoraDisplay.inc'
+    THEME_ESDORA_OBJECT_TABS => array(
+      'arguments' => array('item' => NULL, 'tab' => NULL),
+      'template' => 'templates/object-tabs',
+      'file' => 'esdora.object.tabs.inc'
     ),
-    THEME_ESDORA_ISLANDORA_OBJECT_TAB_MANAGE => array(
+    THEME_ESDORA_OBJECT_MANAGE_TAB => array(
       'arguments' => array('pid' => NULL),
       'template' => 'templates/ManageTab',
       'file' => 'EsdoraDisplay.inc'
@@ -433,8 +434,14 @@ function esdora_rels_int_handler(array &$form, array &$form_state) {
 /**
  * Menu callback for fedora/respository. This becomes the main entry of the ESDORA repository
  */
-function esdora_repository_page($pid = NULL, $dsid = NULL, $collection = NULL, $page_number = NULL, $limit = NULL) {
-  module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
+function esdora_repository_page($pid = NULL, $dsid = NULL, $collection = NULL, $page_number = NULL) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $item = new Fedora_Item($pid);
+  $is_collection = FALSE;
+  return $is_collection ? theme(THEME_ESDORA_COLLECTION) : theme(THEME_ESDORA_OBJECT, $item);
+
+
+ module_load_include('inc', 'esdora_islandora', 'EsdoraDisplay');
   try {
     return esdora_menu_alter_fedora_repository($pid, $dsid, $collection, $page_number, $limit);
   }
