@@ -5,34 +5,23 @@
  *
  *  Utility/Convenience functions for this module.
  */
+module_load_include('inc', 'fedora_repository', 'api/fedora_item');
 
 /**
  * Gets the numbers of child objects the given collection has.
  *
  * This function is referenced in the data/xsl/sparcql_to_html.xsl to be used with this transform it must be registered though registerPHPFunctions().
  *
- * @see ObjectHelper.inc->parseContent($content, $pid, $dsid, $collection, $page_number = NULL)
- * @see XSLTProcessor
  *
  * @param string $collection_pid
  *   The PID of the collection object.
  */
-function esdora_get_collection_child_count($collection_pid) {
-  $query = "select count (select \$object from <#ri> where \$object <fedora-rels-ext:isMemberOfCollection> <info:fedora/$collection_pid>) from <#ri>
-            where \$s \$p \$o and \$object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>";
+function esdora_get_collection_member_count(FedoraItem $item) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  $query = esdora_get_collection_itql_query($item);
   $query = htmlentities(urlencode($query));
-  $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch') . "?lang=itql&format=Simple&query={$query}";
-  $content = do_curl($url);
-  if (strlen($content) > 0) {
-    $tokens = explode('"', trim($content));
-    $value = $tokens[1];
-    if ($value == 0) {
-      return "Data Object"; // @todo: Fix this is wrong when create a new empty collection
-    } else {
-      return 'Collection Object (total items: ' . $value . ')';
-    }
-  }
-  return $content;
+  $url = variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch') . "?lang=itql&format=count&query={$query}";
+  return (int) trim(do_curl($url)); // Collection Object (total items: ' . $value . ')
 }
 
 /**
@@ -286,7 +275,7 @@ function esdora_configure_pager($pager_id, $total, $limit = 10) {
   $pager_page_array = explode(',', $page); // Convert comma-separated $page to an array, used by other functions.
   $pager_total[$pager_id] = ceil($total / $limit);
   $pager_page_array[$pager_id] = max(0, min((int)$pager_page_array[$pager_id], ((int)$pager_total[$pager_id]) - 1));
-  return $page;
+  return array_pop(explode(',', $page));
 }
 
 /**
@@ -320,4 +309,32 @@ function esdora_get_models(Fedora_Item $item) {
   $models = esdora_get_rels_triples('fedora-model:hasModel', $xpath);
   $models = $models[$item->pid];
   return $models;
+}
+
+/**
+ * Get the collection itql query for the given object.
+ *
+ * This does not check if the given object is a collection.
+ *
+ * @param Fedora_Item $item
+ *   The fedora object to generate the query for.
+ *
+ * @return string
+ *   The collection QUERY stored in the object, or the default query.
+ */
+function esdora_get_collection_itql_query(Fedora_Item $item) {
+  if (isset($item->datastreams['QUERY'])) {
+    return $item->get_datastream_dissemination('QUERY');
+  }
+  return 'select $object $title $content
+          count(select $pid from <#ri> where $pid <fedora-model:state> <fedora-model:Active> and
+                ($pid <fedora-rels-ext:isMemberOfCollection> $object or $pid <fedora-rels-ext:isMemberOf> $object))
+          from <#ri> where
+          ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $item->pid . '> or
+           $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $item->pid . '>) and
+          $object <fedora-model:state> <fedora-model:Active> and
+          $object <dc:title> $title and $object <fedora-model:hasModel> $content
+          minus $content <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+          minus $content <mulgara:is> <info:fedora/islandora:collectionCModel>
+          order by $title';
 }

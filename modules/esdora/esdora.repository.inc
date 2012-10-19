@@ -23,9 +23,22 @@ function theme_esdora_repository_page($pid = NULL, $dsid = NULL) {
  }
  drupal_set_title(t('Repository'));
  esdora_repository_page_set_breadcrumbs($pid);
+ esdora_repository_page_add_js_and_css();
  $is_collection = esdora_has_model($item, ESDORA_COLLECTION_PID);
- $is_collection = FALSE;
  return $is_collection ? theme(THEME_ESDORA_COLLECTION, $item) : theme(THEME_ESDORA_OBJECT, $item);
+}
+
+/**
+ * Include the required css/js for rendering the repository page.
+ */
+function esdora_repository_page_add_js_and_css() {
+ // @todo replace with a call to the fancybox module.
+ // @note Should fancybox be an optional requirement?
+ $path = drupal_get_path('module', 'esdora_islandora');
+ drupal_add_css("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.css");
+ drupal_add_js("sites/all/libraries/fancybox/jquery.fancybox-1.3.4.js");
+ drupal_add_css("$path/css/esdora.css");
+ drupal_add_js("$path/js/esdora.js");
 }
 
 /**

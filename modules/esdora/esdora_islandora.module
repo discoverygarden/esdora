@@ -12,7 +12,9 @@ define('THEME_ESDORA_REPOSITORY_PAGE', 'esdora_repository_page');
 define('THEME_ESDORA_OBJECT', 'esdora_object');
 define('THEME_ESDORA_OBJECT_TABS', 'esdora_object_tabs');
 define('THEME_ESDORA_OBJECT_MANAGE_TAB', 'esdora_islandora_object_manage_tab');
-define('THEME_ESDORA_COLLECTION', 'esdora_islandora_collection');
+define('THEME_ESDORA_COLLECTION', 'esdora_collection');
+define('THEME_ESDORA_COLLECTION_MEMBERS', 'esdora_collection_members');
+define('THEME_ESDORA_COLLECTION_MANAGE_TAB', 'esdora_collection_manage_tab');
 define('THEME_ESDORA_DERIVATIVE_FORM_TABLE', 'esdora_derivative_form_table');
 
 /**
@@ -91,14 +93,23 @@ function esdora_islandora_theme() {
       'template' => 'templates/object-tabs',
       'file' => 'esdora.object.tabs.inc'
     ),
-    THEME_ESDORA_OBJECT_MANAGE_TAB => array(
+    THEME_ESDORA_OBJECT_MANAGE_TAB => array( // @todo clean me up
       'arguments' => array('pid' => NULL),
       'template' => 'templates/ManageTab',
       'file' => 'EsdoraDisplay.inc'
     ),
     THEME_ESDORA_COLLECTION => array(
-      'arguments' => array('pid' => NULL, 'page_number' => NULL),
-      'file' => 'EsdoraDisplay.inc'
+      'arguments' => array('pid' => NULL),
+      'file' => 'esdora.collection.inc'
+    ),
+    THEME_ESDORA_COLLECTION_MEMBERS => array(
+      'arguments' => array('item' => NULL),
+      'file' => 'esdora.collection.inc',
+    ),
+    THEME_ESDORA_COLLECTION_MANAGE_TAB => array(
+      'arguments' => array('item' => NULL),
+      'file' => 'esdora.collection.inc',
+      'template' => 'templates/collection-manage-tab',
     ),
     THEME_ESDORA_DERIVATIVE_FORM_TABLE => array(
       'arguments' => array('element' => NULL),
