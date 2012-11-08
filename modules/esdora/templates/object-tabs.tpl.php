@@ -1,13 +1,13 @@
 <div id='dataset-ajax-tabs'>
-  <button id='Items'>Items</button>
-  <button id='Metadata'>Metadata</button>
-  <button id='Description'>Description</button>
-  <button id='History'>History</button>
+  <button id='items'>Items</button>
+  <button id='metadata'>Metadata</button>
+  <button id='description'>Description</button>
+  <button id='history'>History</button>
   <?php if ($can_manage): ?>
-    <button id='Manage'>Manage</button>
+    <button id='manage'>Manage</button>
   <?php endif;?>
   <?php if ($has_viewers): ?>
-    <button id='Viewers'>Viewers</button>
+    <button id='viewers'>Viewers</button>
   <?php endif;?>
 </div>
 <div id='div1'>

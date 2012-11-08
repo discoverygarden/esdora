@@ -15,7 +15,7 @@ function theme_esdora_object(Fedora_Item $item) {
     return drupal_json(esdora_get_tab($item, $_GET['tab']));
   }
   $path = drupal_get_path('module', 'esdora_islandora');
-  drupal_add_js("$path/js/ajaxtabs_compound.js");
+  drupal_add_js("$path/js/esdora_object_tabs.js");
   drupal_add_css("$path/css/ajaxtabs.css");
   return theme(THEME_ESDORA_OBJECT_TABS, $item);
 }
