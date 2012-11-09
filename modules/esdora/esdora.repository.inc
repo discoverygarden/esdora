@@ -73,7 +73,7 @@ function esdora_object_and_datastream_exist(Fedora_Item $item, $dsid) {
     drupal_set_message(t("Object '@pid' does not exist!", array('@pid' => $item->pid)), 'error');
     return FALSE;
   }
-  if (isset($dsid) && $dsid != '-' && isset($item->datastreams[$dsid])) {
+  if (isset($dsid) && $dsid != '-' && !isset($item->datastreams[$dsid])) {
     drupal_set_message(t("Datastream '@dsid' does not exist!", array('@dsid' => $dsid)), 'error');
     return FALSE;
   }
