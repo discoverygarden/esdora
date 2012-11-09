@@ -22,7 +22,7 @@ function theme_esdora_repository_page($pid = NULL, $dsid = NULL) {
    return makeObject($pid, $dsid);
  }
  drupal_set_title(t('Repository'));
- esdora_repository_page_set_breadcrumbs($pid);
+ esdora_repository_page_set_breadcrumbs($item);
  esdora_repository_page_add_js_and_css();
  $is_collection = esdora_has_model($item, ESDORA_COLLECTION_PID);
  return $is_collection ? theme(THEME_ESDORA_COLLECTION, $item) : theme(THEME_ESDORA_OBJECT, $item);
